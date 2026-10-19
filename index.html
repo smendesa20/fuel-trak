@@ -1,0 +1,2640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#090d16" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>MacroTrack</title>
+  <link rel="manifest" href="./manifest.json" />
+  <link rel="icon" href="./icon-192.png" />
+  <link rel="apple-touch-icon" href="./icon-192.png" />
+  <style>
+    :root {
+      --bg: #090d16;
+      --card: #111827;
+      --card-alt: #1e293b;
+      --input-bg: #0b1120;
+      --border: #263248;
+      --border-light: #334155;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent: #38bdf8;
+      --accent-dark: #0284c7;
+      --success: #10b981;
+      --success-bg: rgba(16, 185, 129, 0.14);
+      --warning: #f59e0b;
+      --warning-bg: rgba(245, 158, 11, 0.14);
+      --danger: #f43f5e;
+      --danger-bg: rgba(244, 63, 94, 0.14);
+      --radius: 12px;
+      --nav-h: 64px;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-size: 15px;
+      line-height: 1.45;
+      min-height: 100%;
+    }
+
+    body {
+      padding-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom, 16px) + 16px);
+    }
+
+    /* Update Banner */
+    #updateBanner {
+      display: none;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: var(--accent-dark);
+      color: #fff;
+      text-align: center;
+      padding: 10px 16px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+    }
+
+    .app-shell {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 14px 14px 24px;
+    }
+
+    .screen {
+      display: none;
+    }
+    .screen.active {
+      display: block;
+    }
+
+    /* Cards & Layout */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px;
+      margin-bottom: 14px;
+    }
+
+    .card-title {
+      font-size: 1rem;
+      font-weight: 700;
+      margin: 0 0 10px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .row-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .col {
+      flex: 1;
+      min-width: 0;
+    }
+
+    /* Inputs & Buttons */
+    label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 5px;
+    }
+
+    .label-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 5px;
+    }
+
+    .label-row label {
+      margin-bottom: 0;
+    }
+
+    input[type="text"],
+    input[type="password"],
+    input[type="number"],
+    input[type="date"],
+    select,
+    textarea {
+      width: 100%;
+      background: var(--input-bg);
+      border: 1px solid var(--border-light);
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-family: inherit;
+      outline: none;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--accent);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 76px;
+    }
+
+    button {
+      font-family: inherit;
+      font-size: 0.92rem;
+      font-weight: 700;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 14px;
+      cursor: pointer;
+      transition: opacity 0.15s, transform 0.05s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    button:active:not(:disabled) {
+      transform: scale(0.98);
+    }
+
+    button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #061320;
+      width: 100%;
+      padding: 12px;
+      font-size: 0.98rem;
+    }
+
+    .btn-secondary {
+      background: var(--card-alt);
+      color: var(--text);
+      border: 1px solid var(--border-light);
+    }
+
+    .btn-success {
+      background: var(--success);
+      color: #041f17;
+      width: 100%;
+      padding: 12px;
+    }
+
+    .btn-danger {
+      background: var(--danger-bg);
+      color: var(--danger);
+      border: 1px solid var(--danger);
+    }
+
+    .btn-sm {
+      padding: 6px 10px;
+      font-size: 0.8rem;
+      border-radius: 6px;
+    }
+
+    /* Mic Button */
+    .mic-btn {
+      background: var(--card-alt);
+      color: var(--text);
+      border: 1px solid var(--border-light);
+      padding: 4px 10px;
+      font-size: 0.78rem;
+      border-radius: 999px;
+      font-weight: 600;
+    }
+
+    .mic-btn.recording {
+      background: var(--danger-bg);
+      color: var(--danger);
+      border-color: var(--danger);
+      animation: pulse 1.2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.55; }
+    }
+
+    /* Date Bar */
+    .date-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .date-nav button {
+      background: var(--card);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 9px 13px;
+    }
+
+    .date-nav input[type="date"] {
+      text-align: center;
+      font-weight: 700;
+      background: var(--card);
+      border-color: var(--border);
+      flex: 1;
+    }
+
+    /* Macro Progress & Counters */
+    .macro-main-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .macro-box {
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+    }
+
+    .macro-box-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 4px;
+    }
+
+    .macro-box-title {
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      letter-spacing: 0.03em;
+    }
+
+    .macro-big-num {
+      font-size: 1.35rem;
+      font-weight: 800;
+    }
+
+    .macro-sub {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .progress-track {
+      height: 7px;
+      background: #1e293b;
+      border-radius: 999px;
+      overflow: hidden;
+      margin: 7px 0;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 999px;
+      transition: width 0.25s ease;
+    }
+
+    .progress-fill.over-limit {
+      background: var(--danger);
+    }
+
+    .progress-fill.target-hit {
+      background: var(--success);
+    }
+
+    .secondary-macros {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .plain-counter {
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 9px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .plain-counter span:first-child {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .plain-counter span:last-child {
+      font-size: 1.05rem;
+      font-weight: 700;
+    }
+
+    .avg-strip {
+      margin-top: 10px;
+      padding: 9px 12px;
+      background: rgba(56, 189, 248, 0.07);
+      border: 1px solid rgba(56, 189, 248, 0.22);
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+      font-size: 0.83rem;
+    }
+
+    .avg-strip-title {
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .avg-strip-values {
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    /* Badges & Flags */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .badge-estimate {
+      background: var(--warning-bg);
+      color: var(--warning);
+      border: 1px solid var(--warning);
+    }
+
+    .badge-label {
+      background: var(--success-bg);
+      color: var(--success);
+      border: 1px solid var(--success);
+    }
+
+    .badge-neutral {
+      background: var(--card-alt);
+      color: var(--text-muted);
+      border: 1px solid var(--border-light);
+    }
+
+    .alert-box {
+      padding: 11px 12px;
+      border-radius: 8px;
+      font-size: 0.86rem;
+      margin-top: 10px;
+    }
+
+    .alert-warning {
+      background: var(--warning-bg);
+      border-left: 4px solid var(--warning);
+      color: #fde68a;
+    }
+
+    .alert-danger {
+      background: var(--danger-bg);
+      border-left: 4px solid var(--danger);
+      color: #fecdd3;
+    }
+
+    .alert-success {
+      background: var(--success-bg);
+      border-left: 4px solid var(--success);
+      color: #a7f3d0;
+    }
+
+    /* Meals List */
+    .meal-item {
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 9px;
+      cursor: pointer;
+    }
+
+    .meal-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .meal-item-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .meal-item-name {
+      font-weight: 700;
+      font-size: 0.96rem;
+    }
+
+    .meal-item-macros {
+      font-size: 0.83rem;
+      color: var(--text-muted);
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .meal-item-macros strong {
+      color: var(--text);
+    }
+
+    /* Multiplier Bar */
+    .mult-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .mult-btn {
+      background: var(--input-bg);
+      color: var(--text-muted);
+      border: 1px solid var(--border-light);
+      padding: 6px 10px;
+      font-size: 0.8rem;
+      border-radius: 6px;
+      font-weight: 700;
+    }
+
+    .mult-btn.active {
+      background: var(--accent);
+      color: #061320;
+      border-color: var(--accent);
+    }
+
+    /* Breakdown Table */
+    .table-wrap {
+      overflow-x: auto;
+      margin-top: 10px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    table.breakdown-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+      background: var(--input-bg);
+    }
+
+    table.breakdown-table th,
+    table.breakdown-table td {
+      padding: 6px 5px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+    }
+
+    table.breakdown-table th {
+      color: var(--text-muted);
+      font-weight: 700;
+      font-size: 0.74rem;
+      text-transform: uppercase;
+      background: var(--card);
+    }
+
+    table.breakdown-table input {
+      padding: 5px 6px;
+      font-size: 0.82rem;
+      border-radius: 5px;
+    }
+
+    .col-name { min-width: 115px; }
+    .col-qty { width: 72px; }
+    .col-num { width: 54px; }
+    .col-del { width: 32px; text-align: center; }
+
+    /* Bottom Navigation */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: calc(var(--nav-h) + env(safe-area-inset-bottom, 0px));
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+      background: rgba(17, 24, 39, 0.96);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      z-index: 900;
+    }
+
+    .nav-tab {
+      flex: 1;
+      height: 100%;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 6px 0;
+    }
+
+    .nav-tab.active {
+      color: var(--accent);
+    }
+
+    .nav-icon {
+      font-size: 1.2rem;
+      line-height: 1;
+    }
+
+    /* Modal */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.72);
+      z-index: 1100;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-card {
+      background: var(--card);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius);
+      width: 100%;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 16px;
+    }
+
+    /* Toast */
+    #toast {
+      position: fixed;
+      bottom: calc(var(--nav-h) + 18px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1e293b;
+      color: #f8fafc;
+      border: 1px solid var(--accent);
+      padding: 9px 16px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      z-index: 1200;
+      display: none;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+      white-space: nowrap;
+    }
+
+    .muted-text {
+      color: var(--text-muted);
+      font-size: 0.83rem;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 24px 12px;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Versioned SW Update Banner -->
+  <div id="updateBanner" onclick="applyServiceWorkerUpdate()">
+    Update available — tap to refresh
+  </div>
+
+  <div class="app-shell">
+
+    <!-- ==================== 1. TODAY SCREEN ==================== -->
+    <section id="screen-today" class="screen active">
+      <div class="date-nav">
+        <button type="button" onclick="shiftDate(-1)" aria-label="Previous day">&larr;</button>
+        <input type="date" id="todayDatePicker" onchange="onDatePickerChange(this.value)" />
+        <button type="button" onclick="shiftDate(1)" aria-label="Next day">&rarr;</button>
+        <button type="button" class="btn-secondary btn-sm" onclick="jumpToToday()">Today</button>
+      </div>
+
+      <!-- Backup status reminder banner on Today if needed -->
+      <div id="todayBackupBanner" style="display:none; margin-bottom: 12px;"></div>
+
+      <div class="card">
+        <div class="macro-main-grid">
+          <!-- Calories -->
+          <div class="macro-box">
+            <div class="macro-box-header">
+              <span class="macro-box-title">Calories</span>
+              <span id="calStatusBadge" class="badge badge-neutral">0 / 2200</span>
+            </div>
+            <div class="macro-big-num" id="calUsedText">0</div>
+            <div class="progress-track">
+              <div id="calProgressBar" class="progress-fill" style="width: 0%;"></div>
+            </div>
+            <div class="macro-sub" id="calRemainingText">2,200 remaining</div>
+          </div>
+
+          <!-- Protein -->
+          <div class="macro-box">
+            <div class="macro-box-header">
+              <span class="macro-box-title">Protein</span>
+              <span id="proStatusBadge" class="badge badge-neutral">170–190g</span>
+            </div>
+            <div class="macro-big-num"><span id="proUsedText">0</span>g</div>
+            <div class="progress-track">
+              <div id="proProgressBar" class="progress-fill" style="width: 0%;"></div>
+            </div>
+            <div class="macro-sub" id="proRemainingText">170g to target</div>
+          </div>
+        </div>
+
+        <div class="secondary-macros">
+          <div class="plain-counter">
+            <span>Carbs</span>
+            <span><strong id="carbUsedText">0</strong>g</span>
+          </div>
+          <div class="plain-counter">
+            <span>Fat</span>
+            <span><strong id="fatUsedText">0</strong>g</span>
+          </div>
+        </div>
+
+        <!-- 7-Day Average for Calories and Protein -->
+        <div class="avg-strip">
+          <span class="avg-strip-title" id="sevenDayAvgLabel">7-Day Avg (0/7d logged)</span>
+          <span class="avg-strip-values" id="sevenDayAvgValues">— kcal &middot; —g P</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <span id="mealsCardHeading">Logged Meals</span>
+          <button type="button" class="btn-secondary btn-sm" onclick="copyDaySummary()">Copy today's summary</button>
+        </div>
+        <div id="todayMealsList"></div>
+      </div>
+    </section>
+
+    <!-- ==================== 2. LOG MEAL SCREEN ==================== -->
+    <section id="screen-log" class="screen">
+      <div class="card">
+        <div class="card-title">
+          <span>AI Meal &amp; Label Analyzer</span>
+          <span class="badge badge-neutral" id="logTargetDateBadge"></span>
+        </div>
+
+        <div class="row" style="margin-bottom: 10px;">
+          <div class="col">
+            <label for="analysisMode">Mode</label>
+            <select id="analysisMode" onchange="onModeChange()">
+              <option value="meal">Meal / Plate / Recipe</option>
+              <option value="label">Supplement / Nutrition Label</option>
+            </select>
+          </div>
+          <div class="col">
+            <label for="photoInput">Photos</label>
+            <input type="file" id="photoInput" accept="image/*" multiple onchange="handlePhotoInput(this.files)" />
+          </div>
+        </div>
+
+        <div class="row-wrap" style="justify-content: space-between; margin-bottom: 10px;">
+          <span class="muted-text" id="photoCountStatus">0 photo(s) attached</span>
+          <button type="button" class="btn-secondary btn-sm" id="clearPhotosBtn" style="display:none;" onclick="clearAttachedPhotos()">Clear photos</button>
+        </div>
+
+        <!-- Recipe Box + Mic -->
+        <div style="margin-bottom: 10px;">
+          <div class="label-row">
+            <label for="recipeInput">Recipe / Full Batch Text (Optional)</label>
+            <button type="button" class="mic-btn" id="micBtnRecipe" onclick="toggleSpeech('recipeInput', 'micBtnRecipe')">&#127908; Dictate</button>
+          </div>
+          <textarea id="recipeInput" placeholder="Paste or dictate full pot/batch ingredients if logging a homemade recipe..."></textarea>
+        </div>
+
+        <!-- Note Box + Mic -->
+        <div style="margin-bottom: 12px;">
+          <div class="label-row">
+            <label for="noteInput">Your Note / Portion Description</label>
+            <button type="button" class="mic-btn" id="micBtnNote" onclick="toggleSpeech('noteInput', 'micBtnNote')">&#127908; Dictate</button>
+          </div>
+          <textarea id="noteInput" placeholder="e.g., 200g chicken breast, 1 bowl of chili, or supplement serving..."></textarea>
+        </div>
+
+        <button type="button" class="btn-primary" id="analyzeBtn" onclick="runGeminiAnalysis()">Analyze with AI</button>
+        <div id="analysisStatusBox" style="display:none;"></div>
+      </div>
+
+      <!-- Editable Breakdown & Logging Card -->
+      <div class="card">
+        <div class="card-title">
+          <span>Meal Breakdown &amp; Portion</span>
+          <div id="resultBadgesWrap" class="row-wrap">
+            <span class="badge badge-estimate" id="sourceDataBadge">ESTIMATE</span>
+          </div>
+        </div>
+
+        <div id="aiMetaLine" class="muted-text" style="margin-bottom: 8px; display:none;"></div>
+        <div id="vaguePortionBanner" class="alert-box alert-warning" style="display:none; margin-bottom: 10px;"></div>
+
+        <div style="margin-bottom: 10px;">
+          <label for="mealTitleInput">Meal / Item Name</label>
+          <input type="text" id="mealTitleInput" placeholder="e.g., Post-Workout Shake or Chicken & Rice" />
+        </div>
+
+        <!-- Pot Fraction / Multiplier Buttons -->
+        <div style="margin-bottom: 12px;">
+          <label>Pot Fraction / Portion Multiplier (Scales Table)</label>
+          <div class="mult-bar" id="multButtonsBar">
+            <button type="button" class="mult-btn" onclick="applyMultiplier(1/6, '1/6')">1/6</button>
+            <button type="button" class="mult-btn" onclick="applyMultiplier(0.25, '1/4')">1/4</button>
+            <button type="button" class="mult-btn" onclick="applyMultiplier(1/3, '1/3')">1/3</button>
+            <button type="button" class="mult-btn" onclick="applyMultiplier(0.5, '1/2')">1/2</button>
+            <button type="button" class="mult-btn" onclick="applyMultiplier(0.75, '3/4')">3/4</button>
+            <button type="button" class="mult-btn active" onclick="applyMultiplier(1, '1x')">1x</button>
+            <button type="button" class="mult-btn" onclick="applyMultiplier(1.25, '1.25x')">1.25x</button>
+            <button type="button" class="mult-btn" onclick="applyMultiplier(1.5, '1.5x')">1.5x</button>
+            <button type="button" class="mult-btn" onclick="applyMultiplier(2, '2x')">2x</button>
+          </div>
+        </div>
+
+        <!-- Editable Ingredient Table -->
+        <div class="table-wrap">
+          <table class="breakdown-table">
+            <thead>
+              <tr>
+                <th class="col-name">Item</th>
+                <th class="col-qty">Amount</th>
+                <th class="col-num">Cal</th>
+                <th class="col-num">P (g)</th>
+                <th class="col-num">C (g)</th>
+                <th class="col-num">F (g)</th>
+                <th class="col-del"></th>
+              </tr>
+            </thead>
+            <tbody id="breakdownTbody"></tbody>
+          </table>
+        </div>
+
+        <div class="row-wrap" style="justify-content: space-between; margin-top: 8px; margin-bottom: 12px;">
+          <button type="button" class="btn-secondary btn-sm" onclick="addEmptyIngredientRow()">+ Add Ingredient Row</button>
+          <div class="muted-text" id="liveTableTotalsText">Total: 0 kcal | 0P | 0C | 0F</div>
+        </div>
+
+        <div class="row" style="flex-direction: column; gap: 8px;">
+          <button type="button" class="btn-success" id="logToDateBtn" onclick="commitCurrentMeal(false)">Log to Today</button>
+          <button type="button" class="btn-secondary" style="width:100%;" onclick="commitCurrentMeal(true)">Log &amp; Also Save as Staple / Saved Meal</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== 3. SAVED SCREEN ==================== -->
+    <section id="screen-saved" class="screen">
+      <div class="card">
+        <div class="card-title">
+          <span>Saved Staples &amp; Meals</span>
+          <button type="button" class="btn-secondary btn-sm" onclick="openNewStapleModal()">+ New Staple</button>
+        </div>
+        <input type="text" id="savedSearchInput" placeholder="Search staples or saved meals..." oninput="renderSavedScreen()" />
+      </div>
+
+      <div id="savedListContainer"></div>
+    </section>
+
+    <!-- ==================== 4. SETTINGS SCREEN ==================== -->
+    <section id="screen-settings" class="screen">
+      <div class="card">
+        <div class="card-title">
+          <span>Gemini API Key &amp; Model</span>
+          <span class="badge badge-neutral">Local Only</span>
+        </div>
+        <label for="settingsApiKey">AI Studio Key (Sent via <code>x-goog-api-key</code> header)</label>
+        <div class="row" style="margin-bottom: 10px;">
+          <input type="password" id="settingsApiKey" placeholder="Paste AIzaSy... key" />
+          <button type="button" class="btn-secondary btn-sm" onclick="toggleApiKeyVisibility()" id="toggleKeyBtn">Show</button>
+        </div>
+
+        <label for="settingsModel">Primary AI Model (Auto-falls back to Flash-Lite on 503)</label>
+        <select id="settingsModel" style="margin-bottom: 12px;">
+          <option value="gemini-3.8-flash">gemini-3.8-flash (Main)</option>
+          <option value="gemini-3.5-flash-lite">gemini-3.5-flash-lite (Fallback / Fast)</option>
+        </select>
+
+        <button type="button" class="btn-primary" onclick="saveApiSettings()">Save Key &amp; Model</button>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Daily Targets</div>
+        <div class="row" style="margin-bottom: 10px;">
+          <div class="col">
+            <label for="targetCaloriesInput">Calorie Ceiling</label>
+            <input type="number" id="targetCaloriesInput" value="2200" />
+          </div>
+          <div class="col">
+            <label for="targetProteinMinInput">Protein Target Min (g)</label>
+            <input type="number" id="targetProteinMinInput" value="170" />
+          </div>
+          <div class="col">
+            <label for="targetProteinMaxInput">Protein Target Max (g)</label>
+            <input type="number" id="targetProteinMaxInput" value="190" />
+          </div>
+        </div>
+        <button type="button" class="btn-secondary" style="width:100%;" onclick="saveTargetSettings()">Save Targets</button>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <span>Backup &amp; Restore</span>
+          <span class="badge badge-neutral" id="storagePersistBadge">Checking storage...</span>
+        </div>
+        <div id="backupStatusAlert" class="alert-box alert-warning" style="margin-bottom: 12px;">
+          No backup yet
+        </div>
+        <div class="row" style="margin-bottom: 10px;">
+          <button type="button" class="btn-primary" onclick="exportBackupJson()">Export Backup (.json)</button>
+        </div>
+        <div>
+          <label for="importBackupFile">Restore / Import from Backup File</label>
+          <input type="file" id="importBackupFile" accept=".json,application/json" onchange="importBackupJson(this.files)" />
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Bottom Tab Navigation -->
+  <nav class="bottom-nav">
+    <button type="button" class="nav-tab active" data-target="today" onclick="switchTab('today')">
+      <span class="nav-icon">&#128197;</span>
+      <span>Today</span>
+    </button>
+    <button type="button" class="nav-tab" data-target="log" onclick="switchTab('log')">
+      <span class="nav-icon">&#10133;</span>
+      <span>Log Meal</span>
+    </button>
+    <button type="button" class="nav-tab" data-target="saved" onclick="switchTab('saved')">
+      <span class="nav-icon">&#11088;</span>
+      <span>Saved</span>
+    </button>
+    <button type="button" class="nav-tab" data-target="settings" onclick="switchTab('settings')">
+      <span class="nav-icon">&#9881;&#65039;</span>
+      <span>Settings</span>
+    </button>
+  </nav>
+
+  <!-- Edit Meal / Staple Modal -->
+  <div id="editModal" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="card-title">
+        <span id="editModalTitle">Edit Item</span>
+        <button type="button" class="btn-secondary btn-sm" onclick="closeEditModal()">Close</button>
+      </div>
+      <div id="editModalBody"></div>
+    </div>
+  </div>
+
+  <div id="toast"></div>
+
+  <script>
+    /********************************************************************
+     * 1. LOCAL DATE UTILITIES & GLOBAL STATE
+     ********************************************************************/
+    function getLocalYYYYMMDD(dateObj = new Date()) {
+      const y = dateObj.getFullYear();
+      const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+      const d = String(dateObj.getDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    }
+
+    function addDaysToYYYYMMDD(ymdStr, deltaDays) {
+      const [y, m, d] = ymdStr.split('-').map(Number);
+      const dt = new Date(y, m - 1, d);
+      dt.setDate(dt.getDate() + deltaDays);
+      return getLocalYYYYMMDD(dt);
+    }
+
+    const ALLOWED_MODELS = ['gemini-3.8-flash', 'gemini-3.5-flash-lite'];
+    const PRIMARY_MODEL = 'gemini-3.8-flash';
+    const FALLBACK_MODEL = 'gemini-3.5-flash-lite';
+
+    const state = {
+      currentDate: getLocalYYYYMMDD(),
+      settings: {
+        apiKey: '',
+        model: PRIMARY_MODEL,
+        targetCal: 2200,
+        targetProMin: 170,
+        targetProMax: 190,
+        lastBackupDate: null
+      },
+      meals: [],     // { id, date, name, cal, p, c, f, isLabelData, aiPhotosReceived, note, vagueFlag, items: [] }
+      staples: [],   // { id, name, baseGrams, cal, p, c, f, isLabelData, items: [] }
+      logDraft: {
+        compressedPhotos: [], // [{ mimeType, base64 }]
+        isCompressing: false,
+        isLabelData: false,
+        aiPhotosReceived: null,
+        modelUsed: null,
+        vagueWarning: '',
+        multiplier: 1,
+        baseItems: [
+          { name: '', qty: '1 serving', cal: 0, p: 0, c: 0, f: 0 }
+        ],
+        displayItems: [
+          { name: '', qty: '1 serving', cal: 0, p: 0, c: 0, f: 0 }
+        ]
+      },
+      swWaitingWorker: null
+    };
+
+    /********************************************************************
+     * 2. INDEXEDDB + PERSISTENT STORAGE LAYER
+     ********************************************************************/
+    const DB_NAME = 'MacroTrackDB';
+    const DB_VERSION = 1;
+    let dbInstance = null;
+
+    function openDatabase() {
+      return new Promise((resolve, reject) => {
+        if (dbInstance) return resolve(dbInstance);
+        const req = indexedDB.open(DB_NAME, DB_VERSION);
+        req.onupgradeneeded = (e) => {
+          const db = e.target.result;
+          if (!db.objectStoreNames.contains('settings')) {
+            db.createObjectStore('settings', { keyPath: 'key' });
+          }
+          if (!db.objectStoreNames.contains('meals')) {
+            const mealStore = db.createObjectStore('meals', { keyPath: 'id' });
+            mealStore.createIndex('by_date', 'date', { unique: false });
+          }
+          if (!db.objectStoreNames.contains('staples')) {
+            db.createObjectStore('staples', { keyPath: 'id' });
+          }
+        };
+        req.onsuccess = (e) => {
+          dbInstance = e.target.result;
+          resolve(dbInstance);
+        };
+        req.onerror = (e) => reject(e.target.error);
+      });
+    }
+
+    async function dbGetAll(storeName) {
+      const db = await openDatabase();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(storeName, 'readonly');
+        const store = tx.objectStore(storeName);
+        const req = store.getAll();
+        req.onsuccess = () => resolve(req.result || []);
+        req.onerror = () => reject(req.error);
+      });
+    }
+
+    async function dbPut(storeName, record) {
+      const db = await openDatabase();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(storeName, 'readwrite');
+        const store = tx.objectStore(storeName);
+        const req = store.put(record);
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+      });
+    }
+
+    async function dbDelete(storeName, key) {
+      const db = await openDatabase();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(storeName, 'readwrite');
+        const store = tx.objectStore(storeName);
+        const req = store.delete(key);
+        req.onsuccess = () => resolve();
+        req.onerror = () => reject(req.error);
+      });
+    }
+
+    async function dbClear(storeName) {
+      const db = await openDatabase();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(storeName, 'readwrite');
+        const store = tx.objectStore(storeName);
+        const req = store.clear();
+        req.onsuccess = () => resolve();
+        req.onerror = () => reject(req.error);
+      });
+    }
+
+    async function initStoragePersistence() {
+      const badge = document.getElementById('storagePersistBadge');
+      if (navigator.storage && navigator.storage.persist) {
+        try {
+          const already = await navigator.storage.persisted();
+          if (already) {
+            badge.textContent = 'Storage: Persisted ✓';
+            badge.className = 'badge badge-label';
+            return;
+          }
+          const granted = await navigator.storage.persist();
+          badge.textContent = granted ? 'Storage: Persisted ✓' : 'Storage: Best-Effort';
+          badge.className = granted ? 'badge badge-label' : 'badge badge-neutral';
+        } catch (err) {
+          badge.textContent = 'Storage: Local IndexedDB';
+        }
+      } else {
+        badge.textContent = 'Storage: Local IndexedDB';
+      }
+    }
+
+    async function loadAllStateFromDB() {
+      const settingsRows = await dbGetAll('settings');
+      const savedConfig = settingsRows.find(r => r.key === 'app_settings');
+      const lsKey = localStorage.getItem('macrotrack_api_key');
+
+      if (savedConfig && savedConfig.value) {
+        state.settings = { ...state.settings, ...savedConfig.value };
+      }
+      if (lsKey && !state.settings.apiKey) {
+        state.settings.apiKey = lsKey;
+      }
+
+      if (!ALLOWED_MODELS.includes(state.settings.model)) {
+        state.settings.model = PRIMARY_MODEL;
+        await saveSettingsToDB();
+      }
+
+      state.meals = await dbGetAll('meals');
+      state.staples = await dbGetAll('staples');
+    }
+
+    async function saveSettingsToDB() {
+      if (state.settings.apiKey) {
+        localStorage.setItem('macrotrack_api_key', state.settings.apiKey);
+      } else {
+        localStorage.removeItem('macrotrack_api_key');
+      }
+      await dbPut('settings', { key: 'app_settings', value: state.settings });
+    }
+
+    /********************************************************************
+     * 3. SPEECH-TO-TEXT (SEGMENTED NON-CONTINUOUS + DEDUPE ENGINE)
+     ********************************************************************/
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let activeRecognition = null;
+    let activeMicBtnId = null;
+    let activeTextareaId = null;
+    let userWantsMic = false;
+    let micSafetyTimer = null;
+
+    // Segmented dictation state
+    let baseText = '';
+    let committedSegments = [];
+    let segmentFinal = '';
+    let segmentInterim = '';
+
+    function setupSpeechButtons() {
+      const btnRecipe = document.getElementById('micBtnRecipe');
+      const btnNote = document.getElementById('micBtnNote');
+      if (!SpeechRecognition) {
+        if (btnRecipe) btnRecipe.style.display = 'none';
+        if (btnNote) btnNote.style.display = 'none';
+      }
+    }
+
+    // Dedupe helper: if new segment text is identical to, or starts with, the last committed segment, skip or trim the repeat.
+    function dedupeSegmentText(rawCandidate, committedList) {
+      let candidate = (rawCandidate || '').trim().replace(/\s+/g, ' ');
+      if (!candidate) return '';
+      if (!Array.isArray(committedList) || committedList.length === 0) return candidate;
+
+      // Check against the full committed chain first (in case Android repeats the whole session)
+      const fullCommitted = committedList.join(' ').trim().replace(/\s+/g, ' ');
+      if (fullCommitted) {
+        const candLower = candidate.toLowerCase();
+        const fullLower = fullCommitted.toLowerCase();
+        if (candLower === fullLower) {
+          return '';
+        }
+        if (candLower.startsWith(fullLower)) {
+          candidate = candidate.slice(fullCommitted.length).trim();
+          if (!candidate) return '';
+        }
+      }
+
+      // Check against the immediately preceding committed segment
+      const lastSeg = committedList[committedList.length - 1].trim().replace(/\s+/g, ' ');
+      if (lastSeg) {
+        const candLower = candidate.toLowerCase();
+        const lastLower = lastSeg.toLowerCase();
+        if (candLower === lastLower) {
+          return '';
+        }
+        if (candLower.startsWith(lastLower)) {
+          candidate = candidate.slice(lastSeg.length).trim();
+        }
+      }
+
+      return candidate;
+    }
+
+    // Joins cumulative pieces inside a single event.results list without repeating overlapping prefixes
+    function appendChunkWithoutOverlap(existingStr, nextChunk) {
+      const cleanNext = (nextChunk || '').trim().replace(/\s+/g, ' ');
+      if (!cleanNext) return existingStr;
+      if (!existingStr) return cleanNext;
+
+      const existLower = existingStr.toLowerCase();
+      const nextLower = cleanNext.toLowerCase();
+
+      // If Android Chrome sends cumulative transcripts across results[0..n], take the longer superset
+      if (nextLower === existLower) {
+        return existingStr;
+      }
+      if (nextLower.startsWith(existLower)) {
+        return cleanNext;
+      }
+      if (existLower.endsWith(nextLower)) {
+        return existingStr;
+      }
+      return `${existingStr} ${cleanNext}`;
+    }
+
+    // Replaces textarea value with baseText + committedSegments + segmentFinal + segmentInterim
+    function writeDictationToBox(includeInterim = true) {
+      if (!activeTextareaId) return;
+      const textarea = document.getElementById(activeTextareaId);
+      if (!textarea) return;
+
+      const cleanFinal = dedupeSegmentText(segmentFinal, committedSegments);
+      const effectiveCommitted = cleanFinal ? [...committedSegments, cleanFinal] : committedSegments;
+      const cleanInterim = includeInterim ? dedupeSegmentText(segmentInterim, effectiveCommitted) : '';
+
+      const spokenParts = [...committedSegments];
+      if (cleanFinal) spokenParts.push(cleanFinal);
+      if (cleanInterim) spokenParts.push(cleanInterim);
+
+      const spokenBlock = spokenParts.join(' ').trim();
+
+      if (baseText && spokenBlock) {
+        const sep = /\s$/.test(baseText) ? '' : ' ';
+        textarea.value = `${baseText}${sep}${spokenBlock}`;
+      } else if (baseText) {
+        textarea.value = baseText;
+      } else {
+        textarea.value = spokenBlock;
+      }
+    }
+
+    function commitCurrentSegmentFinal() {
+      const cleanFinal = dedupeSegmentText(segmentFinal, committedSegments);
+      if (cleanFinal) {
+        committedSegments.push(cleanFinal);
+      }
+      segmentFinal = '';
+      segmentInterim = '';
+    }
+
+    function startNewRecognitionSegment() {
+      if (!userWantsMic || !SpeechRecognition) return;
+
+      const recognition = new SpeechRecognition();
+      recognition.lang = 'en-CA';
+      recognition.continuous = false; // Each restart is a clean segment
+      recognition.interimResults = true;
+      activeRecognition = recognition;
+
+      recognition.onresult = (event) => {
+        if (!userWantsMic || activeRecognition !== recognition) return;
+
+        // Rebuild CURRENT segment from scratch every time (loop from 0, not resultIndex)
+        let rebuiltFinal = '';
+        let rebuiltInterim = '';
+
+        for (let i = 0; i < event.results.length; i++) {
+          const res = event.results[i];
+          const transcriptPiece = (res[0] && res[0].transcript) ? res[0].transcript.trim() : '';
+          if (!transcriptPiece) continue;
+
+          if (res.isFinal) {
+            rebuiltFinal = appendChunkWithoutOverlap(rebuiltFinal, transcriptPiece);
+          } else {
+            rebuiltInterim = appendChunkWithoutOverlap(rebuiltInterim, transcriptPiece);
+          }
+        }
+
+        // If rebuiltInterim merely duplicates rebuiltFinal, drop the duplicate prefix
+        if (rebuiltFinal && rebuiltInterim) {
+          rebuiltInterim = dedupeSegmentText(rebuiltInterim, [rebuiltFinal]);
+        }
+
+        segmentFinal = rebuiltFinal;
+        segmentInterim = rebuiltInterim;
+        writeDictationToBox(true);
+      };
+
+      recognition.onerror = (event) => {
+        if (activeRecognition !== recognition) return;
+
+        // Ignore "no-speech" pauses and let onend restart
+        if (event.error === 'no-speech') {
+          return;
+        }
+        // Ignore intentional abort when stopping
+        if (event.error === 'aborted' && !userWantsMic) {
+          return;
+        }
+
+        const errLabel = (event.error === 'not-allowed' || event.error === 'service-not-allowed')
+          ? 'Microphone permission denied (not-allowed).'
+          : `Speech recognition error: ${event.error}`;
+
+        stopSpeechRecognition();
+        showToast(errLabel);
+        showStatusAlert(errLabel, 'danger');
+      };
+
+      recognition.onend = () => {
+        if (activeRecognition !== recognition) return;
+
+        // Push segmentFinal into committedSegments ONCE, then clear before restarting
+        commitCurrentSegmentFinal();
+        writeDictationToBox(false);
+
+        if (userWantsMic) {
+          try {
+            startNewRecognitionSegment();
+          } catch (_) {
+            setTimeout(() => {
+              if (userWantsMic) {
+                try {
+                  startNewRecognitionSegment();
+                } catch (err) {
+                  stopSpeechRecognition();
+                }
+              }
+            }, 120);
+          }
+        } else {
+          cleanupMicUI();
+        }
+      };
+
+      try {
+        recognition.start();
+      } catch (err) {
+        setTimeout(() => {
+          if (userWantsMic && activeRecognition === recognition) {
+            try {
+              recognition.start();
+            } catch (_) {
+              stopSpeechRecognition();
+              showToast('Could not start microphone');
+            }
+          }
+        }, 120);
+      }
+    }
+
+    function toggleSpeech(targetTextareaId, micBtnId) {
+      if (!SpeechRecognition) return;
+
+      // Tapping active mic button stops dictation
+      if (userWantsMic && activeMicBtnId === micBtnId) {
+        stopSpeechRecognition();
+        return;
+      }
+
+      // Switching from one mic button to the other stops the first cleanly
+      if (userWantsMic) {
+        stopSpeechRecognition();
+      }
+
+      const textarea = document.getElementById(targetTextareaId);
+      const btn = document.getElementById(micBtnId);
+      if (!textarea || !btn) return;
+
+      // Save what is already in the box as baseText; clear segment state
+      baseText = textarea.value.trim();
+      committedSegments = [];
+      segmentFinal = '';
+      segmentInterim = '';
+
+      userWantsMic = true;
+      activeTextareaId = targetTextareaId;
+      activeMicBtnId = micBtnId;
+
+      btn.classList.add('recording');
+      btn.innerHTML = '&#9209; Stop';
+
+      // Auto-stop after 2 minutes as a safety limit
+      clearTimeout(micSafetyTimer);
+      micSafetyTimer = setTimeout(() => {
+        if (userWantsMic) {
+          stopSpeechRecognition();
+          showToast('Mic auto-stopped after 2 minutes');
+        }
+      }, 120000);
+
+      startNewRecognitionSegment();
+    }
+
+    function stopSpeechRecognition() {
+      userWantsMic = false;
+      clearTimeout(micSafetyTimer);
+      micSafetyTimer = null;
+
+      // Commit any final segment text gathered so far and strip any interim leftovers
+      commitCurrentSegmentFinal();
+      writeDictationToBox(false);
+
+      const rec = activeRecognition;
+      cleanupMicUI();
+
+      if (rec) {
+        try {
+          rec.stop();
+        } catch (_) {}
+      }
+    }
+
+    function cleanupMicUI() {
+      ['micBtnRecipe', 'micBtnNote'].forEach((id) => {
+        const btn = document.getElementById(id);
+        if (btn) {
+          btn.classList.remove('recording');
+          btn.innerHTML = '&#127908; Dictate';
+        }
+      });
+      activeRecognition = null;
+      activeMicBtnId = null;
+      activeTextareaId = null;
+      segmentFinal = '';
+      segmentInterim = '';
+    }
+
+    /********************************************************************
+     * 4. NAVIGATION & TODAY DASHBOARD (WITH 7-DAY AVERAGE)
+     ********************************************************************/
+    function switchTab(tabName) {
+      // Stop speech recognition automatically if leaving the Log Meal screen
+      if (tabName !== 'log' && userWantsMic) {
+        stopSpeechRecognition();
+      }
+
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
+
+      const targetScreen = document.getElementById(`screen-${tabName}`);
+      if (targetScreen) targetScreen.classList.add('active');
+
+      const navBtn = document.querySelector(`.nav-tab[data-target="${tabName}"]`);
+      if (navBtn) navBtn.classList.add('active');
+
+      if (tabName === 'today') renderTodayScreen();
+      if (tabName === 'log') syncLogScreenDateLabels();
+      if (tabName === 'saved') renderSavedScreen();
+      if (tabName === 'settings') renderSettingsScreen();
+    }
+
+    function shiftDate(delta) {
+      state.currentDate = addDaysToYYYYMMDD(state.currentDate, delta);
+      renderTodayScreen();
+      syncLogScreenDateLabels();
+    }
+
+    function onDatePickerChange(val) {
+      if (!val) return;
+      state.currentDate = val;
+      renderTodayScreen();
+      syncLogScreenDateLabels();
+    }
+
+    function jumpToToday() {
+      state.currentDate = getLocalYYYYMMDD();
+      renderTodayScreen();
+      syncLogScreenDateLabels();
+    }
+
+    function syncLogScreenDateLabels() {
+      const isToday = state.currentDate === getLocalYYYYMMDD();
+      const labelStr = isToday ? `Today (${state.currentDate})` : state.currentDate;
+      document.getElementById('logTargetDateBadge').textContent = labelStr;
+      document.getElementById('logToDateBtn').textContent = `Log to ${labelStr}`;
+    }
+
+    function calculateSevenDayAverage(anchorDateStr) {
+      let totalCal = 0;
+      let totalPro = 0;
+      let loggedDays = 0;
+
+      for (let i = 0; i < 7; i++) {
+        const dStr = addDaysToYYYYMMDD(anchorDateStr, -i);
+        const dayMeals = state.meals.filter(m => m.date === dStr);
+        if (dayMeals.length > 0) {
+          loggedDays++;
+          dayMeals.forEach(m => {
+            totalCal += Number(m.cal) || 0;
+            totalPro += Number(m.p) || 0;
+          });
+        }
+      }
+
+      if (loggedDays === 0) {
+        return { loggedDays: 0, avgCal: null, avgPro: null };
+      }
+
+      return {
+        loggedDays,
+        avgCal: Math.round(totalCal / loggedDays),
+        avgPro: Math.round(totalPro / loggedDays)
+      };
+    }
+
+    function renderTodayScreen() {
+      document.getElementById('todayDatePicker').value = state.currentDate;
+
+      const dayMeals = state.meals.filter(m => m.date === state.currentDate);
+      const totals = dayMeals.reduce((acc, m) => {
+        acc.cal += Number(m.cal) || 0;
+        acc.p += Number(m.p) || 0;
+        acc.c += Number(m.c) || 0;
+        acc.f += Number(m.f) || 0;
+        return acc;
+      }, { cal: 0, p: 0, c: 0, f: 0 });
+
+      const calTarget = Number(state.settings.targetCal) || 2200;
+      const proMin = Number(state.settings.targetProMin) || 170;
+      const proMax = Number(state.settings.targetProMax) || 190;
+
+      // Calories UI (Over target = warning)
+      const calUsed = Math.round(totals.cal);
+      const calRem = calTarget - calUsed;
+      document.getElementById('calUsedText').textContent = calUsed.toLocaleString();
+      document.getElementById('calStatusBadge').textContent = `${calUsed} / ${calTarget}`;
+
+      const calPct = Math.min(100, Math.max(0, (calUsed / calTarget) * 100));
+      const calBar = document.getElementById('calProgressBar');
+      calBar.style.width = `${calPct}%`;
+
+      if (calRem >= 0) {
+        calBar.className = 'progress-fill';
+        document.getElementById('calRemainingText').textContent = `${calRem.toLocaleString()} kcal remaining`;
+        document.getElementById('calStatusBadge').className = 'badge badge-neutral';
+      } else {
+        calBar.className = 'progress-fill over-limit';
+        document.getElementById('calRemainingText').textContent = `${Math.abs(calRem).toLocaleString()} kcal over limit`;
+        document.getElementById('calStatusBadge').className = 'badge badge-estimate';
+      }
+
+      // Protein UI (170-190 is a target, NOT a limit; 170+ is always green/neutral "Target hit ✓", never red)
+      const proUsed = Math.round(totals.p);
+      document.getElementById('proUsedText').textContent = proUsed;
+      const proPct = Math.min(100, Math.max(0, (proUsed / proMin) * 100));
+      const proBar = document.getElementById('proProgressBar');
+      proBar.style.width = `${proPct}%`;
+
+      const proBadge = document.getElementById('proStatusBadge');
+      const proRemText = document.getElementById('proRemainingText');
+
+      if (proUsed >= proMin) {
+        proBar.className = 'progress-fill target-hit';
+        proBadge.textContent = 'Target hit ✓';
+        proBadge.className = 'badge badge-label';
+        proRemText.textContent = `Target (${proMin}–${proMax}g) hit ✓`;
+      } else {
+        proBar.className = 'progress-fill';
+        proBadge.textContent = `${proMin}–${proMax}g`;
+        proBadge.className = 'badge badge-neutral';
+        proRemText.textContent = `${proMin - proUsed}g to ${proMin}g target`;
+      }
+
+      // Plain Carbs & Fat Counters
+      document.getElementById('carbUsedText').textContent = Math.round(totals.c);
+      document.getElementById('fatUsedText').textContent = Math.round(totals.f);
+
+      // 7-Day Average UI
+      const avgStats = calculateSevenDayAverage(state.currentDate);
+      const avgLabelEl = document.getElementById('sevenDayAvgLabel');
+      const avgValEl = document.getElementById('sevenDayAvgValues');
+      avgLabelEl.textContent = `7-Day Avg (${avgStats.loggedDays}/7d logged)`;
+      if (avgStats.loggedDays === 0) {
+        avgValEl.textContent = '— kcal · —g P';
+      } else {
+        avgValEl.textContent = `${avgStats.avgCal.toLocaleString()} kcal · ${avgStats.avgPro}g P`;
+      }
+
+      // Backup Banner check
+      renderBackupStatusElements();
+
+      // Meals List
+      const listEl = document.getElementById('todayMealsList');
+      if (dayMeals.length === 0) {
+        listEl.innerHTML = `<div class="empty-state">No meals logged for ${state.currentDate}.</div>`;
+      } else {
+        listEl.innerHTML = dayMeals.map(m => {
+          const badge = m.isLabelData
+            ? `<span class="badge badge-label">LABEL DATA</span>`
+            : `<span class="badge badge-estimate">ESTIMATE</span>`;
+          return `
+            <div class="meal-item" onclick="openEditMealModal('${m.id}')">
+              <div class="meal-item-top">
+                <span class="meal-item-name">${escapeHtml(m.name || 'Logged Meal')}</span>
+                ${badge}
+              </div>
+              <div class="meal-item-macros">
+                <span><strong>${Math.round(m.cal)}</strong> kcal</span>
+                <span><strong>${Math.round(m.p)}g</strong> P</span>
+                <span><strong>${Math.round(m.c)}g</strong> C</span>
+                <span><strong>${Math.round(m.f)}g</strong> F</span>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    function copyDaySummary() {
+      const dayMeals = state.meals.filter(m => m.date === state.currentDate);
+      const totals = dayMeals.reduce((acc, m) => {
+        acc.cal += Number(m.cal) || 0;
+        acc.p += Number(m.p) || 0;
+        acc.c += Number(m.c) || 0;
+        acc.f += Number(m.f) || 0;
+        return acc;
+      }, { cal: 0, p: 0, c: 0, f: 0 });
+
+      const avg = calculateSevenDayAverage(state.currentDate);
+      const avgLine = avg.loggedDays > 0
+        ? `7-Day Avg (${avg.loggedDays}/7d): ${avg.avgCal} kcal | ${avg.avgPro}g P`
+        : `7-Day Avg: No days logged`;
+
+      const lines = [
+        `MacroTrack Summary — ${state.currentDate}`,
+        `Totals: ${Math.round(totals.cal)} / ${state.settings.targetCal} kcal | ${Math.round(totals.p)}g P (Target ${state.settings.targetProMin}-${state.settings.targetProMax}g) | ${Math.round(totals.c)}g C | ${Math.round(totals.f)}g F`,
+        avgLine,
+        `---`
+      ];
+
+      if (dayMeals.length === 0) {
+        lines.push('No meals logged.');
+      } else {
+        dayMeals.forEach((m, idx) => {
+          const tag = m.isLabelData ? '[LABEL]' : '[ESTIMATE]';
+          lines.push(`${idx + 1}. ${m.name} ${tag}: ${Math.round(m.cal)} kcal (${Math.round(m.p)}P / ${Math.round(m.c)}C / ${Math.round(m.f)}F)`);
+        });
+      }
+
+      navigator.clipboard.writeText(lines.join('\n')).then(() => {
+        showToast('Summary copied to clipboard');
+      }).catch(() => {
+        showToast('Could not copy to clipboard');
+      });
+    }
+
+    /********************************************************************
+     * 5. PHOTO COMPRESSION & LOG MEAL WORKFLOW
+     ********************************************************************/
+    function onModeChange() {
+      const mode = document.getElementById('analysisMode').value;
+      const recipeBox = document.getElementById('recipeInput');
+      if (mode === 'label') {
+        recipeBox.placeholder = 'Optional product context (attach a clear photo of the Nutrition / Supplemented Food Facts label)...';
+      } else {
+        recipeBox.placeholder = 'Paste or dictate full pot/batch ingredients if logging a homemade recipe...';
+      }
+    }
+
+    async function handlePhotoInput(fileList) {
+      const files = Array.from(fileList || []);
+      const analyzeBtn = document.getElementById('analyzeBtn');
+      const statusText = document.getElementById('photoCountStatus');
+      const clearBtn = document.getElementById('clearPhotosBtn');
+
+      if (files.length === 0) {
+        state.logDraft.compressedPhotos = [];
+        statusText.textContent = '0 photo(s) attached';
+        clearBtn.style.display = 'none';
+        return;
+      }
+
+      state.logDraft.isCompressing = true;
+      analyzeBtn.disabled = true;
+      statusText.textContent = `Compressing ${files.length} photo(s)...`;
+
+      try {
+        const compressed = [];
+        for (const file of files) {
+          const dataUrl = await compressImageFile(file, 1400, 0.82);
+          const base64 = dataUrl.split(',')[1];
+          compressed.push({ mimeType: 'image/jpeg', base64 });
+        }
+        state.logDraft.compressedPhotos = compressed;
+        statusText.textContent = `${compressed.length} photo(s) attached`;
+        clearBtn.style.display = compressed.length > 0 ? 'inline-flex' : 'none';
+      } catch (err) {
+        statusText.textContent = 'Photo compression failed — try selecting again';
+      } finally {
+        state.logDraft.isCompressing = false;
+        analyzeBtn.disabled = false;
+      }
+    }
+
+    function compressImageFile(file, maxDim = 1400, quality = 0.82) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            let { width, height } = img;
+            if (width > maxDim || height > maxDim) {
+              if (width > height) {
+                height = Math.round((height * maxDim) / width);
+                width = maxDim;
+              } else {
+                width = Math.round((width * maxDim) / height);
+                height = maxDim;
+              }
+            }
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            resolve(canvas.toDataURL('image/jpeg', quality));
+          };
+          img.onerror = reject;
+          img.src = e.target.result;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function clearAttachedPhotos() {
+      state.logDraft.compressedPhotos = [];
+      const input = document.getElementById('photoInput');
+      if (input) input.value = '';
+      document.getElementById('photoCountStatus').textContent = '0 photo(s) attached';
+      document.getElementById('clearPhotosBtn').style.display = 'none';
+    }
+
+    /********************************************************************
+     * 6. GEMINI API CALL WITH ALL 8 FIXES & 429 vs 503 LOGIC
+     ********************************************************************/
+    function sleep(ms) {
+      return new Promise(res => setTimeout(res, ms));
+    }
+
+    async function callGeminiEndpoint(modelName, apiKey, payload) {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(modelName)}:generateContent`;
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-goog-api-key': apiKey
+        },
+        body: JSON.stringify(payload)
+      });
+
+      let bodyJson = null;
+      try {
+        bodyJson = await response.json();
+      } catch (_) {
+        bodyJson = null;
+      }
+
+      if (!response.ok) {
+        const errMsg = (bodyJson && bodyJson.error && bodyJson.error.message)
+          ? bodyJson.error.message
+          : `HTTP ${response.status}`;
+        const err = new Error(errMsg);
+        err.status = response.status;
+        throw err;
+      }
+
+      return bodyJson;
+    }
+
+    function isServerBusyError(err) {
+      const msg = (err && err.message ? err.message : '').toLowerCase();
+      return (
+        err.status === 503 ||
+        msg.includes('503') ||
+        msg.includes('high demand') ||
+        msg.includes('overloaded') ||
+        msg.includes('unavailable')
+      );
+    }
+
+    async function runGeminiAnalysis() {
+      if (state.logDraft.isCompressing) return;
+
+      if (userWantsMic) {
+        stopSpeechRecognition();
+      }
+
+      const apiKey = (state.settings.apiKey || '').trim();
+      if (!apiKey) {
+        showStatusAlert('Please save your Gemini API key in Settings first.', 'danger');
+        switchTab('settings');
+        return;
+      }
+
+      const mode = document.getElementById('analysisMode').value;
+      const photoCount = state.logDraft.compressedPhotos.length;
+      const recipeText = document.getElementById('recipeInput').value.trim();
+      const noteText = document.getElementById('noteInput').value.trim();
+
+      // RULE 5: Label mode with no photo -> STOP immediately, ask for the label, return no numbers.
+      if (mode === 'label' && photoCount === 0) {
+        showStatusAlert('STOP: Label mode requires a photo of the Nutrition / Supplemented Food Facts table. Attach a label photo and try again. No numbers returned.', 'danger');
+        return;
+      }
+
+      if (photoCount === 0 && !recipeText && !noteText) {
+        showStatusAlert('Attach a photo or enter a note/recipe before analyzing.', 'warning');
+        return;
+      }
+
+      const analyzeBtn = document.getElementById('analyzeBtn');
+      analyzeBtn.disabled = true;
+
+      const chosenModel = ALLOWED_MODELS.includes(state.settings.model) ? state.settings.model : PRIMARY_MODEL;
+      showStatusAlert(`Analyzing with ${chosenModel} (${photoCount} photo(s) attached)...`, 'warning');
+
+      const systemInstruction = `
+You are a precision nutrition & macro analyzer for a Canadian user.
+STRICT OPERATING RULES:
+1. Receive and inspect all attached images (${photoCount} attached).
+2. Read Canadian Nutrition Facts and Canadian Supplemented Food Facts tables accurately when present.
+3. NEVER claim the user's note or recipe text specified a measurement, quantity, or ingredient that was not explicitly written in the user's note/recipe.
+4. Only set "isLabelData": true if you actually read a Nutrition Facts / Supplemented Food Facts label from an attached photo. In all other cases, set "isLabelData": false.
+5. If the user's portion description is vague (e.g., "a bowl", "a plate", "a scoop", "a piece", "some", or unweighed portion), set "vaguePortionFlag": true and state the exact assumed gram/cup/ml quantity in "assumedPortionNote" so the user can verify or override it.
+6. Return ONLY valid JSON matching this schema:
+{
+  "mealName": "string",
+  "isLabelData": boolean,
+  "vaguePortionFlag": boolean,
+  "assumedPortionNote": "string or empty",
+  "items": [
+    {
+      "name": "string",
+      "qty": "string (e.g. '1 can (355ml)' or '150g')",
+      "cal": number,
+      "p": number,
+      "c": number,
+      "f": number
+    }
+  ]
+}`;
+
+      const userParts = [];
+      state.logDraft.compressedPhotos.forEach((img) => {
+        userParts.push({
+          inline_data: {
+            mime_type: img.mimeType,
+            data: img.base64
+          }
+        });
+      });
+
+      userParts.push({
+        text: `Mode: ${mode === 'label' ? 'Nutrition/Supplement Label' : 'Meal/Recipe'}\nAttached Photo Count: ${photoCount}\nUser Recipe Text (verbatim): ${recipeText || '(none)'}\nUser Note (verbatim): ${noteText || '(none)'}`
+      });
+
+      const payload = {
+        system_instruction: { parts: [{ text: systemInstruction }] },
+        contents: [{ role: 'user', parts: userParts }],
+        generationConfig: {
+          temperature: 0.1,
+          responseMimeType: 'application/json'
+        }
+      };
+
+      let finalModelUsed = chosenModel;
+      let usedFallback = false;
+      let apiResponse = null;
+
+      try {
+        try {
+          apiResponse = await callGeminiEndpoint(chosenModel, apiKey, payload);
+        } catch (firstErr) {
+          // 429 = User hit their own rate/quota limit -> tell user and DO NOT retry
+          if (firstErr.status === 429 || (firstErr.message && firstErr.message.includes('429'))) {
+            throw new Error('429 Rate Limit Reached: You hit your AI Studio quota/rate limit. Wait a minute before trying again (no automatic retry performed).');
+          }
+
+          // 503 / overloaded / high demand -> wait 3 seconds, retry once, then fall back to gemini-3.5-flash-lite
+          if (isServerBusyError(firstErr)) {
+            showStatusAlert(`${chosenModel} reported high demand (503). Waiting 3 seconds and retrying once...`, 'warning');
+            await sleep(3000);
+            try {
+              apiResponse = await callGeminiEndpoint(chosenModel, apiKey, payload);
+            } catch (secondErr) {
+              if (secondErr.status === 429) {
+                throw new Error('429 Rate Limit Reached during retry.');
+              }
+              if (chosenModel !== FALLBACK_MODEL) {
+                showStatusAlert(`${chosenModel} still busy. Falling back to ${FALLBACK_MODEL}...`, 'warning');
+                finalModelUsed = FALLBACK_MODEL;
+                usedFallback = true;
+                apiResponse = await callGeminiEndpoint(FALLBACK_MODEL, apiKey, payload);
+              } else {
+                throw secondErr;
+              }
+            }
+          } else {
+            throw firstErr;
+          }
+        }
+
+        const rawText = apiResponse?.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (!rawText) {
+          throw new Error('Empty response from Gemini API.');
+        }
+
+        const parsed = JSON.parse(rawText);
+
+        // RULE 6: Never call numbers "label data" unless a label photo was actually read
+        const verifiedLabel = Boolean(parsed.isLabelData && photoCount > 0);
+        state.logDraft.isLabelData = verifiedLabel;
+        state.logDraft.aiPhotosReceived = photoCount;
+        state.logDraft.modelUsed = usedFallback ? `${finalModelUsed} (fell back from ${chosenModel})` : finalModelUsed;
+
+        // RULE 8: Check vague portions in note or AI flag
+        const localVagueMatch = /\b(a bowl|bowl|a plate|plate|some|handful|glass|mug|piece|slice)\b/i.test(noteText);
+        if (parsed.vaguePortionFlag || localVagueMatch) {
+          state.logDraft.vagueWarning = parsed.assumedPortionNote
+            ? `Assumed portion: ${parsed.assumedPortionNote} — edit table or multiplier below if your serving differed.`
+            : `Vague portion detected in note (${noteText || 'unweighed serving'}). Check assumed amounts in the table below and adjust if needed.`;
+        } else {
+          state.logDraft.vagueWarning = '';
+        }
+
+        const items = Array.isArray(parsed.items) && parsed.items.length > 0
+          ? parsed.items.map(it => ({
+              name: String(it.name || 'Item'),
+              qty: String(it.qty || '1 serving'),
+              cal: Number(it.cal) || 0,
+              p: Number(it.p) || 0,
+              c: Number(it.c) || 0,
+              f: Number(it.f) || 0
+            }))
+          : [{ name: parsed.mealName || 'Analyzed Item', qty: '1 serving', cal: 0, p: 0, c: 0, f: 0 }];
+
+        document.getElementById('mealTitleInput').value = parsed.mealName || items[0].name || 'Logged Meal';
+        state.logDraft.multiplier = 1;
+        state.logDraft.baseItems = JSON.parse(JSON.stringify(items));
+        state.logDraft.displayItems = JSON.parse(JSON.stringify(items));
+
+        updateMultiplierHighlight('1x');
+        renderBreakdownTable();
+        renderAnalysisMetaUI();
+
+        const fallbackMsg = usedFallback ? ` (Fell back to ${FALLBACK_MODEL} due to high demand)` : '';
+        showStatusAlert(`Analysis complete. AI received ${photoCount} photo(s).${fallbackMsg}`, 'success');
+
+        // RULE 2: Only wipe photos AFTER a successful analysis
+        clearAttachedPhotos();
+      } catch (err) {
+        // Failed request: keep attached photos intact so user doesn't lose them
+        showStatusAlert(`Analysis failed (photos kept intact): ${err.message}`, 'danger');
+      } finally {
+        analyzeBtn.disabled = false;
+      }
+    }
+
+    function showStatusAlert(message, level = 'warning') {
+      const box = document.getElementById('analysisStatusBox');
+      box.style.display = 'block';
+      box.className = `alert-box alert-${level}`;
+      box.textContent = message;
+    }
+
+    function renderAnalysisMetaUI() {
+      const badgeEl = document.getElementById('sourceDataBadge');
+      if (state.logDraft.isLabelData) {
+        badgeEl.className = 'badge badge-label';
+        badgeEl.textContent = 'LABEL DATA';
+      } else {
+        badgeEl.className = 'badge badge-estimate';
+        badgeEl.textContent = 'ESTIMATE';
+      }
+
+      const metaLine = document.getElementById('aiMetaLine');
+      if (state.logDraft.aiPhotosReceived !== null) {
+        metaLine.style.display = 'block';
+        metaLine.textContent = `AI received: ${state.logDraft.aiPhotosReceived} photo(s) · Model: ${state.logDraft.modelUsed}`;
+      } else {
+        metaLine.style.display = 'none';
+      }
+
+      const vagueBanner = document.getElementById('vaguePortionBanner');
+      if (state.logDraft.vagueWarning) {
+        vagueBanner.style.display = 'block';
+        vagueBanner.textContent = `⚠️ Portion Flag: ${state.logDraft.vagueWarning}`;
+      } else {
+        vagueBanner.style.display = 'none';
+      }
+    }
+
+    /********************************************************************
+     * 7. EDITABLE BREAKDOWN TABLE & POT FRACTION MULTIPLIERS
+     ********************************************************************/
+    function updateMultiplierHighlight(labelStr) {
+      document.querySelectorAll('#multButtonsBar .mult-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.textContent.trim() === labelStr);
+      });
+    }
+
+    function applyMultiplier(factor, labelStr) {
+      state.logDraft.multiplier = factor;
+      updateMultiplierHighlight(labelStr);
+
+      state.logDraft.displayItems = state.logDraft.baseItems.map(item => ({
+        name: item.name,
+        qty: factor === 1 ? item.qty : `${labelStr} of (${item.qty})`,
+        cal: Math.round((Number(item.cal) || 0) * factor),
+        p: Math.round((Number(item.p) || 0) * factor * 10) / 10,
+        c: Math.round((Number(item.c) || 0) * factor * 10) / 10,
+        f: Math.round((Number(item.f) || 0) * factor * 10) / 10
+      }));
+
+      renderBreakdownTable();
+    }
+
+    function renderBreakdownTable() {
+      const tbody = document.getElementById('breakdownTbody');
+      tbody.innerHTML = state.logDraft.displayItems.map((row, idx) => `
+        <tr>
+          <td><input type="text" value="${escapeHtml(row.name)}" oninput="onTableCellEdit(${idx}, 'name', this.value)" placeholder="Ingredient" /></td>
+          <td><input type="text" value="${escapeHtml(row.qty)}" oninput="onTableCellEdit(${idx}, 'qty', this.value)" placeholder="Qty" /></td>
+          <td><input type="number" step="1" value="${row.cal}" oninput="onTableCellEdit(${idx}, 'cal', this.value)" /></td>
+          <td><input type="number" step="0.5" value="${row.p}" oninput="onTableCellEdit(${idx}, 'p', this.value)" /></td>
+          <td><input type="number" step="0.5" value="${row.c}" oninput="onTableCellEdit(${idx}, 'c', this.value)" /></td>
+          <td><input type="number" step="0.5" value="${row.f}" oninput="onTableCellEdit(${idx}, 'f', this.value)" /></td>
+          <td class="col-del"><button type="button" class="btn-danger btn-sm" onclick="removeIngredientRow(${idx})">&times;</button></td>
+        </tr>
+      `).join('');
+      updateLiveTableTotals();
+    }
+
+    function onTableCellEdit(idx, field, val) {
+      const row = state.logDraft.displayItems[idx];
+      if (!row) return;
+      if (field === 'name' || field === 'qty') {
+        row[field] = val;
+      } else {
+        row[field] = Number(val) || 0;
+      }
+      const m = state.logDraft.multiplier || 1;
+      state.logDraft.baseItems[idx] = {
+        name: row.name,
+        qty: row.qty,
+        cal: (Number(row.cal) || 0) / m,
+        p: (Number(row.p) || 0) / m,
+        c: (Number(row.c) || 0) / m,
+        f: (Number(row.f) || 0) / m
+      };
+      updateLiveTableTotals();
+    }
+
+    function addEmptyIngredientRow() {
+      const blank = { name: '', qty: '1 serving', cal: 0, p: 0, c: 0, f: 0 };
+      state.logDraft.displayItems.push({ ...blank });
+      state.logDraft.baseItems.push({ ...blank });
+      renderBreakdownTable();
+    }
+
+    function removeIngredientRow(idx) {
+      state.logDraft.displayItems.splice(idx, 1);
+      state.logDraft.baseItems.splice(idx, 1);
+      if (state.logDraft.displayItems.length === 0) {
+        addEmptyIngredientRow();
+      } else {
+        renderBreakdownTable();
+      }
+    }
+
+    function getDraftTotals() {
+      return state.logDraft.displayItems.reduce((acc, r) => {
+        acc.cal += Number(r.cal) || 0;
+        acc.p += Number(r.p) || 0;
+        acc.c += Number(r.c) || 0;
+        acc.f += Number(r.f) || 0;
+        return acc;
+      }, { cal: 0, p: 0, c: 0, f: 0 });
+    }
+
+    function updateLiveTableTotals() {
+      const t = getDraftTotals();
+      document.getElementById('liveTableTotalsText').textContent =
+        `Total: ${Math.round(t.cal)} kcal | ${Math.round(t.p)}g P | ${Math.round(t.c)}g C | ${Math.round(t.f)}g F`;
+    }
+
+    async function commitCurrentMeal(alsoSaveStaple) {
+      if (userWantsMic) {
+        stopSpeechRecognition();
+      }
+
+      const totals = getDraftTotals();
+      const titleInput = document.getElementById('mealTitleInput').value.trim();
+      const firstItemName = state.logDraft.displayItems[0]?.name?.trim();
+      const mealName = titleInput || firstItemName || 'Logged Meal';
+
+      const newMeal = {
+        id: 'meal_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
+        date: state.currentDate,
+        name: mealName,
+        cal: Math.round(totals.cal),
+        p: Math.round(totals.p * 10) / 10,
+        c: Math.round(totals.c * 10) / 10,
+        f: Math.round(totals.f * 10) / 10,
+        isLabelData: Boolean(state.logDraft.isLabelData),
+        aiPhotosReceived: state.logDraft.aiPhotosReceived,
+        note: document.getElementById('noteInput').value.trim(),
+        items: JSON.parse(JSON.stringify(state.logDraft.displayItems))
+      };
+
+      state.meals.push(newMeal);
+      await dbPut('meals', newMeal);
+
+      if (alsoSaveStaple) {
+        const staple = {
+          id: 'staple_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
+          name: mealName,
+          baseGrams: 100,
+          cal: Math.round(totals.cal),
+          p: Math.round(totals.p * 10) / 10,
+          c: Math.round(totals.c * 10) / 10,
+          f: Math.round(totals.f * 10) / 10,
+          isLabelData: Boolean(state.logDraft.isLabelData),
+          items: JSON.parse(JSON.stringify(state.logDraft.displayItems))
+        };
+        state.staples.push(staple);
+        await dbPut('staples', staple);
+      }
+
+      // Reset draft form
+      document.getElementById('mealTitleInput').value = '';
+      document.getElementById('recipeInput').value = '';
+      document.getElementById('noteInput').value = '';
+      document.getElementById('analysisStatusBox').style.display = 'none';
+      state.logDraft.isLabelData = false;
+      state.logDraft.aiPhotosReceived = null;
+      state.logDraft.vagueWarning = '';
+      state.logDraft.multiplier = 1;
+      state.logDraft.baseItems = [{ name: '', qty: '1 serving', cal: 0, p: 0, c: 0, f: 0 }];
+      state.logDraft.displayItems = [{ name: '', qty: '1 serving', cal: 0, p: 0, c: 0, f: 0 }];
+      renderBreakdownTable();
+      renderAnalysisMetaUI();
+
+      showToast(alsoSaveStaple ? 'Logged & saved to Staples' : `Logged to ${state.currentDate}`);
+      switchTab('today');
+    }
+
+    /********************************************************************
+     * 8. SAVED STAPLES & MEALS SCREEN
+     ********************************************************************/
+    function renderSavedScreen() {
+      const q = (document.getElementById('savedSearchInput').value || '').toLowerCase().trim();
+      const container = document.getElementById('savedListContainer');
+
+      const filtered = state.staples.filter(s => s.name.toLowerCase().includes(q));
+      if (filtered.length === 0) {
+        container.innerHTML = `<div class="card empty-state">No saved staples found. Save a meal from the Log screen or tap "+ New Staple".</div>`;
+        return;
+      }
+
+      container.innerHTML = filtered.map(s => {
+        const badge = s.isLabelData
+          ? `<span class="badge badge-label">LABEL DATA</span>`
+          : `<span class="badge badge-estimate">ESTIMATE</span>`;
+        const baseG = Number(s.baseGrams) || 100;
+        return `
+          <div class="card">
+            <div class="meal-item-top">
+              <div>
+                <div class="meal-item-name">${escapeHtml(s.name)}</div>
+                <div class="muted-text">1x = ${Math.round(s.cal)} kcal (${s.p}g P · ${s.c}g C · ${s.f}g F) · Base: ${baseG}g</div>
+              </div>
+              ${badge}
+            </div>
+            <div class="row-wrap" style="margin-top: 10px;">
+              <button type="button" class="btn-secondary btn-sm" onclick="quickLogStaple('${s.id}', 0.5, '0.5x')">Log 0.5x</button>
+              <button type="button" class="btn-primary btn-sm" style="width:auto;" onclick="quickLogStaple('${s.id}', 1, '1x')">Log 1x</button>
+              <button type="button" class="btn-secondary btn-sm" onclick="quickLogStaple('${s.id}', 1.5, '1.5x')">Log 1.5x</button>
+              <div class="row" style="gap:4px; max-width: 145px;">
+                <input type="number" id="gramInput_${s.id}" placeholder="${baseG}g" style="padding:5px 7px; font-size:0.8rem;" />
+                <button type="button" class="btn-secondary btn-sm" onclick="quickLogStapleGrams('${s.id}')">Log g</button>
+              </div>
+            </div>
+            <div class="row-wrap" style="margin-top: 8px; justify-content: flex-end;">
+              <button type="button" class="btn-secondary btn-sm" onclick="openEditStapleModal('${s.id}')">Edit</button>
+              <button type="button" class="btn-danger btn-sm" onclick="deleteStaple('${s.id}')">Delete</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function quickLogStaple(stapleId, mult, labelSuffix) {
+      const s = state.staples.find(x => x.id === stapleId);
+      if (!s) return;
+
+      const meal = {
+        id: 'meal_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
+        date: state.currentDate,
+        name: mult === 1 ? s.name : `${s.name} (${labelSuffix})`,
+        cal: Math.round(s.cal * mult),
+        p: Math.round(s.p * mult * 10) / 10,
+        c: Math.round(s.c * mult * 10) / 10,
+        f: Math.round(s.f * mult * 10) / 10,
+        isLabelData: Boolean(s.isLabelData),
+        aiPhotosReceived: null,
+        note: `Quick logged (${labelSuffix})`,
+        items: []
+      };
+
+      state.meals.push(meal);
+      await dbPut('meals', meal);
+      showToast(`Logged ${meal.name} to ${state.currentDate}`);
+      switchTab('today');
+    }
+
+    async function quickLogStapleGrams(stapleId) {
+      const s = state.staples.find(x => x.id === stapleId);
+      if (!s) return;
+      const gInput = document.getElementById(`gramInput_${stapleId}`);
+      const grams = Number(gInput?.value);
+      if (!grams || grams <= 0) {
+        showToast('Enter grams to log');
+        return;
+      }
+      const baseG = Number(s.baseGrams) || 100;
+      const ratio = grams / baseG;
+      await quickLogStaple(stapleId, ratio, `${grams}g`);
+    }
+
+    async function deleteStaple(stapleId) {
+      state.staples = state.staples.filter(s => s.id !== stapleId);
+      await dbDelete('staples', stapleId);
+      renderSavedScreen();
+      showToast('Staple deleted');
+    }
+
+    /********************************************************************
+     * 9. EDIT MODALS (TODAY MEALS & SAVED STAPLES)
+     ********************************************************************/
+    function openEditMealModal(mealId) {
+      const m = state.meals.find(x => x.id === mealId);
+      if (!m) return;
+
+      document.getElementById('editModalTitle').textContent = 'Edit Logged Meal';
+      document.getElementById('editModalBody').innerHTML = `
+        <div style="margin-bottom: 10px;">
+          <label>Meal Name</label>
+          <input type="text" id="modalMealName" value="${escapeHtml(m.name)}" />
+        </div>
+        <div class="row" style="margin-bottom: 10px;">
+          <div class="col">
+            <label>Calories</label>
+            <input type="number" id="modalMealCal" value="${Math.round(m.cal)}" />
+          </div>
+          <div class="col">
+            <label>Protein (g)</label>
+            <input type="number" step="0.5" id="modalMealP" value="${m.p}" />
+          </div>
+        </div>
+        <div class="row" style="margin-bottom: 14px;">
+          <div class="col">
+            <label>Carbs (g)</label>
+            <input type="number" step="0.5" id="modalMealC" value="${m.c}" />
+          </div>
+          <div class="col">
+            <label>Fat (g)</label>
+            <input type="number" step="0.5" id="modalMealF" value="${m.f}" />
+          </div>
+        </div>
+        <div class="row" style="gap: 8px;">
+          <button type="button" class="btn-primary" onclick="saveEditedMeal('${m.id}')">Save Changes</button>
+          <button type="button" class="btn-danger" onclick="deleteLoggedMeal('${m.id}')">Delete</button>
+        </div>
+      `;
+      document.getElementById('editModal').classList.add('open');
+    }
+
+    async function saveEditedMeal(mealId) {
+      const m = state.meals.find(x => x.id === mealId);
+      if (!m) return;
+      m.name = document.getElementById('modalMealName').value.trim() || 'Logged Meal';
+      m.cal = Number(document.getElementById('modalMealCal').value) || 0;
+      m.p = Number(document.getElementById('modalMealP').value) || 0;
+      m.c = Number(document.getElementById('modalMealC').value) || 0;
+      m.f = Number(document.getElementById('modalMealF').value) || 0;
+
+      await dbPut('meals', m);
+      closeEditModal();
+      renderTodayScreen();
+      showToast('Meal updated');
+    }
+
+    async function deleteLoggedMeal(mealId) {
+      state.meals = state.meals.filter(x => x.id !== mealId);
+      await dbDelete('meals', mealId);
+      closeEditModal();
+      renderTodayScreen();
+      showToast('Meal removed');
+    }
+
+    function openNewStapleModal() {
+      document.getElementById('editModalTitle').textContent = 'New Staple / Saved Meal';
+      document.getElementById('editModalBody').innerHTML = getStapleFormHtml({
+        id: '',
+        name: '',
+        baseGrams: 100,
+        cal: 0,
+        p: 0,
+        c: 0,
+        f: 0,
+        isLabelData: true
+      });
+      document.getElementById('editModal').classList.add('open');
+    }
+
+    function openEditStapleModal(stapleId) {
+      const s = state.staples.find(x => x.id === stapleId);
+      if (!s) return;
+      document.getElementById('editModalTitle').textContent = 'Edit Saved Staple';
+      document.getElementById('editModalBody').innerHTML = getStapleFormHtml(s);
+      document.getElementById('editModal').classList.add('open');
+    }
+
+    function getStapleFormHtml(s) {
+      return `
+        <div style="margin-bottom: 10px;">
+          <label>Name</label>
+          <input type="text" id="modalStapleName" value="${escapeHtml(s.name)}" placeholder="e.g., Whey Isolate (1 scoop)" />
+        </div>
+        <div class="row" style="margin-bottom: 10px;">
+          <div class="col">
+            <label>Base Serving Weight (g)</label>
+            <input type="number" id="modalStapleGrams" value="${Number(s.baseGrams) || 100}" />
+          </div>
+          <div class="col">
+            <label>Source Type</label>
+            <select id="modalStapleBadge">
+              <option value="label" ${s.isLabelData ? 'selected' : ''}>LABEL DATA</option>
+              <option value="estimate" ${!s.isLabelData ? 'selected' : ''}>ESTIMATE</option>
+            </select>
+          </div>
+        </div>
+        <div class="row" style="margin-bottom: 10px;">
+          <div class="col">
+            <label>Calories</label>
+            <input type="number" id="modalStapleCal" value="${Math.round(s.cal)}" />
+          </div>
+          <div class="col">
+            <label>Protein (g)</label>
+            <input type="number" step="0.5" id="modalStapleP" value="${s.p}" />
+          </div>
+        </div>
+        <div class="row" style="margin-bottom: 14px;">
+          <div class="col">
+            <label>Carbs (g)</label>
+            <input type="number" step="0.5" id="modalStapleC" value="${s.c}" />
+          </div>
+          <div class="col">
+            <label>Fat (g)</label>
+            <input type="number" step="0.5" id="modalStapleF" value="${s.f}" />
+          </div>
+        </div>
+        <button type="button" class="btn-primary" onclick="saveStapleFromModal('${s.id}')">Save Staple</button>
+      `;
+    }
+
+    async function saveStapleFromModal(existingId) {
+      const name = document.getElementById('modalStapleName').value.trim() || 'Saved Staple';
+      const baseGrams = Number(document.getElementById('modalStapleGrams').value) || 100;
+      const isLabelData = document.getElementById('modalStapleBadge').value === 'label';
+      const cal = Number(document.getElementById('modalStapleCal').value) || 0;
+      const p = Number(document.getElementById('modalStapleP').value) || 0;
+      const c = Number(document.getElementById('modalStapleC').value) || 0;
+      const f = Number(document.getElementById('modalStapleF').value) || 0;
+
+      if (existingId) {
+        const s = state.staples.find(x => x.id === existingId);
+        if (s) {
+          Object.assign(s, { name, baseGrams, isLabelData, cal, p, c, f });
+          await dbPut('staples', s);
+        }
+      } else {
+        const newS = {
+          id: 'staple_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
+          name, baseGrams, isLabelData, cal, p, c, f, items: []
+        };
+        state.staples.push(newS);
+        await dbPut('staples', newS);
+      }
+
+      closeEditModal();
+      renderSavedScreen();
+      showToast('Staple saved');
+    }
+
+    function closeEditModal() {
+      document.getElementById('editModal').classList.remove('open');
+    }
+
+    /********************************************************************
+     * 10. SETTINGS & BACKUP REMINDER LOGIC ("No backup yet" vs ">7 days")
+     ********************************************************************/
+    function renderSettingsScreen() {
+      document.getElementById('settingsApiKey').value = state.settings.apiKey || '';
+      document.getElementById('settingsModel').value = ALLOWED_MODELS.includes(state.settings.model)
+        ? state.settings.model
+        : PRIMARY_MODEL;
+      document.getElementById('targetCaloriesInput').value = state.settings.targetCal;
+      document.getElementById('targetProteinMinInput').value = state.settings.targetProMin;
+      document.getElementById('targetProteinMaxInput').value = state.settings.targetProMax;
+      renderBackupStatusElements();
+    }
+
+    function toggleApiKeyVisibility() {
+      const inp = document.getElementById('settingsApiKey');
+      const btn = document.getElementById('toggleKeyBtn');
+      if (inp.type === 'password') {
+        inp.type = 'text';
+        btn.textContent = 'Hide';
+      } else {
+        inp.type = 'password';
+        btn.textContent = 'Show';
+      }
+    }
+
+    async function saveApiSettings() {
+      state.settings.apiKey = document.getElementById('settingsApiKey').value.trim();
+      const selectedModel = document.getElementById('settingsModel').value;
+      state.settings.model = ALLOWED_MODELS.includes(selectedModel) ? selectedModel : PRIMARY_MODEL;
+      await saveSettingsToDB();
+      showToast('API key & model saved on device');
+    }
+
+    async function saveTargetSettings() {
+      state.settings.targetCal = Number(document.getElementById('targetCaloriesInput').value) || 2200;
+      state.settings.targetProMin = Number(document.getElementById('targetProteinMinInput').value) || 170;
+      state.settings.targetProMax = Number(document.getElementById('targetProteinMaxInput').value) || 190;
+      await saveSettingsToDB();
+      renderTodayScreen();
+      showToast('Targets updated');
+    }
+
+    function getBackupStatusInfo() {
+      const last = state.settings.lastBackupDate;
+      if (!last) {
+        return {
+          status: 'never',
+          message: 'No backup yet',
+          alertClass: 'alert-warning',
+          showOnToday: false
+        };
+      }
+
+      const lastMs = new Date(last).getTime();
+      const daysDiff = Math.floor((Date.now() - lastMs) / (1000 * 60 * 60 * 24));
+      const dateFormatted = getLocalYYYYMMDD(new Date(last));
+
+      if (daysDiff > 7) {
+        return {
+          status: 'overdue',
+          message: `Last backup: ${dateFormatted} (${daysDiff} days ago — over 7 days). Please export a backup.`,
+          alertClass: 'alert-warning',
+          showOnToday: true
+        };
+      }
+
+      return {
+        status: 'ok',
+        message: `Last backup: ${dateFormatted} (${daysDiff === 0 ? 'today' : daysDiff + 'd ago'})`,
+        alertClass: 'alert-success',
+        showOnToday: false
+      };
+    }
+
+    function renderBackupStatusElements() {
+      const info = getBackupStatusInfo();
+      const settingsBox = document.getElementById('backupStatusAlert');
+      if (settingsBox) {
+        settingsBox.className = `alert-box ${info.alertClass}`;
+        settingsBox.textContent = info.message;
+      }
+
+      const todayBanner = document.getElementById('todayBackupBanner');
+      if (todayBanner) {
+        if (info.showOnToday) {
+          todayBanner.style.display = 'block';
+          todayBanner.className = 'alert-box alert-warning';
+          todayBanner.textContent = info.message;
+        } else {
+          todayBanner.style.display = 'none';
+        }
+      }
+    }
+
+    async function exportBackupJson() {
+      const nowIso = new Date().toISOString();
+      state.settings.lastBackupDate = nowIso;
+      await saveSettingsToDB();
+      renderBackupStatusElements();
+
+      const backupPayload = {
+        app: 'MacroTrack',
+        version: '3.3',
+        exportedAt: nowIso,
+        settings: {
+          targetCal: state.settings.targetCal,
+          targetProMin: state.settings.targetProMin,
+          targetProMax: state.settings.targetProMax,
+          model: state.settings.model,
+          lastBackupDate: state.settings.lastBackupDate
+        },
+        meals: state.meals,
+        staples: state.staples
+      };
+
+      const blob = new Blob([JSON.stringify(backupPayload, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `macrotrack-backup-${getLocalYYYYMMDD()}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast('Backup exported');
+    }
+
+    async function importBackupJson(fileList) {
+      const file = fileList && fileList[0];
+      if (!file) return;
+
+      try {
+        const text = await file.text();
+        const data = JSON.parse(text);
+        if (!Array.isArray(data.meals) || !Array.isArray(data.staples)) {
+          throw new Error('Invalid backup format.');
+        }
+
+        await dbClear('meals');
+        await dbClear('staples');
+
+        state.meals = data.meals;
+        state.staples = data.staples;
+
+        for (const m of state.meals) await dbPut('meals', m);
+        for (const s of state.staples) await dbPut('staples', s);
+
+        if (data.settings) {
+          state.settings.targetCal = Number(data.settings.targetCal) || 2200;
+          state.settings.targetProMin = Number(data.settings.targetProMin) || 170;
+          state.settings.targetProMax = Number(data.settings.targetProMax) || 190;
+          if (ALLOWED_MODELS.includes(data.settings.model)) {
+            state.settings.model = data.settings.model;
+          }
+          if (data.settings.lastBackupDate) {
+            state.settings.lastBackupDate = data.settings.lastBackupDate;
+          }
+          await saveSettingsToDB();
+        }
+
+        renderSettingsScreen();
+        renderTodayScreen();
+        showToast(`Restored ${state.meals.length} meals & ${state.staples.length} staples`);
+      } catch (err) {
+        showToast('Restore failed: ' + err.message);
+      } finally {
+        document.getElementById('importBackupFile').value = '';
+      }
+    }
+
+    /********************************************************************
+     * 11. SERVICE WORKER REGISTRATION & UPDATE BANNER
+     ********************************************************************/
+    function registerServiceWorker() {
+      if (!('serviceWorker' in navigator)) return;
+
+      navigator.serviceWorker.register('./sw.js').then((reg) => {
+        if (reg.waiting) {
+          promptServiceWorkerUpdate(reg.waiting);
+        }
+        reg.addEventListener('updatefound', () => {
+          const newWorker = reg.installing;
+          if (!newWorker) return;
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              promptServiceWorkerUpdate(newWorker);
+            }
+          });
+        });
+      }).catch(() => {});
+
+      let refreshing = false;
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (refreshing) return;
+        refreshing = true;
+        window.location.reload();
+      });
+    }
+
+    function promptServiceWorkerUpdate(worker) {
+      state.swWaitingWorker = worker;
+      document.getElementById('updateBanner').style.display = 'block';
+    }
+
+    function applyServiceWorkerUpdate() {
+      if (state.swWaitingWorker) {
+        state.swWaitingWorker.postMessage({ action: 'skipWaiting' });
+      } else {
+        window.location.reload();
+      }
+    }
+
+    /********************************************************************
+     * 12. HELPERS & BOOTSTRAP
+     ********************************************************************/
+    function escapeHtml(str) {
+      return String(str ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    let toastTimer = null;
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.style.display = 'block';
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        t.style.display = 'none';
+      }, 2600);
+    }
+
+    async function bootstrapApp() {
+      setupSpeechButtons();
+      await loadAllStateFromDB();
+      initStoragePersistence();
+      syncLogScreenDateLabels();
+      renderBreakdownTable();
+      renderAnalysisMetaUI();
+      renderTodayScreen();
+      registerServiceWorker();
+    }
+
+    window.addEventListener('DOMContentLoaded', bootstrapApp);
+  </script>
+</body>
+</html>
