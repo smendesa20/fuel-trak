@@ -244,6 +244,51 @@
       50% { opacity: 0.55; }
     }
 
+    /* Photo Thumbnails Grid */
+    .thumb-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .thumb-item {
+      position: relative;
+      width: 62px;
+      height: 62px;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--border-light);
+      background: var(--input-bg);
+      flex-shrink: 0;
+    }
+
+    .thumb-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .thumb-remove {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      width: 20px;
+      height: 20px;
+      border-radius: 999px;
+      background: rgba(9, 13, 22, 0.88);
+      color: var(--danger);
+      border: 1px solid var(--danger);
+      font-size: 0.72rem;
+      font-weight: 800;
+      padding: 0;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
     /* Date Bar */
     .date-nav {
       display: flex;
@@ -395,6 +440,11 @@
       letter-spacing: 0.03em;
     }
 
+    .badge-clickable {
+      cursor: pointer;
+      user-select: none;
+    }
+
     .badge-estimate {
       background: var(--warning-bg);
       color: var(--warning);
@@ -501,46 +551,133 @@
       border-color: var(--accent);
     }
 
-    /* Breakdown Table */
-    .table-wrap {
-      overflow-x: auto;
+    /* Ingredient Row Editor Cards (Log Screen & Modal) */
+    .ing-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
       margin-top: 10px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
     }
 
-    table.breakdown-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.82rem;
+    .ing-row-card {
       background: var(--input-bg);
+      border: 1px solid var(--border-light);
+      border-radius: 10px;
+      padding: 10px;
     }
 
-    table.breakdown-table th,
-    table.breakdown-table td {
-      padding: 6px 5px;
-      border-bottom: 1px solid var(--border);
-      text-align: left;
+    .ing-row-top {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      margin-bottom: 8px;
     }
 
-    table.breakdown-table th {
-      color: var(--text-muted);
-      font-weight: 700;
-      font-size: 0.74rem;
-      text-transform: uppercase;
+    .ing-row-top input.ing-name-input {
+      flex: 1.4;
+      padding: 7px 9px;
+      font-size: 0.88rem;
+      font-weight: 600;
+    }
+
+    .ing-row-top input.ing-desc-input {
+      flex: 1;
+      padding: 7px 9px;
+      font-size: 0.82rem;
+    }
+
+    .ing-row-mid {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 6px 8px;
       background: var(--card);
+      border-radius: 8px;
+      margin-bottom: 8px;
     }
 
-    table.breakdown-table input {
+    .servings-Control {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .servings-Control span.srv-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-right: 2px;
+    }
+
+    .step-btn {
+      width: 30px;
+      height: 30px;
+      padding: 0;
+      border-radius: 6px;
+      background: var(--card-alt);
+      color: var(--text);
+      border: 1px solid var(--border-light);
+      font-size: 1rem;
+      font-weight: 800;
+    }
+
+    .srv-input {
+      width: 62px !important;
+      text-align: center;
+      padding: 5px 6px !important;
+      font-size: 0.88rem !important;
+      font-weight: 700;
+    }
+
+    .row-calc-totals {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .ing-per-serving-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+    }
+
+    .ing-per-serving-cell label {
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      margin-bottom: 2px;
+      text-transform: uppercase;
+    }
+
+    .ing-per-serving-cell input {
       padding: 5px 6px;
       font-size: 0.82rem;
-      border-radius: 5px;
+      text-align: center;
     }
 
-    .col-name { min-width: 115px; }
-    .col-qty { width: 72px; }
-    .col-num { width: 54px; }
-    .col-del { width: 32px; text-align: center; }
+    /* Checkbox Row */
+    .checkbox-row {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 10px 12px;
+      background: var(--input-bg);
+      border: 1px solid var(--border-light);
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 12px;
+    }
+
+    .checkbox-row input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
 
     /* Bottom Navigation */
     .bottom-nav {
@@ -589,11 +726,11 @@
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.72);
+      background: rgba(0, 0, 0, 0.76);
       z-index: 1100;
       align-items: center;
       justify-content: center;
-      padding: 16px;
+      padding: 12px;
     }
 
     .modal-backdrop.open {
@@ -605,10 +742,10 @@
       border: 1px solid var(--border-light);
       border-radius: var(--radius);
       width: 100%;
-      max-width: 500px;
-      max-height: 90vh;
+      max-width: 560px;
+      max-height: 92vh;
       overflow-y: auto;
-      padding: 16px;
+      padding: 15px;
     }
 
     /* Toast */
@@ -737,14 +874,17 @@
             </select>
           </div>
           <div class="col">
-            <label for="photoInput">Photos</label>
+            <label for="photoInput">Add Photos (Up to 6)</label>
             <input type="file" id="photoInput" accept="image/*" multiple onchange="handlePhotoInput(this.files)" />
           </div>
         </div>
 
+        <!-- Thumbnails Strip -->
+        <div id="photoThumbnailsGrid" class="thumb-grid" style="display:none;"></div>
+
         <div class="row-wrap" style="justify-content: space-between; margin-bottom: 10px;">
           <span class="muted-text" id="photoCountStatus">0 photo(s) attached</span>
-          <button type="button" class="btn-secondary btn-sm" id="clearPhotosBtn" style="display:none;" onclick="clearAttachedPhotos()">Clear photos</button>
+          <button type="button" class="btn-secondary btn-sm" id="clearPhotosBtn" style="display:none;" onclick="clearAttachedPhotos()">Clear all</button>
         </div>
 
         <!-- Recipe Box + Mic -->
@@ -762,7 +902,7 @@
             <label for="noteInput">Your Note / Portion Description</label>
             <button type="button" class="mic-btn" id="micBtnNote" onclick="toggleSpeech('noteInput', 'micBtnNote')">&#127908; Dictate</button>
           </div>
-          <textarea id="noteInput" placeholder="e.g., 200g chicken breast, 1 bowl of chili, or supplement serving..."></textarea>
+          <textarea id="noteInput" placeholder="e.g., 1 scoop protein, 1 cup almond milk, 250 mL coconut water..."></textarea>
         </div>
 
         <button type="button" class="btn-primary" id="analyzeBtn" onclick="runGeminiAnalysis()">Analyze with AI</button>
@@ -772,7 +912,7 @@
       <!-- Editable Breakdown & Logging Card -->
       <div class="card">
         <div class="card-title">
-          <span>Meal Breakdown &amp; Portion</span>
+          <span>Meal Breakdown &amp; Servings</span>
           <div id="resultBadgesWrap" class="row-wrap">
             <span class="badge badge-estimate" id="sourceDataBadge">ESTIMATE</span>
           </div>
@@ -786,43 +926,28 @@
           <input type="text" id="mealTitleInput" placeholder="e.g., Post-Workout Shake or Chicken & Rice" />
         </div>
 
-        <!-- Pot Fraction / Multiplier Buttons -->
+        <!-- Whole-Meal Multiplier Buttons (Scales Servings, Never Overwrites Per-Serving Numbers) -->
         <div style="margin-bottom: 12px;">
-          <label>Pot Fraction / Portion Multiplier (Scales Table)</label>
+          <label>Whole-Meal Multiplier (Scales Servings)</label>
           <div class="mult-bar" id="multButtonsBar">
-            <button type="button" class="mult-btn" onclick="applyMultiplier(1/6, '1/6')">1/6</button>
-            <button type="button" class="mult-btn" onclick="applyMultiplier(0.25, '1/4')">1/4</button>
-            <button type="button" class="mult-btn" onclick="applyMultiplier(1/3, '1/3')">1/3</button>
-            <button type="button" class="mult-btn" onclick="applyMultiplier(0.5, '1/2')">1/2</button>
-            <button type="button" class="mult-btn" onclick="applyMultiplier(0.75, '3/4')">3/4</button>
-            <button type="button" class="mult-btn active" onclick="applyMultiplier(1, '1x')">1x</button>
-            <button type="button" class="mult-btn" onclick="applyMultiplier(1.25, '1.25x')">1.25x</button>
-            <button type="button" class="mult-btn" onclick="applyMultiplier(1.5, '1.5x')">1.5x</button>
-            <button type="button" class="mult-btn" onclick="applyMultiplier(2, '2x')">2x</button>
+            <button type="button" class="mult-btn" onclick="applyLogMealMultiplier(1/6, '1/6')">1/6</button>
+            <button type="button" class="mult-btn" onclick="applyLogMealMultiplier(0.25, '1/4')">1/4</button>
+            <button type="button" class="mult-btn" onclick="applyLogMealMultiplier(1/3, '1/3')">1/3</button>
+            <button type="button" class="mult-btn" onclick="applyLogMealMultiplier(0.5, '1/2')">1/2</button>
+            <button type="button" class="mult-btn" onclick="applyLogMealMultiplier(0.75, '3/4')">3/4</button>
+            <button type="button" class="mult-btn active" onclick="applyLogMealMultiplier(1, '1x')">1x</button>
+            <button type="button" class="mult-btn" onclick="applyLogMealMultiplier(1.25, '1.25x')">1.25x</button>
+            <button type="button" class="mult-btn" onclick="applyLogMealMultiplier(1.5, '1.5x')">1.5x</button>
+            <button type="button" class="mult-btn" onclick="applyLogMealMultiplier(2, '2x')">2x</button>
           </div>
         </div>
 
-        <!-- Editable Ingredient Table -->
-        <div class="table-wrap">
-          <table class="breakdown-table">
-            <thead>
-              <tr>
-                <th class="col-name">Item</th>
-                <th class="col-qty">Amount</th>
-                <th class="col-num">Cal</th>
-                <th class="col-num">P (g)</th>
-                <th class="col-num">C (g)</th>
-                <th class="col-num">F (g)</th>
-                <th class="col-del"></th>
-              </tr>
-            </thead>
-            <tbody id="breakdownTbody"></tbody>
-          </table>
-        </div>
+        <!-- Editable Ingredient Rows -->
+        <div id="logIngredientsList" class="ing-list"></div>
 
-        <div class="row-wrap" style="justify-content: space-between; margin-top: 8px; margin-bottom: 12px;">
-          <button type="button" class="btn-secondary btn-sm" onclick="addEmptyIngredientRow()">+ Add Ingredient Row</button>
-          <div class="muted-text" id="liveTableTotalsText">Total: 0 kcal | 0P | 0C | 0F</div>
+        <div class="row-wrap" style="justify-content: space-between; margin-top: 10px; margin-bottom: 12px;">
+          <button type="button" class="btn-secondary btn-sm" onclick="addLogIngredientRow()">+ Add Ingredient</button>
+          <div class="muted-text" id="liveTableTotalsText" style="font-weight:700; color:var(--text);">Total: 0 kcal | 0P | 0C | 0F</div>
         </div>
 
         <div class="row" style="flex-direction: column; gap: 8px;">
@@ -837,7 +962,7 @@
       <div class="card">
         <div class="card-title">
           <span>Saved Staples &amp; Meals</span>
-          <button type="button" class="btn-secondary btn-sm" onclick="openNewStapleModal()">+ New Staple</button>
+          <button type="button" class="btn-secondary btn-sm" onclick="openNewStapleModal()">+ New Saved Meal</button>
         </div>
         <input type="text" id="savedSearchInput" placeholder="Search staples or saved meals..." oninput="renderSavedScreen()" />
       </div>
@@ -926,7 +1051,7 @@
     </button>
   </nav>
 
-  <!-- Edit Meal / Staple Modal -->
+  <!-- Unified Meal & Saved Item Editor Modal -->
   <div id="editModal" class="modal-backdrop">
     <div class="modal-card">
       <div class="card-title">
@@ -941,7 +1066,7 @@
 
   <script>
     /********************************************************************
-     * 1. LOCAL DATE UTILITIES & GLOBAL STATE
+     * 1. LOCAL DATE UTILITIES, DATA NORMALIZATION & GLOBAL STATE
      ********************************************************************/
     function getLocalYYYYMMDD(dateObj = new Date()) {
       const y = dateObj.getFullYear();
@@ -957,9 +1082,128 @@
       return getLocalYYYYMMDD(dt);
     }
 
+    function round1(num) {
+      return Math.round((Number(num) || 0) * 10) / 10;
+    }
+
+    function round2(num) {
+      return Math.round((Number(num) || 0) * 100) / 100;
+    }
+
     const ALLOWED_MODELS = ['gemini-3.8-flash', 'gemini-3.5-flash-lite'];
     const PRIMARY_MODEL = 'gemini-3.8-flash';
     const FALLBACK_MODEL = 'gemini-3.5-flash-lite';
+    const MAX_PHOTOS = 6;
+
+    // Normalize an ingredient item (migrates legacy items to { name, servingDesc, baseCal, baseP, baseC, baseF, servings, initialServings, isLabelData })
+    function normalizeIngredientItem(raw, fallbackIsLabel = false) {
+      if (!raw || typeof raw !== 'object') {
+        return {
+          name: '',
+          servingDesc: '1 serving',
+          baseCal: 0,
+          baseP: 0,
+          baseC: 0,
+          baseF: 0,
+          servings: 1,
+          initialServings: 1,
+          isLabelData: Boolean(fallbackIsLabel)
+        };
+      }
+
+      const servings = (raw.servings !== undefined && raw.servings !== null && !isNaN(Number(raw.servings)))
+        ? Math.max(0, Number(raw.servings))
+        : 1;
+
+      const hasPerServing = raw.baseCal !== undefined || raw.perServingCal !== undefined;
+      const baseCal = hasPerServing
+        ? (Number(raw.baseCal ?? raw.perServingCal) || 0)
+        : (servings > 0 ? (Number(raw.cal) || 0) / servings : (Number(raw.cal) || 0));
+      const baseP = hasPerServing
+        ? (Number(raw.baseP ?? raw.perServingP) || 0)
+        : (servings > 0 ? (Number(raw.p) || 0) / servings : (Number(raw.p) || 0));
+      const baseC = hasPerServing
+        ? (Number(raw.baseC ?? raw.perServingC) || 0)
+        : (servings > 0 ? (Number(raw.c) || 0) / servings : (Number(raw.c) || 0));
+      const baseF = hasPerServing
+        ? (Number(raw.baseF ?? raw.perServingF) || 0)
+        : (servings > 0 ? (Number(raw.f) || 0) / servings : (Number(raw.f) || 0));
+
+      const servingDesc = String(raw.servingDesc ?? raw.qty ?? '1 serving').trim() || '1 serving';
+      const isLabelData = raw.isLabelData !== undefined ? Boolean(raw.isLabelData) : Boolean(fallbackIsLabel);
+      const initialServings = (raw.initialServings !== undefined && !isNaN(Number(raw.initialServings)) && Number(raw.initialServings) > 0)
+        ? Number(raw.initialServings)
+        : (servings > 0 ? servings : 1);
+
+      return {
+        name: String(raw.name || ''),
+        servingDesc,
+        baseCal: round1(baseCal),
+        baseP: round1(baseP),
+        baseC: round1(baseC),
+        baseF: round1(baseF),
+        servings: round2(servings),
+        initialServings: round2(initialServings),
+        isLabelData
+      };
+    }
+
+    function computeItemTotals(item) {
+      const s = Number(item.servings) || 0;
+      return {
+        cal: Math.round((Number(item.baseCal) || 0) * s),
+        p: round1((Number(item.baseP) || 0) * s),
+        c: round1((Number(item.baseC) || 0) * s),
+        f: round1((Number(item.baseF) || 0) * s)
+      };
+    }
+
+    function computeItemsListTotals(items) {
+      return (items || []).reduce((acc, it) => {
+        const t = computeItemTotals(it);
+        acc.cal += t.cal;
+        acc.p += t.p;
+        acc.c += t.c;
+        acc.f += t.f;
+        return acc;
+      }, { cal: 0, p: 0, c: 0, f: 0 });
+    }
+
+    function deriveMealIsLabel(items, fallback = false) {
+      if (!Array.isArray(items) || items.length === 0) return Boolean(fallback);
+      return items.some(it => Boolean(it.isLabelData));
+    }
+
+    // Migrate/normalize any logged meal or saved staple record
+    function normalizeRecord(rec) {
+      if (!rec || typeof rec !== 'object') return rec;
+      const fallbackLabel = Boolean(rec.isLabelData);
+      let items = Array.isArray(rec.items) && rec.items.length > 0
+        ? rec.items.map(it => normalizeIngredientItem(it, fallbackLabel))
+        : [
+            normalizeIngredientItem({
+              name: rec.name || 'Item',
+              servingDesc: rec.baseGrams ? `${rec.baseGrams}g` : '1 serving',
+              servings: 1,
+              baseCal: Number(rec.cal) || 0,
+              baseP: Number(rec.p) || 0,
+              baseC: Number(rec.c) || 0,
+              baseF: Number(rec.f) || 0,
+              isLabelData: fallbackLabel
+            }, fallbackLabel)
+          ];
+
+      const totals = computeItemsListTotals(items);
+      return {
+        ...rec,
+        cal: Math.round(totals.cal),
+        p: round1(totals.p),
+        c: round1(totals.c),
+        f: round1(totals.f),
+        isLabelData: deriveMealIsLabel(items, fallbackLabel),
+        items
+      };
+    }
 
     const state = {
       currentDate: getLocalYYYYMMDD(),
@@ -971,22 +1215,26 @@
         targetProMax: 190,
         lastBackupDate: null
       },
-      meals: [],     // { id, date, name, cal, p, c, f, isLabelData, aiPhotosReceived, note, vagueFlag, items: [] }
-      staples: [],   // { id, name, baseGrams, cal, p, c, f, isLabelData, items: [] }
+      meals: [],
+      staples: [],
       logDraft: {
-        compressedPhotos: [], // [{ mimeType, base64 }]
+        compressedPhotos: [], // [{ id, mimeType, base64, dataUrl }]
         isCompressing: false,
-        isLabelData: false,
         aiPhotosReceived: null,
         modelUsed: null,
         vagueWarning: '',
         multiplier: 1,
-        baseItems: [
-          { name: '', qty: '1 serving', cal: 0, p: 0, c: 0, f: 0 }
-        ],
-        displayItems: [
-          { name: '', qty: '1 serving', cal: 0, p: 0, c: 0, f: 0 }
+        items: [
+          normalizeIngredientItem({ name: '', servingDesc: '1 serving', baseCal: 0, baseP: 0, baseC: 0, baseF: 0, servings: 1, isLabelData: false })
         ]
+      },
+      modalEditor: {
+        mode: null, // 'meal' | 'staple' | 'new-staple'
+        targetId: null,
+        name: '',
+        baseGrams: 100,
+        multiplier: 1,
+        items: []
       },
       swWaitingWorker: null
     };
@@ -1105,8 +1353,11 @@
         await saveSettingsToDB();
       }
 
-      state.meals = await dbGetAll('meals');
-      state.staples = await dbGetAll('staples');
+      const rawMeals = await dbGetAll('meals');
+      const rawStaples = await dbGetAll('staples');
+
+      state.meals = rawMeals.map(normalizeRecord);
+      state.staples = rawStaples.map(normalizeRecord);
     }
 
     async function saveSettingsToDB() {
@@ -1128,7 +1379,6 @@
     let userWantsMic = false;
     let micSafetyTimer = null;
 
-    // Segmented dictation state
     let baseText = '';
     let committedSegments = [];
     let segmentFinal = '';
@@ -1143,13 +1393,11 @@
       }
     }
 
-    // Dedupe helper: if new segment text is identical to, or starts with, the last committed segment, skip or trim the repeat.
     function dedupeSegmentText(rawCandidate, committedList) {
       let candidate = (rawCandidate || '').trim().replace(/\s+/g, ' ');
       if (!candidate) return '';
       if (!Array.isArray(committedList) || committedList.length === 0) return candidate;
 
-      // Check against the full committed chain first (in case Android repeats the whole session)
       const fullCommitted = committedList.join(' ').trim().replace(/\s+/g, ' ');
       if (fullCommitted) {
         const candLower = candidate.toLowerCase();
@@ -1163,7 +1411,6 @@
         }
       }
 
-      // Check against the immediately preceding committed segment
       const lastSeg = committedList[committedList.length - 1].trim().replace(/\s+/g, ' ');
       if (lastSeg) {
         const candLower = candidate.toLowerCase();
@@ -1179,7 +1426,6 @@
       return candidate;
     }
 
-    // Joins cumulative pieces inside a single event.results list without repeating overlapping prefixes
     function appendChunkWithoutOverlap(existingStr, nextChunk) {
       const cleanNext = (nextChunk || '').trim().replace(/\s+/g, ' ');
       if (!cleanNext) return existingStr;
@@ -1188,7 +1434,6 @@
       const existLower = existingStr.toLowerCase();
       const nextLower = cleanNext.toLowerCase();
 
-      // If Android Chrome sends cumulative transcripts across results[0..n], take the longer superset
       if (nextLower === existLower) {
         return existingStr;
       }
@@ -1201,7 +1446,6 @@
       return `${existingStr} ${cleanNext}`;
     }
 
-    // Replaces textarea value with baseText + committedSegments + segmentFinal + segmentInterim
     function writeDictationToBox(includeInterim = true) {
       if (!activeTextareaId) return;
       const textarea = document.getElementById(activeTextareaId);
@@ -1241,14 +1485,13 @@
 
       const recognition = new SpeechRecognition();
       recognition.lang = 'en-CA';
-      recognition.continuous = false; // Each restart is a clean segment
+      recognition.continuous = false;
       recognition.interimResults = true;
       activeRecognition = recognition;
 
       recognition.onresult = (event) => {
         if (!userWantsMic || activeRecognition !== recognition) return;
 
-        // Rebuild CURRENT segment from scratch every time (loop from 0, not resultIndex)
         let rebuiltFinal = '';
         let rebuiltInterim = '';
 
@@ -1264,7 +1507,6 @@
           }
         }
 
-        // If rebuiltInterim merely duplicates rebuiltFinal, drop the duplicate prefix
         if (rebuiltFinal && rebuiltInterim) {
           rebuiltInterim = dedupeSegmentText(rebuiltInterim, [rebuiltFinal]);
         }
@@ -1277,11 +1519,9 @@
       recognition.onerror = (event) => {
         if (activeRecognition !== recognition) return;
 
-        // Ignore "no-speech" pauses and let onend restart
         if (event.error === 'no-speech') {
           return;
         }
-        // Ignore intentional abort when stopping
         if (event.error === 'aborted' && !userWantsMic) {
           return;
         }
@@ -1298,7 +1538,6 @@
       recognition.onend = () => {
         if (activeRecognition !== recognition) return;
 
-        // Push segmentFinal into committedSegments ONCE, then clear before restarting
         commitCurrentSegmentFinal();
         writeDictationToBox(false);
 
@@ -1340,13 +1579,11 @@
     function toggleSpeech(targetTextareaId, micBtnId) {
       if (!SpeechRecognition) return;
 
-      // Tapping active mic button stops dictation
       if (userWantsMic && activeMicBtnId === micBtnId) {
         stopSpeechRecognition();
         return;
       }
 
-      // Switching from one mic button to the other stops the first cleanly
       if (userWantsMic) {
         stopSpeechRecognition();
       }
@@ -1355,7 +1592,6 @@
       const btn = document.getElementById(micBtnId);
       if (!textarea || !btn) return;
 
-      // Save what is already in the box as baseText; clear segment state
       baseText = textarea.value.trim();
       committedSegments = [];
       segmentFinal = '';
@@ -1368,7 +1604,6 @@
       btn.classList.add('recording');
       btn.innerHTML = '&#9209; Stop';
 
-      // Auto-stop after 2 minutes as a safety limit
       clearTimeout(micSafetyTimer);
       micSafetyTimer = setTimeout(() => {
         if (userWantsMic) {
@@ -1385,7 +1620,6 @@
       clearTimeout(micSafetyTimer);
       micSafetyTimer = null;
 
-      // Commit any final segment text gathered so far and strip any interim leftovers
       commitCurrentSegmentFinal();
       writeDictationToBox(false);
 
@@ -1418,7 +1652,6 @@
      * 4. NAVIGATION & TODAY DASHBOARD (WITH 7-DAY AVERAGE)
      ********************************************************************/
     function switchTab(tabName) {
-      // Stop speech recognition automatically if leaving the Log Meal screen
       if (tabName !== 'log' && userWantsMic) {
         stopSpeechRecognition();
       }
@@ -1508,7 +1741,6 @@
       const proMin = Number(state.settings.targetProMin) || 170;
       const proMax = Number(state.settings.targetProMax) || 190;
 
-      // Calories UI (Over target = warning)
       const calUsed = Math.round(totals.cal);
       const calRem = calTarget - calUsed;
       document.getElementById('calUsedText').textContent = calUsed.toLocaleString();
@@ -1528,7 +1760,6 @@
         document.getElementById('calStatusBadge').className = 'badge badge-estimate';
       }
 
-      // Protein UI (170-190 is a target, NOT a limit; 170+ is always green/neutral "Target hit ✓", never red)
       const proUsed = Math.round(totals.p);
       document.getElementById('proUsedText').textContent = proUsed;
       const proPct = Math.min(100, Math.max(0, (proUsed / proMin) * 100));
@@ -1550,11 +1781,9 @@
         proRemText.textContent = `${proMin - proUsed}g to ${proMin}g target`;
       }
 
-      // Plain Carbs & Fat Counters
       document.getElementById('carbUsedText').textContent = Math.round(totals.c);
       document.getElementById('fatUsedText').textContent = Math.round(totals.f);
 
-      // 7-Day Average UI
       const avgStats = calculateSevenDayAverage(state.currentDate);
       const avgLabelEl = document.getElementById('sevenDayAvgLabel');
       const avgValEl = document.getElementById('sevenDayAvgValues');
@@ -1565,10 +1794,8 @@
         avgValEl.textContent = `${avgStats.avgCal.toLocaleString()} kcal · ${avgStats.avgPro}g P`;
       }
 
-      // Backup Banner check
       renderBackupStatusElements();
 
-      // Meals List
       const listEl = document.getElementById('todayMealsList');
       if (dayMeals.length === 0) {
         listEl.innerHTML = `<div class="empty-state">No meals logged for ${state.currentDate}.</div>`;
@@ -1577,17 +1804,21 @@
           const badge = m.isLabelData
             ? `<span class="badge badge-label">LABEL DATA</span>`
             : `<span class="badge badge-estimate">ESTIMATE</span>`;
+          const itemCount = Array.isArray(m.items) ? m.items.length : 1;
           return `
             <div class="meal-item" onclick="openEditMealModal('${m.id}')">
               <div class="meal-item-top">
-                <span class="meal-item-name">${escapeHtml(m.name || 'Logged Meal')}</span>
+                <div>
+                  <span class="meal-item-name">${escapeHtml(m.name || 'Logged Meal')}</span>
+                  <div class="muted-text" style="font-size:0.75rem;">${itemCount} ingredient(s) &middot; Tap to edit servings</div>
+                </div>
                 ${badge}
               </div>
               <div class="meal-item-macros">
                 <span><strong>${Math.round(m.cal)}</strong> kcal</span>
-                <span><strong>${Math.round(m.p)}g</strong> P</span>
-                <span><strong>${Math.round(m.c)}g</strong> C</span>
-                <span><strong>${Math.round(m.f)}g</strong> F</span>
+                <span><strong>${round1(m.p)}g</strong> P</span>
+                <span><strong>${round1(m.c)}g</strong> C</span>
+                <span><strong>${round1(m.f)}g</strong> F</span>
               </div>
             </div>
           `;
@@ -1612,7 +1843,7 @@
 
       const lines = [
         `MacroTrack Summary — ${state.currentDate}`,
-        `Totals: ${Math.round(totals.cal)} / ${state.settings.targetCal} kcal | ${Math.round(totals.p)}g P (Target ${state.settings.targetProMin}-${state.settings.targetProMax}g) | ${Math.round(totals.c)}g C | ${Math.round(totals.f)}g F`,
+        `Totals: ${Math.round(totals.cal)} / ${state.settings.targetCal} kcal | ${round1(totals.p)}g P (Target ${state.settings.targetProMin}-${state.settings.targetProMax}g) | ${round1(totals.c)}g C | ${round1(totals.f)}g F`,
         avgLine,
         `---`
       ];
@@ -1622,7 +1853,7 @@
       } else {
         dayMeals.forEach((m, idx) => {
           const tag = m.isLabelData ? '[LABEL]' : '[ESTIMATE]';
-          lines.push(`${idx + 1}. ${m.name} ${tag}: ${Math.round(m.cal)} kcal (${Math.round(m.p)}P / ${Math.round(m.c)}C / ${Math.round(m.f)}F)`);
+          lines.push(`${idx + 1}. ${m.name} ${tag}: ${Math.round(m.cal)} kcal (${round1(m.p)}P / ${round1(m.c)}C / ${round1(m.f)}F)`);
         });
       }
 
@@ -1634,51 +1865,101 @@
     }
 
     /********************************************************************
-     * 5. PHOTO COMPRESSION & LOG MEAL WORKFLOW
+     * 5. MULTI-PHOTO APPEND (UP TO 6), THUMBNAILS & COMPRESSION
      ********************************************************************/
     function onModeChange() {
       const mode = document.getElementById('analysisMode').value;
       const recipeBox = document.getElementById('recipeInput');
       if (mode === 'label') {
-        recipeBox.placeholder = 'Optional product context (attach a clear photo of the Nutrition / Supplemented Food Facts label)...';
+        recipeBox.placeholder = 'Optional product context (attach up to 6 Nutrition / Supplemented Food Facts label photos)...';
       } else {
         recipeBox.placeholder = 'Paste or dictate full pot/batch ingredients if logging a homemade recipe...';
       }
     }
 
     async function handlePhotoInput(fileList) {
-      const files = Array.from(fileList || []);
-      const analyzeBtn = document.getElementById('analyzeBtn');
-      const statusText = document.getElementById('photoCountStatus');
-      const clearBtn = document.getElementById('clearPhotosBtn');
+      const incomingFiles = Array.from(fileList || []);
+      const inputEl = document.getElementById('photoInput');
+      if (inputEl) inputEl.value = ''; // Reset input so user can keep adding one by one
 
-      if (files.length === 0) {
-        state.logDraft.compressedPhotos = [];
-        statusText.textContent = '0 photo(s) attached';
-        clearBtn.style.display = 'none';
+      if (incomingFiles.length === 0) return;
+
+      const currentCount = state.logDraft.compressedPhotos.length;
+      const remainingSlots = MAX_PHOTOS - currentCount;
+
+      if (remainingSlots <= 0) {
+        showToast(`Maximum ${MAX_PHOTOS} photos already attached`);
         return;
       }
 
+      let filesToProcess = incomingFiles;
+      if (incomingFiles.length > remainingSlots) {
+        filesToProcess = incomingFiles.slice(0, remainingSlots);
+        showToast(`Only added ${remainingSlots} photo(s) (max ${MAX_PHOTOS} limit)`);
+      }
+
+      const analyzeBtn = document.getElementById('analyzeBtn');
+      const statusText = document.getElementById('photoCountStatus');
+
       state.logDraft.isCompressing = true;
       analyzeBtn.disabled = true;
-      statusText.textContent = `Compressing ${files.length} photo(s)...`;
+      statusText.textContent = `Compressing ${filesToProcess.length} photo(s)...`;
 
       try {
-        const compressed = [];
-        for (const file of files) {
+        for (const file of filesToProcess) {
           const dataUrl = await compressImageFile(file, 1400, 0.82);
           const base64 = dataUrl.split(',')[1];
-          compressed.push({ mimeType: 'image/jpeg', base64 });
+          state.logDraft.compressedPhotos.push({
+            id: 'photo_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
+            mimeType: 'image/jpeg',
+            base64,
+            dataUrl
+          });
         }
-        state.logDraft.compressedPhotos = compressed;
-        statusText.textContent = `${compressed.length} photo(s) attached`;
-        clearBtn.style.display = compressed.length > 0 ? 'inline-flex' : 'none';
       } catch (err) {
-        statusText.textContent = 'Photo compression failed — try selecting again';
+        showToast('Photo compression failed — try again');
       } finally {
         state.logDraft.isCompressing = false;
         analyzeBtn.disabled = false;
+        renderPhotoThumbnailsAndStatus();
       }
+    }
+
+    function renderPhotoThumbnailsAndStatus() {
+      const photos = state.logDraft.compressedPhotos;
+      const grid = document.getElementById('photoThumbnailsGrid');
+      const statusText = document.getElementById('photoCountStatus');
+      const clearBtn = document.getElementById('clearPhotosBtn');
+
+      statusText.textContent = `${photos.length} photo(s) attached`;
+      clearBtn.style.display = photos.length > 0 ? 'inline-flex' : 'none';
+
+      if (photos.length === 0) {
+        grid.style.display = 'none';
+        grid.innerHTML = '';
+        return;
+      }
+
+      grid.style.display = 'flex';
+      grid.innerHTML = photos.map((p, idx) => `
+        <div class="thumb-item">
+          <img src="${p.dataUrl}" alt="Photo ${idx + 1}" />
+          <button type="button" class="thumb-remove" onclick="removeSingleAttachedPhoto('${p.id}')" aria-label="Remove photo">&times;</button>
+        </div>
+      `).join('');
+    }
+
+    function removeSingleAttachedPhoto(photoId) {
+      if (state.logDraft.isCompressing) return;
+      state.logDraft.compressedPhotos = state.logDraft.compressedPhotos.filter(p => p.id !== photoId);
+      renderPhotoThumbnailsAndStatus();
+    }
+
+    function clearAttachedPhotos() {
+      state.logDraft.compressedPhotos = [];
+      const input = document.getElementById('photoInput');
+      if (input) input.value = '';
+      renderPhotoThumbnailsAndStatus();
     }
 
     function compressImageFile(file, maxDim = 1400, quality = 0.82) {
@@ -1712,16 +1993,8 @@
       });
     }
 
-    function clearAttachedPhotos() {
-      state.logDraft.compressedPhotos = [];
-      const input = document.getElementById('photoInput');
-      if (input) input.value = '';
-      document.getElementById('photoCountStatus').textContent = '0 photo(s) attached';
-      document.getElementById('clearPhotosBtn').style.display = 'none';
-    }
-
     /********************************************************************
-     * 6. GEMINI API CALL WITH ALL 8 FIXES & 429 vs 503 LOGIC
+     * 6. GEMINI API CALL (MULTI-LABEL SUPPORT + 429 vs 503 + RULES 1-8)
      ********************************************************************/
     function sleep(ms) {
       return new Promise(res => setTimeout(res, ms));
@@ -1807,25 +2080,31 @@
       const systemInstruction = `
 You are a precision nutrition & macro analyzer for a Canadian user.
 STRICT OPERATING RULES:
-1. Receive and inspect all attached images (${photoCount} attached).
+1. Receive and inspect all attached images (${photoCount} photo(s) attached).
 2. Read Canadian Nutrition Facts and Canadian Supplemented Food Facts tables accurately when present.
-3. NEVER claim the user's note or recipe text specified a measurement, quantity, or ingredient that was not explicitly written in the user's note/recipe.
-4. Only set "isLabelData": true if you actually read a Nutrition Facts / Supplemented Food Facts label from an attached photo. In all other cases, set "isLabelData": false.
-5. If the user's portion description is vague (e.g., "a bowl", "a plate", "a scoop", "a piece", "some", or unweighed portion), set "vaguePortionFlag": true and state the exact assumed gram/cup/ml quantity in "assumedPortionNote" so the user can verify or override it.
-6. Return ONLY valid JSON matching this schema:
+3. MULTIPLE LABELS / PRODUCTS: When multiple Nutrition/Supplemented Food Facts labels are attached (e.g. protein powder + almond milk + coconut water), read EACH label separately and return ONE ingredient row per product.
+4. PER-SERVING SEPARATION: For each ingredient row, return:
+   - "servingDesc": the single-serving description from the label or standard reference (e.g. "1 scoop (34g)", "1 cup (240 mL)", "100g").
+   - "perServingCal", "perServingP", "perServingC", "perServingF": the exact macros for ONE single serving of that product.
+   - "servings": the number of servings the user actually had based on their Note (e.g., if label serving is 250 mL and user note says "250 mL coconut water", servings = 1; if label serving is 1 cup (240 mL) and note says "1.5 cups almond milk", servings = 1.5; if note doesn't specify, default servings = 1).
+5. NEVER claim the user's note or recipe text specified a measurement, quantity, or ingredient that was not explicitly written in the user's note/recipe.
+6. Set "isLabelData": true on an ingredient row ONLY if you directly read that product's Nutrition Facts / Supplemented Food Facts table from an attached photo. For any estimated ingredient without a read label photo, set "isLabelData": false.
+7. If the user's portion description is vague (e.g., "a bowl", "a plate", "some", "a piece", or unweighed portion), set "vaguePortionFlag": true and state the exact assumed gram/cup/ml quantity in "assumedPortionNote" so the user can verify or override it.
+8. Return ONLY valid JSON matching this schema:
 {
   "mealName": "string",
-  "isLabelData": boolean,
   "vaguePortionFlag": boolean,
   "assumedPortionNote": "string or empty",
   "items": [
     {
       "name": "string",
-      "qty": "string (e.g. '1 can (355ml)' or '150g')",
-      "cal": number,
-      "p": number,
-      "c": number,
-      "f": number
+      "servingDesc": "string (e.g. '1 scoop (34g)' or '1 cup (250 mL)')",
+      "servings": number,
+      "perServingCal": number,
+      "perServingP": number,
+      "perServingC": number,
+      "perServingF": number,
+      "isLabelData": boolean
     }
   ]
 }`;
@@ -1841,7 +2120,7 @@ STRICT OPERATING RULES:
       });
 
       userParts.push({
-        text: `Mode: ${mode === 'label' ? 'Nutrition/Supplement Label' : 'Meal/Recipe'}\nAttached Photo Count: ${photoCount}\nUser Recipe Text (verbatim): ${recipeText || '(none)'}\nUser Note (verbatim): ${noteText || '(none)'}`
+        text: `Mode: ${mode === 'label' ? 'Nutrition/Supplement Label (read each label separately)' : 'Meal/Recipe'}\nAttached Photo Count: ${photoCount}\nUser Recipe Text (verbatim): ${recipeText || '(none)'}\nUser Note (verbatim): ${noteText || '(none)'}`
       });
 
       const payload = {
@@ -1861,12 +2140,10 @@ STRICT OPERATING RULES:
         try {
           apiResponse = await callGeminiEndpoint(chosenModel, apiKey, payload);
         } catch (firstErr) {
-          // 429 = User hit their own rate/quota limit -> tell user and DO NOT retry
           if (firstErr.status === 429 || (firstErr.message && firstErr.message.includes('429'))) {
             throw new Error('429 Rate Limit Reached: You hit your AI Studio quota/rate limit. Wait a minute before trying again (no automatic retry performed).');
           }
 
-          // 503 / overloaded / high demand -> wait 3 seconds, retry once, then fall back to gemini-3.5-flash-lite
           if (isServerBusyError(firstErr)) {
             showStatusAlert(`${chosenModel} reported high demand (503). Waiting 3 seconds and retrying once...`, 'warning');
             await sleep(3000);
@@ -1897,40 +2174,45 @@ STRICT OPERATING RULES:
 
         const parsed = JSON.parse(rawText);
 
-        // RULE 6: Never call numbers "label data" unless a label photo was actually read
-        const verifiedLabel = Boolean(parsed.isLabelData && photoCount > 0);
-        state.logDraft.isLabelData = verifiedLabel;
         state.logDraft.aiPhotosReceived = photoCount;
         state.logDraft.modelUsed = usedFallback ? `${finalModelUsed} (fell back from ${chosenModel})` : finalModelUsed;
 
-        // RULE 8: Check vague portions in note or AI flag
         const localVagueMatch = /\b(a bowl|bowl|a plate|plate|some|handful|glass|mug|piece|slice)\b/i.test(noteText);
         if (parsed.vaguePortionFlag || localVagueMatch) {
           state.logDraft.vagueWarning = parsed.assumedPortionNote
-            ? `Assumed portion: ${parsed.assumedPortionNote} — edit table or multiplier below if your serving differed.`
-            : `Vague portion detected in note (${noteText || 'unweighed serving'}). Check assumed amounts in the table below and adjust if needed.`;
+            ? `Assumed portion: ${parsed.assumedPortionNote} — adjust servings or per-serving values below if needed.`
+            : `Vague portion detected in note (${noteText || 'unweighed serving'}). Check assumed amounts below and adjust if needed.`;
         } else {
           state.logDraft.vagueWarning = '';
         }
 
         const items = Array.isArray(parsed.items) && parsed.items.length > 0
-          ? parsed.items.map(it => ({
-              name: String(it.name || 'Item'),
-              qty: String(it.qty || '1 serving'),
-              cal: Number(it.cal) || 0,
-              p: Number(it.p) || 0,
-              c: Number(it.c) || 0,
-              f: Number(it.f) || 0
-            }))
-          : [{ name: parsed.mealName || 'Analyzed Item', qty: '1 serving', cal: 0, p: 0, c: 0, f: 0 }];
+          ? parsed.items.map(it => {
+              // Rule 6: Never call numbers label data unless at least 1 photo was sent and AI read a label
+              const rowIsLabel = Boolean(photoCount > 0 && (it.isLabelData ?? parsed.isLabelData));
+              const srv = (it.servings !== undefined && !isNaN(Number(it.servings)) && Number(it.servings) > 0)
+                ? Number(it.servings)
+                : 1;
+              return normalizeIngredientItem({
+                name: String(it.name || 'Item'),
+                servingDesc: String(it.servingDesc || it.qty || '1 serving'),
+                servings: srv,
+                initialServings: srv,
+                baseCal: Number(it.perServingCal ?? it.baseCal ?? it.cal) || 0,
+                baseP: Number(it.perServingP ?? it.baseP ?? it.p) || 0,
+                baseC: Number(it.perServingC ?? it.baseC ?? it.c) || 0,
+                baseF: Number(it.perServingF ?? it.baseF ?? it.f) || 0,
+                isLabelData: rowIsLabel
+              }, rowIsLabel);
+            })
+          : [normalizeIngredientItem({ name: parsed.mealName || 'Analyzed Item', servingDesc: '1 serving', servings: 1, baseCal: 0, baseP: 0, baseC: 0, baseF: 0, isLabelData: false })];
 
         document.getElementById('mealTitleInput').value = parsed.mealName || items[0].name || 'Logged Meal';
         state.logDraft.multiplier = 1;
-        state.logDraft.baseItems = JSON.parse(JSON.stringify(items));
-        state.logDraft.displayItems = JSON.parse(JSON.stringify(items));
+        state.logDraft.items = items;
 
-        updateMultiplierHighlight('1x');
-        renderBreakdownTable();
+        updateMultiplierHighlight('#multButtonsBar', '1x');
+        renderLogIngredientsList();
         renderAnalysisMetaUI();
 
         const fallbackMsg = usedFallback ? ` (Fell back to ${FALLBACK_MODEL} due to high demand)` : '';
@@ -1939,7 +2221,6 @@ STRICT OPERATING RULES:
         // RULE 2: Only wipe photos AFTER a successful analysis
         clearAttachedPhotos();
       } catch (err) {
-        // Failed request: keep attached photos intact so user doesn't lose them
         showStatusAlert(`Analysis failed (photos kept intact): ${err.message}`, 'danger');
       } finally {
         analyzeBtn.disabled = false;
@@ -1955,7 +2236,8 @@ STRICT OPERATING RULES:
 
     function renderAnalysisMetaUI() {
       const badgeEl = document.getElementById('sourceDataBadge');
-      if (state.logDraft.isLabelData) {
+      const hasAnyLabel = deriveMealIsLabel(state.logDraft.items, false);
+      if (hasAnyLabel) {
         badgeEl.className = 'badge badge-label';
         badgeEl.textContent = 'LABEL DATA';
       } else {
@@ -1981,97 +2263,188 @@ STRICT OPERATING RULES:
     }
 
     /********************************************************************
-     * 7. EDITABLE BREAKDOWN TABLE & POT FRACTION MULTIPLIERS
+     * 7. SHARED INGREDIENT ROW RENDERER & SERVINGS MATH (LOG & MODAL)
      ********************************************************************/
-    function updateMultiplierHighlight(labelStr) {
-      document.querySelectorAll('#multButtonsBar .mult-btn').forEach(btn => {
+    function updateMultiplierHighlight(containerSelector, labelStr) {
+      document.querySelectorAll(`${containerSelector} .mult-btn`).forEach(btn => {
         btn.classList.toggle('active', btn.textContent.trim() === labelStr);
       });
     }
 
-    function applyMultiplier(factor, labelStr) {
-      state.logDraft.multiplier = factor;
-      updateMultiplierHighlight(labelStr);
+    function buildIngredientRowsHtml(items, contextPrefix) {
+      return items.map((row, idx) => {
+        const rowTotals = computeItemTotals(row);
+        const badgeClass = row.isLabelData ? 'badge-label' : 'badge-estimate';
+        const badgeText = row.isLabelData ? 'LABEL' : 'ESTIMATE';
+        return `
+          <div class="ing-row-card">
+            <div class="ing-row-top">
+              <input type="text" class="ing-name-input" value="${escapeHtml(row.name)}" placeholder="Ingredient name" oninput="onIngredientFieldEdit('${contextPrefix}', ${idx}, 'name', this.value)" />
+              <input type="text" class="ing-desc-input" value="${escapeHtml(row.servingDesc)}" placeholder="1 serving" oninput="onIngredientFieldEdit('${contextPrefix}', ${idx}, 'servingDesc', this.value)" />
+              <span class="badge ${badgeClass} badge-clickable" title="Tap to toggle LABEL / ESTIMATE" onclick="toggleIngredientLabelBadge('${contextPrefix}', ${idx})">${badgeText}</span>
+              <button type="button" class="btn-danger btn-sm" onclick="removeIngredientItem('${contextPrefix}', ${idx})" aria-label="Delete row">&times;</button>
+            </div>
 
-      state.logDraft.displayItems = state.logDraft.baseItems.map(item => ({
-        name: item.name,
-        qty: factor === 1 ? item.qty : `${labelStr} of (${item.qty})`,
-        cal: Math.round((Number(item.cal) || 0) * factor),
-        p: Math.round((Number(item.p) || 0) * factor * 10) / 10,
-        c: Math.round((Number(item.c) || 0) * factor * 10) / 10,
-        f: Math.round((Number(item.f) || 0) * factor * 10) / 10
-      }));
+            <div class="ing-row-mid">
+              <div class="servings-Control">
+                <span class="srv-label">Servings:</span>
+                <button type="button" class="step-btn" onclick="stepIngredientServings('${contextPrefix}', ${idx}, -0.5)">&minus;</button>
+                <input type="number" step="0.5" min="0" class="srv-input" id="${contextPrefix}_srv_${idx}" value="${row.servings}" oninput="onIngredientServingsInput('${contextPrefix}', ${idx}, this.value)" />
+                <button type="button" class="step-btn" onclick="stepIngredientServings('${contextPrefix}', ${idx}, 0.5)">+</button>
+              </div>
+              <div class="row-calc-totals" id="${contextPrefix}_rowTotal_${idx}">
+                = ${rowTotals.cal} kcal | ${rowTotals.p}P | ${rowTotals.c}C | ${rowTotals.f}F
+              </div>
+            </div>
 
-      renderBreakdownTable();
+            <div class="ing-per-serving-grid">
+              <div class="ing-per-serving-cell">
+                <label>Per-Serv Cal</label>
+                <input type="number" step="1" value="${row.baseCal}" oninput="onIngredientFieldEdit('${contextPrefix}', ${idx}, 'baseCal', this.value)" />
+              </div>
+              <div class="ing-per-serving-cell">
+                <label>Per-Serv P (g)</label>
+                <input type="number" step="0.5" value="${row.baseP}" oninput="onIngredientFieldEdit('${contextPrefix}', ${idx}, 'baseP', this.value)" />
+              </div>
+              <div class="ing-per-serving-cell">
+                <label>Per-Serv C (g)</label>
+                <input type="number" step="0.5" value="${row.baseC}" oninput="onIngredientFieldEdit('${contextPrefix}', ${idx}, 'baseC', this.value)" />
+              </div>
+              <div class="ing-per-serving-cell">
+                <label>Per-Serv F (g)</label>
+                <input type="number" step="0.5" value="${row.baseF}" oninput="onIngredientFieldEdit('${contextPrefix}', ${idx}, 'baseF', this.value)" />
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
     }
 
-    function renderBreakdownTable() {
-      const tbody = document.getElementById('breakdownTbody');
-      tbody.innerHTML = state.logDraft.displayItems.map((row, idx) => `
-        <tr>
-          <td><input type="text" value="${escapeHtml(row.name)}" oninput="onTableCellEdit(${idx}, 'name', this.value)" placeholder="Ingredient" /></td>
-          <td><input type="text" value="${escapeHtml(row.qty)}" oninput="onTableCellEdit(${idx}, 'qty', this.value)" placeholder="Qty" /></td>
-          <td><input type="number" step="1" value="${row.cal}" oninput="onTableCellEdit(${idx}, 'cal', this.value)" /></td>
-          <td><input type="number" step="0.5" value="${row.p}" oninput="onTableCellEdit(${idx}, 'p', this.value)" /></td>
-          <td><input type="number" step="0.5" value="${row.c}" oninput="onTableCellEdit(${idx}, 'c', this.value)" /></td>
-          <td><input type="number" step="0.5" value="${row.f}" oninput="onTableCellEdit(${idx}, 'f', this.value)" /></td>
-          <td class="col-del"><button type="button" class="btn-danger btn-sm" onclick="removeIngredientRow(${idx})">&times;</button></td>
-        </tr>
-      `).join('');
-      updateLiveTableTotals();
+    function getTargetItemsArray(contextPrefix) {
+      return contextPrefix === 'log' ? state.logDraft.items : state.modalEditor.items;
     }
 
-    function onTableCellEdit(idx, field, val) {
-      const row = state.logDraft.displayItems[idx];
+    function refreshContextTotalsOnly(contextPrefix, changedIdx = null) {
+      const items = getTargetItemsArray(contextPrefix);
+      if (changedIdx !== null && items[changedIdx]) {
+        const rt = computeItemTotals(items[changedIdx]);
+        const rowTotalEl = document.getElementById(`${contextPrefix}_rowTotal_${changedIdx}`);
+        if (rowTotalEl) {
+          rowTotalEl.textContent = `= ${rt.cal} kcal | ${rt.p}P | ${rt.c}C | ${rt.f}F`;
+        }
+      }
+
+      const t = computeItemsListTotals(items);
+      if (contextPrefix === 'log') {
+        document.getElementById('liveTableTotalsText').textContent =
+          `Total: ${Math.round(t.cal)} kcal | ${round1(t.p)}g P | ${round1(t.c)}g C | ${round1(t.f)}g F`;
+        renderAnalysisMetaUI();
+      } else {
+        const modalTotalsEl = document.getElementById('modalLiveTotalsText');
+        if (modalTotalsEl) {
+          modalTotalsEl.textContent =
+            `Total: ${Math.round(t.cal)} kcal | ${round1(t.p)}g P | ${round1(t.c)}g C | ${round1(t.f)}g F`;
+        }
+      }
+    }
+
+    function onIngredientFieldEdit(contextPrefix, idx, field, val) {
+      const items = getTargetItemsArray(contextPrefix);
+      const row = items[idx];
       if (!row) return;
-      if (field === 'name' || field === 'qty') {
+
+      if (field === 'name' || field === 'servingDesc') {
         row[field] = val;
       } else {
         row[field] = Number(val) || 0;
+        refreshContextTotalsOnly(contextPrefix, idx);
       }
-      const m = state.logDraft.multiplier || 1;
-      state.logDraft.baseItems[idx] = {
-        name: row.name,
-        qty: row.qty,
-        cal: (Number(row.cal) || 0) / m,
-        p: (Number(row.p) || 0) / m,
-        c: (Number(row.c) || 0) / m,
-        f: (Number(row.f) || 0) / m
-      };
-      updateLiveTableTotals();
     }
 
-    function addEmptyIngredientRow() {
-      const blank = { name: '', qty: '1 serving', cal: 0, p: 0, c: 0, f: 0 };
-      state.logDraft.displayItems.push({ ...blank });
-      state.logDraft.baseItems.push({ ...blank });
-      renderBreakdownTable();
+    function onIngredientServingsInput(contextPrefix, idx, val) {
+      const items = getTargetItemsArray(contextPrefix);
+      const row = items[idx];
+      if (!row) return;
+
+      const parsed = Math.max(0, Number(val) || 0);
+      row.servings = round2(parsed);
+      const activeMult = contextPrefix === 'log' ? (state.logDraft.multiplier || 1) : (state.modalEditor.multiplier || 1);
+      row.initialServings = activeMult > 0 ? round2(row.servings / activeMult) : row.servings;
+      refreshContextTotalsOnly(contextPrefix, idx);
     }
 
-    function removeIngredientRow(idx) {
-      state.logDraft.displayItems.splice(idx, 1);
-      state.logDraft.baseItems.splice(idx, 1);
-      if (state.logDraft.displayItems.length === 0) {
-        addEmptyIngredientRow();
+    function stepIngredientServings(contextPrefix, idx, delta) {
+      const items = getTargetItemsArray(contextPrefix);
+      const row = items[idx];
+      if (!row) return;
+
+      const nextVal = Math.max(0, round2((Number(row.servings) || 0) + delta));
+      row.servings = nextVal;
+      const activeMult = contextPrefix === 'log' ? (state.logDraft.multiplier || 1) : (state.modalEditor.multiplier || 1);
+      row.initialServings = activeMult > 0 ? round2(row.servings / activeMult) : row.servings;
+
+      const srvInput = document.getElementById(`${contextPrefix}_srv_${idx}`);
+      if (srvInput) srvInput.value = row.servings;
+      refreshContextTotalsOnly(contextPrefix, idx);
+    }
+
+    function toggleIngredientLabelBadge(contextPrefix, idx) {
+      const items = getTargetItemsArray(contextPrefix);
+      const row = items[idx];
+      if (!row) return;
+      row.isLabelData = !row.isLabelData;
+      if (contextPrefix === 'log') {
+        renderLogIngredientsList();
       } else {
-        renderBreakdownTable();
+        renderModalIngredientsList();
       }
     }
 
-    function getDraftTotals() {
-      return state.logDraft.displayItems.reduce((acc, r) => {
-        acc.cal += Number(r.cal) || 0;
-        acc.p += Number(r.p) || 0;
-        acc.c += Number(r.c) || 0;
-        acc.f += Number(r.f) || 0;
-        return acc;
-      }, { cal: 0, p: 0, c: 0, f: 0 });
+    function removeIngredientItem(contextPrefix, idx) {
+      const items = getTargetItemsArray(contextPrefix);
+      items.splice(idx, 1);
+      if (items.length === 0) {
+        items.push(normalizeIngredientItem({ name: '', servingDesc: '1 serving', baseCal: 0, baseP: 0, baseC: 0, baseF: 0, servings: 1, isLabelData: false }));
+      }
+      if (contextPrefix === 'log') {
+        renderLogIngredientsList();
+      } else {
+        renderModalIngredientsList();
+      }
     }
 
-    function updateLiveTableTotals() {
-      const t = getDraftTotals();
-      document.getElementById('liveTableTotalsText').textContent =
-        `Total: ${Math.round(t.cal)} kcal | ${Math.round(t.p)}g P | ${Math.round(t.c)}g C | ${Math.round(t.f)}g F`;
+    // Log Screen Specific List & Multiplier Functions
+    function renderLogIngredientsList() {
+      const container = document.getElementById('logIngredientsList');
+      container.innerHTML = buildIngredientRowsHtml(state.logDraft.items, 'log');
+      refreshContextTotalsOnly('log');
+    }
+
+    function addLogIngredientRow() {
+      state.logDraft.items.push(normalizeIngredientItem({
+        name: '',
+        servingDesc: '1 serving',
+        baseCal: 0,
+        baseP: 0,
+        baseC: 0,
+        baseF: 0,
+        servings: 1,
+        initialServings: 1,
+        isLabelData: false
+      }));
+      renderLogIngredientsList();
+    }
+
+    function applyLogMealMultiplier(factor, labelStr) {
+      state.logDraft.multiplier = factor;
+      updateMultiplierHighlight('#multButtonsBar', labelStr);
+
+      // Scales servings ONLY; never overwrites per-serving numbers (baseCal, baseP, baseC, baseF)
+      state.logDraft.items.forEach(item => {
+        const baseSrv = (item.initialServings !== undefined && item.initialServings > 0) ? item.initialServings : 1;
+        item.servings = round2(baseSrv * factor);
+      });
+      renderLogIngredientsList();
     }
 
     async function commitCurrentMeal(alsoSaveStaple) {
@@ -2079,59 +2452,71 @@ STRICT OPERATING RULES:
         stopSpeechRecognition();
       }
 
-      const totals = getDraftTotals();
+      const cleanItems = state.logDraft.items.map(it => normalizeIngredientItem({
+        ...it,
+        initialServings: it.servings
+      }, it.isLabelData));
+
+      const totals = computeItemsListTotals(cleanItems);
       const titleInput = document.getElementById('mealTitleInput').value.trim();
-      const firstItemName = state.logDraft.displayItems[0]?.name?.trim();
+      const firstItemName = cleanItems[0]?.name?.trim();
       const mealName = titleInput || firstItemName || 'Logged Meal';
+      const mealIsLabel = deriveMealIsLabel(cleanItems, false);
+
+      let linkedStapleId = null;
+
+      if (alsoSaveStaple) {
+        const stapleId = 'staple_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7);
+        linkedStapleId = stapleId;
+        const staple = {
+          id: stapleId,
+          name: mealName,
+          baseGrams: 100,
+          cal: Math.round(totals.cal),
+          p: round1(totals.p),
+          c: round1(totals.c),
+          f: round1(totals.f),
+          isLabelData: mealIsLabel,
+          items: JSON.parse(JSON.stringify(cleanItems))
+        };
+        state.staples.push(staple);
+        await dbPut('staples', staple);
+      }
 
       const newMeal = {
         id: 'meal_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
         date: state.currentDate,
         name: mealName,
         cal: Math.round(totals.cal),
-        p: Math.round(totals.p * 10) / 10,
-        c: Math.round(totals.c * 10) / 10,
-        f: Math.round(totals.f * 10) / 10,
-        isLabelData: Boolean(state.logDraft.isLabelData),
+        p: round1(totals.p),
+        c: round1(totals.c),
+        f: round1(totals.f),
+        isLabelData: mealIsLabel,
+        savedStapleId: linkedStapleId,
         aiPhotosReceived: state.logDraft.aiPhotosReceived,
         note: document.getElementById('noteInput').value.trim(),
-        items: JSON.parse(JSON.stringify(state.logDraft.displayItems))
+        items: JSON.parse(JSON.stringify(cleanItems))
       };
 
       state.meals.push(newMeal);
       await dbPut('meals', newMeal);
-
-      if (alsoSaveStaple) {
-        const staple = {
-          id: 'staple_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
-          name: mealName,
-          baseGrams: 100,
-          cal: Math.round(totals.cal),
-          p: Math.round(totals.p * 10) / 10,
-          c: Math.round(totals.c * 10) / 10,
-          f: Math.round(totals.f * 10) / 10,
-          isLabelData: Boolean(state.logDraft.isLabelData),
-          items: JSON.parse(JSON.stringify(state.logDraft.displayItems))
-        };
-        state.staples.push(staple);
-        await dbPut('staples', staple);
-      }
 
       // Reset draft form
       document.getElementById('mealTitleInput').value = '';
       document.getElementById('recipeInput').value = '';
       document.getElementById('noteInput').value = '';
       document.getElementById('analysisStatusBox').style.display = 'none';
-      state.logDraft.isLabelData = false;
       state.logDraft.aiPhotosReceived = null;
       state.logDraft.vagueWarning = '';
       state.logDraft.multiplier = 1;
-      state.logDraft.baseItems = [{ name: '', qty: '1 serving', cal: 0, p: 0, c: 0, f: 0 }];
-      state.logDraft.displayItems = [{ name: '', qty: '1 serving', cal: 0, p: 0, c: 0, f: 0 }];
-      renderBreakdownTable();
+      state.logDraft.items = [
+        normalizeIngredientItem({ name: '', servingDesc: '1 serving', baseCal: 0, baseP: 0, baseC: 0, baseF: 0, servings: 1, isLabelData: false })
+      ];
+      updateMultiplierHighlight('#multButtonsBar', '1x');
+      renderLogIngredientsList();
       renderAnalysisMetaUI();
 
-      showToast(alsoSaveStaple ? 'Logged & saved to Staples' : `Logged to ${state.currentDate}`);
+      showToast(alsoSaveStaple ? 'Logged & saved to Saved Meals' : `Logged to ${state.currentDate}`);
       switchTab('today');
     }
 
@@ -2144,7 +2529,7 @@ STRICT OPERATING RULES:
 
       const filtered = state.staples.filter(s => s.name.toLowerCase().includes(q));
       if (filtered.length === 0) {
-        container.innerHTML = `<div class="card empty-state">No saved staples found. Save a meal from the Log screen or tap "+ New Staple".</div>`;
+        container.innerHTML = `<div class="card empty-state">No saved staples or meals found. Save a meal from the Log screen or tap "+ New Saved Meal".</div>`;
         return;
       }
 
@@ -2153,12 +2538,13 @@ STRICT OPERATING RULES:
           ? `<span class="badge badge-label">LABEL DATA</span>`
           : `<span class="badge badge-estimate">ESTIMATE</span>`;
         const baseG = Number(s.baseGrams) || 100;
+        const ingCount = Array.isArray(s.items) ? s.items.length : 1;
         return `
           <div class="card">
             <div class="meal-item-top">
               <div>
                 <div class="meal-item-name">${escapeHtml(s.name)}</div>
-                <div class="muted-text">1x = ${Math.round(s.cal)} kcal (${s.p}g P · ${s.c}g C · ${s.f}g F) · Base: ${baseG}g</div>
+                <div class="muted-text">1x = ${Math.round(s.cal)} kcal (${round1(s.p)}g P · ${round1(s.c)}g C · ${round1(s.f)}g F) · ${ingCount} item(s) · Base: ${baseG}g</div>
               </div>
               ${badge}
             </div>
@@ -2172,7 +2558,7 @@ STRICT OPERATING RULES:
               </div>
             </div>
             <div class="row-wrap" style="margin-top: 8px; justify-content: flex-end;">
-              <button type="button" class="btn-secondary btn-sm" onclick="openEditStapleModal('${s.id}')">Edit</button>
+              <button type="button" class="btn-secondary btn-sm" onclick="openEditStapleModal('${s.id}')">Edit Ingredients / Servings</button>
               <button type="button" class="btn-danger btn-sm" onclick="deleteStaple('${s.id}')">Delete</button>
             </div>
           </div>
@@ -2184,18 +2570,32 @@ STRICT OPERATING RULES:
       const s = state.staples.find(x => x.id === stapleId);
       if (!s) return;
 
+      const normalizedStaple = normalizeRecord(s);
+      // Scale each ingredient's servings by mult while keeping per-serving numbers untouched
+      const scaledItems = normalizedStaple.items.map(it => {
+        const newSrv = round2((Number(it.servings) || 1) * mult);
+        return normalizeIngredientItem({
+          ...it,
+          servings: newSrv,
+          initialServings: newSrv
+        }, it.isLabelData);
+      });
+
+      const totals = computeItemsListTotals(scaledItems);
+
       const meal = {
         id: 'meal_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
         date: state.currentDate,
         name: mult === 1 ? s.name : `${s.name} (${labelSuffix})`,
-        cal: Math.round(s.cal * mult),
-        p: Math.round(s.p * mult * 10) / 10,
-        c: Math.round(s.c * mult * 10) / 10,
-        f: Math.round(s.f * mult * 10) / 10,
-        isLabelData: Boolean(s.isLabelData),
+        cal: Math.round(totals.cal),
+        p: round1(totals.p),
+        c: round1(totals.c),
+        f: round1(totals.f),
+        isLabelData: deriveMealIsLabel(scaledItems, s.isLabelData),
+        savedStapleId: s.id,
         aiPhotosReceived: null,
         note: `Quick logged (${labelSuffix})`,
-        items: []
+        items: scaledItems
       };
 
       state.meals.push(meal);
@@ -2222,63 +2622,288 @@ STRICT OPERATING RULES:
       state.staples = state.staples.filter(s => s.id !== stapleId);
       await dbDelete('staples', stapleId);
       renderSavedScreen();
-      showToast('Staple deleted');
+      showToast('Saved item deleted');
     }
 
     /********************************************************************
-     * 9. EDIT MODALS (TODAY MEALS & SAVED STAPLES)
+     * 9. UNIFIED INGREDIENT & SERVINGS EDITOR MODAL (LOGGED & SAVED MEALS)
      ********************************************************************/
     function openEditMealModal(mealId) {
       const m = state.meals.find(x => x.id === mealId);
       if (!m) return;
 
-      document.getElementById('editModalTitle').textContent = 'Edit Logged Meal';
-      document.getElementById('editModalBody').innerHTML = `
-        <div style="margin-bottom: 10px;">
-          <label>Meal Name</label>
-          <input type="text" id="modalMealName" value="${escapeHtml(m.name)}" />
-        </div>
-        <div class="row" style="margin-bottom: 10px;">
-          <div class="col">
-            <label>Calories</label>
-            <input type="number" id="modalMealCal" value="${Math.round(m.cal)}" />
-          </div>
-          <div class="col">
-            <label>Protein (g)</label>
-            <input type="number" step="0.5" id="modalMealP" value="${m.p}" />
-          </div>
-        </div>
-        <div class="row" style="margin-bottom: 14px;">
-          <div class="col">
-            <label>Carbs (g)</label>
-            <input type="number" step="0.5" id="modalMealC" value="${m.c}" />
-          </div>
-          <div class="col">
-            <label>Fat (g)</label>
-            <input type="number" step="0.5" id="modalMealF" value="${m.f}" />
-          </div>
-        </div>
-        <div class="row" style="gap: 8px;">
-          <button type="button" class="btn-primary" onclick="saveEditedMeal('${m.id}')">Save Changes</button>
-          <button type="button" class="btn-danger" onclick="deleteLoggedMeal('${m.id}')">Delete</button>
-        </div>
-      `;
+      const normalized = normalizeRecord(m);
+      state.modalEditor = {
+        mode: 'meal',
+        targetId: m.id,
+        name: normalized.name,
+        baseGrams: 100,
+        multiplier: 1,
+        items: normalized.items.map(it => normalizeIngredientItem({
+          ...it,
+          initialServings: it.servings
+        }, it.isLabelData))
+      };
+
+      document.getElementById('editModalTitle').textContent = `Edit Logged Meal (${m.date})`;
+      renderUnifiedModalBody();
       document.getElementById('editModal').classList.add('open');
     }
 
-    async function saveEditedMeal(mealId) {
-      const m = state.meals.find(x => x.id === mealId);
-      if (!m) return;
-      m.name = document.getElementById('modalMealName').value.trim() || 'Logged Meal';
-      m.cal = Number(document.getElementById('modalMealCal').value) || 0;
-      m.p = Number(document.getElementById('modalMealP').value) || 0;
-      m.c = Number(document.getElementById('modalMealC').value) || 0;
-      m.f = Number(document.getElementById('modalMealF').value) || 0;
+    function openEditStapleModal(stapleId) {
+      const s = state.staples.find(x => x.id === stapleId);
+      if (!s) return;
 
-      await dbPut('meals', m);
-      closeEditModal();
-      renderTodayScreen();
-      showToast('Meal updated');
+      const normalized = normalizeRecord(s);
+      state.modalEditor = {
+        mode: 'staple',
+        targetId: s.id,
+        name: normalized.name,
+        baseGrams: Number(s.baseGrams) || 100,
+        multiplier: 1,
+        items: normalized.items.map(it => normalizeIngredientItem({
+          ...it,
+          initialServings: it.servings
+        }, it.isLabelData))
+      };
+
+      document.getElementById('editModalTitle').textContent = 'Edit Saved Meal / Staple';
+      renderUnifiedModalBody();
+      document.getElementById('editModal').classList.add('open');
+    }
+
+    function openNewStapleModal() {
+      state.modalEditor = {
+        mode: 'new-staple',
+        targetId: null,
+        name: '',
+        baseGrams: 100,
+        multiplier: 1,
+        items: [
+          normalizeIngredientItem({
+            name: '',
+            servingDesc: '1 serving',
+            baseCal: 0,
+            baseP: 0,
+            baseC: 0,
+            baseF: 0,
+            servings: 1,
+            initialServings: 1,
+            isLabelData: true
+          })
+        ]
+      };
+
+      document.getElementById('editModalTitle').textContent = 'New Saved Meal / Staple';
+      renderUnifiedModalBody();
+      document.getElementById('editModal').classList.add('open');
+    }
+
+    function renderUnifiedModalBody() {
+      const isMealMode = state.modalEditor.mode === 'meal';
+      const isStapleMode = state.modalEditor.mode === 'staple' || state.modalEditor.mode === 'new-staple';
+
+      const baseGramsRowHtml = isStapleMode ? `
+        <div style="margin-bottom: 10px;">
+          <label for="modalBaseGramsInput">Base Serving Weight in Grams (for quick-logging by grams)</label>
+          <input type="number" id="modalBaseGramsInput" value="${state.modalEditor.baseGrams}" oninput="state.modalEditor.baseGrams = Number(this.value) || 100" />
+        </div>
+      ` : '';
+
+      const alsoUpdateSavedHtml = isMealMode ? `
+        <label class="checkbox-row">
+          <input type="checkbox" id="alsoUpdateSavedCheckbox" />
+          <span>Also update my saved version</span>
+        </label>
+      ` : '';
+
+      const deleteBtnHtml = isMealMode
+        ? `<button type="button" class="btn-danger" onclick="deleteLoggedMeal('${state.modalEditor.targetId}')">Delete Meal</button>`
+        : (state.modalEditor.mode === 'staple'
+            ? `<button type="button" class="btn-danger" onclick="deleteStapleFromModal('${state.modalEditor.targetId}')">Delete</button>`
+            : '');
+
+      document.getElementById('editModalBody').innerHTML = `
+        <div style="margin-bottom: 10px;">
+          <label for="modalItemTitleInput">Meal / Saved Item Name</label>
+          <input type="text" id="modalItemTitleInput" value="${escapeHtml(state.modalEditor.name)}" placeholder="e.g., Protein Shake or Chicken & Rice" oninput="state.modalEditor.name = this.value" />
+        </div>
+
+        ${baseGramsRowHtml}
+
+        <div style="margin-bottom: 10px;">
+          <label>Whole-Meal Multiplier (Scales All Ingredient Servings)</label>
+          <div class="mult-bar" id="modalMultButtonsBar">
+            <button type="button" class="mult-btn" onclick="applyModalMealMultiplier(1/6, '1/6')">1/6</button>
+            <button type="button" class="mult-btn" onclick="applyModalMealMultiplier(0.25, '1/4')">1/4</button>
+            <button type="button" class="mult-btn" onclick="applyModalMealMultiplier(1/3, '1/3')">1/3</button>
+            <button type="button" class="mult-btn" onclick="applyModalMealMultiplier(0.5, '1/2')">1/2</button>
+            <button type="button" class="mult-btn" onclick="applyModalMealMultiplier(0.75, '3/4')">3/4</button>
+            <button type="button" class="mult-btn active" onclick="applyModalMealMultiplier(1, '1x')">1x</button>
+            <button type="button" class="mult-btn" onclick="applyModalMealMultiplier(1.25, '1.25x')">1.25x</button>
+            <button type="button" class="mult-btn" onclick="applyModalMealMultiplier(1.5, '1.5x')">1.5x</button>
+            <button type="button" class="mult-btn" onclick="applyModalMealMultiplier(2, '2x')">2x</button>
+          </div>
+        </div>
+
+        <div id="modalIngredientsList" class="ing-list"></div>
+
+        <div class="row-wrap" style="justify-content: space-between; margin-top: 10px; margin-bottom: 12px;">
+          <button type="button" class="btn-secondary btn-sm" onclick="addModalIngredientRow()">+ Add Ingredient</button>
+          <div id="modalLiveTotalsText" style="font-weight:700; font-size:0.88rem; color:var(--text);">Total: 0 kcal | 0P | 0C | 0F</div>
+        </div>
+
+        ${alsoUpdateSavedHtml}
+
+        <div class="row" style="gap: 8px;">
+          <button type="button" class="btn-primary" onclick="saveModalChanges()">Save</button>
+          ${deleteBtnHtml}
+        </div>
+      `;
+
+      renderModalIngredientsList();
+    }
+
+    function renderModalIngredientsList() {
+      const container = document.getElementById('modalIngredientsList');
+      if (!container) return;
+      container.innerHTML = buildIngredientRowsHtml(state.modalEditor.items, 'modal');
+      refreshContextTotalsOnly('modal');
+    }
+
+    function addModalIngredientRow() {
+      state.modalEditor.items.push(normalizeIngredientItem({
+        name: '',
+        servingDesc: '1 serving',
+        baseCal: 0,
+        baseP: 0,
+        baseC: 0,
+        baseF: 0,
+        servings: 1,
+        initialServings: 1,
+        isLabelData: false
+      }));
+      renderModalIngredientsList();
+    }
+
+    function applyModalMealMultiplier(factor, labelStr) {
+      state.modalEditor.multiplier = factor;
+      updateMultiplierHighlight('#modalMultButtonsBar', labelStr);
+
+      state.modalEditor.items.forEach(item => {
+        const baseSrv = (item.initialServings !== undefined && item.initialServings > 0) ? item.initialServings : 1;
+        item.servings = round2(baseSrv * factor);
+      });
+      renderModalIngredientsList();
+    }
+
+    async function saveModalChanges() {
+      const titleInput = document.getElementById('modalItemTitleInput');
+      const rawName = (titleInput ? titleInput.value : state.modalEditor.name).trim();
+      const cleanItems = state.modalEditor.items.map(it => normalizeIngredientItem({
+        ...it,
+        initialServings: it.servings
+      }, it.isLabelData));
+
+      const firstItemName = cleanItems[0]?.name?.trim();
+      const finalName = rawName || firstItemName || 'Saved Meal';
+      const totals = computeItemsListTotals(cleanItems);
+      const isLabelData = deriveMealIsLabel(cleanItems, false);
+
+      if (state.modalEditor.mode === 'meal') {
+        const meal = state.meals.find(x => x.id === state.modalEditor.targetId);
+        if (!meal) return;
+
+        meal.name = finalName;
+        meal.cal = Math.round(totals.cal);
+        meal.p = round1(totals.p);
+        meal.c = round1(totals.c);
+        meal.f = round1(totals.f);
+        meal.isLabelData = isLabelData;
+        meal.items = JSON.parse(JSON.stringify(cleanItems));
+
+        const alsoUpdateSaved = Boolean(document.getElementById('alsoUpdateSavedCheckbox')?.checked);
+
+        if (alsoUpdateSaved) {
+          let matchingStaple = null;
+          if (meal.savedStapleId) {
+            matchingStaple = state.staples.find(s => s.id === meal.savedStapleId);
+          }
+          if (!matchingStaple) {
+            matchingStaple = state.staples.find(s => s.name.trim().toLowerCase() === finalName.toLowerCase());
+          }
+
+          if (matchingStaple) {
+            matchingStaple.name = finalName;
+            matchingStaple.cal = Math.round(totals.cal);
+            matchingStaple.p = round1(totals.p);
+            matchingStaple.c = round1(totals.c);
+            matchingStaple.f = round1(totals.f);
+            matchingStaple.isLabelData = isLabelData;
+            matchingStaple.items = JSON.parse(JSON.stringify(cleanItems));
+            meal.savedStapleId = matchingStaple.id;
+            await dbPut('staples', matchingStaple);
+          } else {
+            const newStapleId = 'staple_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7);
+            const newStaple = {
+              id: newStapleId,
+              name: finalName,
+              baseGrams: 100,
+              cal: Math.round(totals.cal),
+              p: round1(totals.p),
+              c: round1(totals.c),
+              f: round1(totals.f),
+              isLabelData,
+              items: JSON.parse(JSON.stringify(cleanItems))
+            };
+            meal.savedStapleId = newStapleId;
+            state.staples.push(newStaple);
+            await dbPut('staples', newStaple);
+          }
+        }
+
+        await dbPut('meals', meal);
+        closeEditModal();
+        renderTodayScreen();
+        showToast(alsoUpdateSaved ? 'Meal & saved version updated' : 'Meal updated for this day');
+        return;
+      }
+
+      // Staple Edit or New Staple
+      const baseGrams = Number(document.getElementById('modalBaseGramsInput')?.value) || 100;
+      if (state.modalEditor.mode === 'staple') {
+        const s = state.staples.find(x => x.id === state.modalEditor.targetId);
+        if (!s) return;
+        s.name = finalName;
+        s.baseGrams = baseGrams;
+        s.cal = Math.round(totals.cal);
+        s.p = round1(totals.p);
+        s.c = round1(totals.c);
+        s.f = round1(totals.f);
+        s.isLabelData = isLabelData;
+        s.items = JSON.parse(JSON.stringify(cleanItems));
+        await dbPut('staples', s);
+        closeEditModal();
+        renderSavedScreen();
+        showToast('Saved meal updated');
+      } else {
+        const newS = {
+          id: 'staple_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
+          name: finalName,
+          baseGrams,
+          cal: Math.round(totals.cal),
+          p: round1(totals.p),
+          c: round1(totals.c),
+          f: round1(totals.f),
+          isLabelData,
+          items: JSON.parse(JSON.stringify(cleanItems))
+        };
+        state.staples.push(newS);
+        await dbPut('staples', newS);
+        closeEditModal();
+        renderSavedScreen();
+        showToast('Saved meal created');
+      }
     }
 
     async function deleteLoggedMeal(mealId) {
@@ -2289,99 +2914,9 @@ STRICT OPERATING RULES:
       showToast('Meal removed');
     }
 
-    function openNewStapleModal() {
-      document.getElementById('editModalTitle').textContent = 'New Staple / Saved Meal';
-      document.getElementById('editModalBody').innerHTML = getStapleFormHtml({
-        id: '',
-        name: '',
-        baseGrams: 100,
-        cal: 0,
-        p: 0,
-        c: 0,
-        f: 0,
-        isLabelData: true
-      });
-      document.getElementById('editModal').classList.add('open');
-    }
-
-    function openEditStapleModal(stapleId) {
-      const s = state.staples.find(x => x.id === stapleId);
-      if (!s) return;
-      document.getElementById('editModalTitle').textContent = 'Edit Saved Staple';
-      document.getElementById('editModalBody').innerHTML = getStapleFormHtml(s);
-      document.getElementById('editModal').classList.add('open');
-    }
-
-    function getStapleFormHtml(s) {
-      return `
-        <div style="margin-bottom: 10px;">
-          <label>Name</label>
-          <input type="text" id="modalStapleName" value="${escapeHtml(s.name)}" placeholder="e.g., Whey Isolate (1 scoop)" />
-        </div>
-        <div class="row" style="margin-bottom: 10px;">
-          <div class="col">
-            <label>Base Serving Weight (g)</label>
-            <input type="number" id="modalStapleGrams" value="${Number(s.baseGrams) || 100}" />
-          </div>
-          <div class="col">
-            <label>Source Type</label>
-            <select id="modalStapleBadge">
-              <option value="label" ${s.isLabelData ? 'selected' : ''}>LABEL DATA</option>
-              <option value="estimate" ${!s.isLabelData ? 'selected' : ''}>ESTIMATE</option>
-            </select>
-          </div>
-        </div>
-        <div class="row" style="margin-bottom: 10px;">
-          <div class="col">
-            <label>Calories</label>
-            <input type="number" id="modalStapleCal" value="${Math.round(s.cal)}" />
-          </div>
-          <div class="col">
-            <label>Protein (g)</label>
-            <input type="number" step="0.5" id="modalStapleP" value="${s.p}" />
-          </div>
-        </div>
-        <div class="row" style="margin-bottom: 14px;">
-          <div class="col">
-            <label>Carbs (g)</label>
-            <input type="number" step="0.5" id="modalStapleC" value="${s.c}" />
-          </div>
-          <div class="col">
-            <label>Fat (g)</label>
-            <input type="number" step="0.5" id="modalStapleF" value="${s.f}" />
-          </div>
-        </div>
-        <button type="button" class="btn-primary" onclick="saveStapleFromModal('${s.id}')">Save Staple</button>
-      `;
-    }
-
-    async function saveStapleFromModal(existingId) {
-      const name = document.getElementById('modalStapleName').value.trim() || 'Saved Staple';
-      const baseGrams = Number(document.getElementById('modalStapleGrams').value) || 100;
-      const isLabelData = document.getElementById('modalStapleBadge').value === 'label';
-      const cal = Number(document.getElementById('modalStapleCal').value) || 0;
-      const p = Number(document.getElementById('modalStapleP').value) || 0;
-      const c = Number(document.getElementById('modalStapleC').value) || 0;
-      const f = Number(document.getElementById('modalStapleF').value) || 0;
-
-      if (existingId) {
-        const s = state.staples.find(x => x.id === existingId);
-        if (s) {
-          Object.assign(s, { name, baseGrams, isLabelData, cal, p, c, f });
-          await dbPut('staples', s);
-        }
-      } else {
-        const newS = {
-          id: 'staple_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
-          name, baseGrams, isLabelData, cal, p, c, f, items: []
-        };
-        state.staples.push(newS);
-        await dbPut('staples', newS);
-      }
-
+    async function deleteStapleFromModal(stapleId) {
+      await deleteStaple(stapleId);
       closeEditModal();
-      renderSavedScreen();
-      showToast('Staple saved');
     }
 
     function closeEditModal() {
@@ -2491,7 +3026,7 @@ STRICT OPERATING RULES:
 
       const backupPayload = {
         app: 'MacroTrack',
-        version: '3.3',
+        version: '3.4',
         exportedAt: nowIso,
         settings: {
           targetCal: state.settings.targetCal,
@@ -2530,8 +3065,9 @@ STRICT OPERATING RULES:
         await dbClear('meals');
         await dbClear('staples');
 
-        state.meals = data.meals;
-        state.staples = data.staples;
+        // Migrate any older backup entries seamlessly to servings = 1
+        state.meals = data.meals.map(normalizeRecord);
+        state.staples = data.staples.map(normalizeRecord);
 
         for (const m of state.meals) await dbPut('meals', m);
         for (const s of state.staples) await dbPut('staples', s);
@@ -2628,7 +3164,7 @@ STRICT OPERATING RULES:
       await loadAllStateFromDB();
       initStoragePersistence();
       syncLogScreenDateLabels();
-      renderBreakdownTable();
+      renderLogIngredientsList();
       renderAnalysisMetaUI();
       renderTodayScreen();
       registerServiceWorker();
