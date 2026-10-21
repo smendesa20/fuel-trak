@@ -3,33 +3,58 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <meta name="theme-color" content="#090d16" />
+  <meta name="theme-color" content="#0a121f" />
+  <meta name="description" content="Fuel-Trak — AI-powered nutrition, calorie and macro tracker." />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <title>MacroTrack</title>
+  <title>Fuel-Trak</title>
   <link rel="manifest" href="./manifest.json" />
   <link rel="icon" href="./icon-192.png" />
   <link rel="apple-touch-icon" href="./icon-192.png" />
   <style>
+    /* ================================================================
+       FUEL-TRAK DESIGN TOKENS (colours taken from the logo)
+       ================================================================ */
     :root {
-      --bg: #090d16;
-      --card: #111827;
-      --card-alt: #1e293b;
-      --input-bg: #0b1120;
-      --border: #263248;
-      --border-light: #334155;
+      color-scheme: dark;
+
+      --bg: #0a121f;
+      --card: #111b2d;
+      --card-alt: #18243a;
+      --input-bg: #0c1626;
+      --border: rgba(148, 163, 184, 0.12);
+      --border-light: rgba(148, 163, 184, 0.2);
+
       --text: #f8fafc;
-      --text-muted: #94a3b8;
-      --accent: #38bdf8;
-      --accent-dark: #0284c7;
-      --success: #10b981;
-      --success-bg: rgba(16, 185, 129, 0.14);
-      --warning: #f59e0b;
-      --warning-bg: rgba(245, 158, 11, 0.14);
-      --danger: #f43f5e;
-      --danger-bg: rgba(244, 63, 94, 0.14);
-      --radius: 12px;
-      --nav-h: 64px;
+      --text-soft: #cbd5e1;
+      --text-muted: #8b9ab3;
+      --placeholder: #56667f;
+
+      --accent: #f97316;
+      --accent-light: #fb923c;
+      --accent-dark: #ea580c;
+      --accent-glow: rgba(249, 115, 22, 0.45);
+      --accent-tint: rgba(249, 115, 22, 0.14);
+      --highlight: #fbbf24;
+      --highlight-tint: rgba(251, 191, 36, 0.12);
+      --hot: #ff4a1c;
+
+      --success: #22c55e;
+      --success-bg: rgba(34, 197, 94, 0.14);
+      --warning: #f97316;
+      --warning-bg: rgba(249, 115, 22, 0.12);
+      --danger: #ef4444;
+      --danger-bg: rgba(239, 68, 68, 0.12);
+
+      --radius: 18px;
+      --radius-md: 14px;
+      --radius-sm: 10px;
+      --nav-h: 68px;
+      --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+      --font: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+      --icon-mic: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='9' y='2.5' width='6' height='11.5' rx='3' fill='%23000'/%3E%3Cpath d='M5.5 10.5a6.5 6.5 0 0 0 13 0'/%3E%3Cpath d='M12 17v4.5M8.5 21.5h7'/%3E%3C/svg%3E");
+      --icon-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23f97316' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
     }
 
     * {
@@ -37,19 +62,37 @@
       -webkit-tap-highlight-color: transparent;
     }
 
+    ::selection {
+      background: rgba(249, 115, 22, 0.35);
+    }
+
     html, body {
       margin: 0;
       padding: 0;
       background-color: var(--bg);
       color: var(--text);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-family: var(--font);
       font-size: 15px;
       line-height: 1.45;
       min-height: 100%;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
     }
 
     body {
-      padding-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom, 16px) + 16px);
+      padding-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom, 0px) + 20px);
+    }
+
+    /* Soft flame glow behind everything */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      background:
+        radial-gradient(120% 55% at 0% 0%, rgba(249, 115, 22, 0.11), transparent 55%),
+        radial-gradient(90% 45% at 100% 0%, rgba(251, 191, 36, 0.05), transparent 60%);
     }
 
     /* Update Banner */
@@ -58,46 +101,94 @@
       position: sticky;
       top: 0;
       z-index: 1000;
-      background: var(--accent-dark);
+      background: linear-gradient(90deg, var(--accent-dark), var(--accent), var(--highlight));
       color: #fff;
       text-align: center;
-      padding: 10px 16px;
-      font-weight: 700;
-      font-size: 0.9rem;
+      padding: 11px 16px;
+      font-weight: 800;
+      font-size: 0.88rem;
+      letter-spacing: 0.01em;
       cursor: pointer;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+      box-shadow: 0 4px 18px rgba(249, 115, 22, 0.35);
     }
 
     .app-shell {
       max-width: 600px;
       margin: 0 auto;
-      padding: 14px 14px 24px;
+      padding: max(10px, env(safe-area-inset-top, 0px)) 16px 24px;
     }
 
+    /* ================================================================
+       HEADER / BRAND
+       ================================================================ */
+    .app-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 2px 16px;
+    }
+
+    .app-logo {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: block;
+      flex-shrink: 0;
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.07), 0 6px 16px -4px rgba(249, 115, 22, 0.45);
+    }
+
+    /* Wordmark: hand-drawn rounded geometric letters (inline SVG, no font needed) */
+    .app-wordmark {
+      margin: 0;
+      line-height: 0;
+    }
+
+    .app-wordmark svg {
+      display: block;
+      height: 27px;
+      width: auto;
+      overflow: visible;
+    }
+
+    .app-wordmark .wm-fuel { stroke: var(--accent); }
+    .app-wordmark .wm-trak { stroke: #f4f1f1; }
+
+    /* ================================================================
+       SCREENS
+       ================================================================ */
     .screen {
       display: none;
     }
     .screen.active {
       display: block;
+      animation: screen-in 0.28s var(--ease);
+    }
+
+    @keyframes screen-in {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
     }
 
     /* Cards & Layout */
     .card {
-      background: var(--card);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0) 40%), var(--card);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 14px;
+      padding: 16px;
       margin-bottom: 14px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03), 0 12px 30px -16px rgba(0, 0, 0, 0.6);
     }
 
     .card-title {
-      font-size: 1rem;
-      font-weight: 700;
-      margin: 0 0 10px 0;
+      font-size: 1.02rem;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      margin: 0 0 14px 0;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 8px;
+      flex-wrap: wrap;
+      gap: 8px 10px;
     }
 
     .row {
@@ -118,20 +209,52 @@
       min-width: 0;
     }
 
-    /* Inputs & Buttons */
+    .field {
+      margin-bottom: 14px;
+    }
+
+    .field-hint {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin: 6px 0 0;
+      line-height: 1.4;
+    }
+
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.85em;
+      background: rgba(148, 163, 184, 0.12);
+      color: var(--text-soft);
+      padding: 1px 5px;
+      border-radius: 5px;
+    }
+
+    /* ================================================================
+       INPUTS
+       ================================================================ */
     label {
       display: block;
-      font-size: 0.82rem;
-      font-weight: 600;
+      font-size: 0.72rem;
+      font-weight: 800;
       color: var(--text-muted);
-      margin-bottom: 5px;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      margin-bottom: 7px;
+    }
+
+    .label-hint {
+      text-transform: none;
+      letter-spacing: 0;
+      font-weight: 600;
+      opacity: 0.75;
+      margin-left: 4px;
     }
 
     .label-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 5px;
+      margin-bottom: 7px;
     }
 
     .label-row label {
@@ -145,42 +268,161 @@
     select,
     textarea {
       width: 100%;
+      min-height: 46px;
       background: var(--input-bg);
       border: 1px solid var(--border-light);
       color: var(--text);
-      padding: 10px 12px;
-      border-radius: 8px;
-      font-size: 0.95rem;
+      padding: 12px 14px;
+      border-radius: 12px;
+      font-size: 0.97rem;
       font-family: inherit;
       outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      color: var(--placeholder);
     }
 
     input:focus, select:focus, textarea:focus {
       border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.18);
+    }
+
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    input[type="number"] {
+      -moz-appearance: textfield;
+      appearance: textfield;
+    }
+
+    input[type="date"]::-webkit-calendar-picker-indicator {
+      opacity: 0.7;
+      cursor: pointer;
+    }
+
+    select {
+      -webkit-appearance: none;
+      appearance: none;
+      padding-right: 40px;
+      background-image: var(--icon-chevron);
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      background-size: 18px;
+      cursor: pointer;
     }
 
     textarea {
       resize: vertical;
-      min-height: 76px;
+      min-height: 92px;
+      line-height: 1.45;
     }
 
+    /* File inputs styled as a drop-zone */
+    input[type="file"] {
+      display: block;
+      width: 100%;
+      padding: 9px;
+      border: 1.5px dashed rgba(249, 115, 22, 0.35);
+      border-radius: 14px;
+      background: rgba(249, 115, 22, 0.04);
+      color: var(--text-muted);
+      font-family: inherit;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: border-color 0.2s, background-color 0.2s;
+    }
+
+    input[type="file"]:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    input[type="file"]::file-selector-button {
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: #fdba74;
+      background: var(--accent-tint);
+      border: 1px solid rgba(249, 115, 22, 0.35);
+      border-radius: 10px;
+      padding: 10px 14px;
+      margin-right: 12px;
+      cursor: pointer;
+    }
+
+    input[type="file"]::-webkit-file-upload-button {
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: #fdba74;
+      background: var(--accent-tint);
+      border: 1px solid rgba(249, 115, 22, 0.35);
+      border-radius: 10px;
+      padding: 10px 14px;
+      margin-right: 12px;
+      cursor: pointer;
+    }
+
+    .search-wrap {
+      position: relative;
+    }
+
+    .search-wrap svg {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 18px;
+      height: 18px;
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .search-wrap input {
+      padding-left: 42px;
+    }
+
+    /* ================================================================
+       BUTTONS
+       ================================================================ */
     button {
       font-family: inherit;
       font-size: 0.92rem;
       font-weight: 700;
+      color: var(--text);
+      background: transparent;
       border: none;
-      border-radius: 8px;
-      padding: 10px 14px;
+      border-radius: 12px;
+      padding: 11px 16px;
+      min-height: 44px;
       cursor: pointer;
-      transition: opacity 0.15s, transform 0.05s;
+      transition: transform 0.12s var(--ease), background-color 0.2s, border-color 0.2s, box-shadow 0.2s, color 0.2s, opacity 0.2s, filter 0.2s;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
+      gap: 8px;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+    }
+
+    button svg {
+      flex-shrink: 0;
     }
 
     button:active:not(:disabled) {
-      transform: scale(0.98);
+      transform: scale(0.97);
+    }
+
+    button:focus-visible {
+      outline: 2px solid var(--highlight);
+      outline-offset: 2px;
     }
 
     button:disabled {
@@ -188,60 +430,151 @@
       cursor: not-allowed;
     }
 
-    .btn-primary {
-      background: var(--accent);
-      color: #061320;
+    .btn-primary,
+    .btn-success {
       width: 100%;
-      padding: 12px;
-      font-size: 0.98rem;
+      min-height: 52px;
+      padding: 14px 18px;
+      font-size: 1rem;
+      font-weight: 800;
+      letter-spacing: 0.01em;
+      color: #fff;
+      background: linear-gradient(135deg, #fb923c 0%, #f97316 45%, #ea580c 100%);
+      box-shadow: 0 10px 24px -10px var(--accent-glow), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+      text-shadow: 0 1px 1px rgba(124, 45, 18, 0.35);
+    }
+
+    .btn-primary:active:not(:disabled),
+    .btn-success:active:not(:disabled) {
+      filter: brightness(0.93);
+      box-shadow: 0 4px 12px -6px var(--accent-glow), inset 0 2px 6px rgba(124, 45, 18, 0.35);
     }
 
     .btn-secondary {
-      background: var(--card-alt);
+      background: rgba(255, 255, 255, 0.06);
       color: var(--text);
       border: 1px solid var(--border-light);
     }
 
-    .btn-success {
-      background: var(--success);
-      color: #041f17;
-      width: 100%;
-      padding: 12px;
+    .btn-secondary:active:not(:disabled) {
+      background: rgba(249, 115, 22, 0.12);
+      border-color: rgba(249, 115, 22, 0.45);
     }
 
     .btn-danger {
       background: var(--danger-bg);
-      color: var(--danger);
-      border: 1px solid var(--danger);
+      color: #fca5a5;
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      flex-shrink: 0;
+    }
+
+    .btn-danger:active:not(:disabled) {
+      background: rgba(239, 68, 68, 0.22);
+    }
+
+    @media (hover: hover) {
+      .btn-primary:hover:not(:disabled),
+      .btn-success:hover:not(:disabled) { filter: brightness(1.07); }
+      .btn-secondary:hover:not(:disabled) { background: rgba(255, 255, 255, 0.1); }
+      .btn-danger:hover:not(:disabled) { background: rgba(239, 68, 68, 0.2); }
     }
 
     .btn-sm {
-      padding: 6px 10px;
-      font-size: 0.8rem;
-      border-radius: 6px;
+      min-height: 38px;
+      padding: 8px 13px;
+      font-size: 0.82rem;
+      border-radius: 10px;
     }
 
-    /* Mic Button */
+    .btn-inline-primary {
+      width: auto;
+      min-height: 38px;
+      padding: 8px 14px;
+      font-size: 0.84rem;
+      border-radius: 10px;
+    }
+
+    .icon-btn {
+      width: 46px;
+      height: 46px;
+      padding: 0;
+      flex-shrink: 0;
+      background: var(--card);
+      color: var(--text-soft);
+      border: 1px solid var(--border);
+    }
+
+    .icon-btn:active:not(:disabled) {
+      color: var(--accent);
+      border-color: rgba(249, 115, 22, 0.45);
+    }
+
+    /* ================================================================
+       MIC BUTTON
+       ================================================================ */
+    .textarea-wrap {
+      position: relative;
+    }
+
+    .textarea-wrap textarea {
+      padding-right: 62px;
+    }
+
     .mic-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 44px;
+      height: 44px;
+      min-height: 44px;
+      padding: 0;
+      border-radius: 50%;
+      font-size: 0;
+      line-height: 0;
+      color: transparent;
+      overflow: hidden;
       background: var(--card-alt);
-      color: var(--text);
       border: 1px solid var(--border-light);
-      padding: 4px 10px;
-      font-size: 0.78rem;
-      border-radius: 999px;
-      font-weight: 600;
+      box-shadow: 0 4px 12px -4px rgba(0, 0, 0, 0.6);
+    }
+
+    .mic-btn::before {
+      content: "";
+      width: 20px;
+      height: 20px;
+      background-color: var(--text-soft);
+      -webkit-mask: var(--icon-mic) center / contain no-repeat;
+      mask: var(--icon-mic) center / contain no-repeat;
+      transition: background-color 0.2s;
+    }
+
+    .mic-btn:active:not(:disabled) {
+      border-color: rgba(249, 115, 22, 0.5);
+    }
+
+    .mic-btn:active::before {
+      background-color: var(--accent-light);
+    }
+
+    @media (hover: hover) {
+      .mic-btn:hover { border-color: rgba(249, 115, 22, 0.5); }
+      .mic-btn:hover::before { background-color: var(--accent-light); }
     }
 
     .mic-btn.recording {
-      background: var(--danger-bg);
-      color: var(--danger);
-      border-color: var(--danger);
-      animation: pulse 1.2s infinite;
+      background: radial-gradient(circle at 35% 30%, #ff8a50 0%, var(--hot) 55%, #d9310c 100%);
+      border-color: transparent;
+      animation: mic-pulse 1.4s ease-out infinite;
     }
 
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.55; }
+    .mic-btn.recording::before {
+      background-color: #fff;
+    }
+
+    @keyframes mic-pulse {
+      0%   { box-shadow: 0 0 0 0 rgba(255, 74, 28, 0.6); }
+      70%  { box-shadow: 0 0 0 13px rgba(255, 74, 28, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(255, 74, 28, 0); }
     }
 
     /* Photo Thumbnails Grid */
@@ -249,18 +582,19 @@
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
-      margin-bottom: 10px;
+      margin: 12px 0 4px;
     }
 
     .thumb-item {
       position: relative;
-      width: 62px;
-      height: 62px;
-      border-radius: 8px;
+      width: 68px;
+      height: 68px;
+      border-radius: 12px;
       overflow: hidden;
       border: 1px solid var(--border-light);
       background: var(--input-bg);
       flex-shrink: 0;
+      box-shadow: 0 6px 14px -8px rgba(0, 0, 0, 0.7);
     }
 
     .thumb-item img {
@@ -272,15 +606,16 @@
 
     .thumb-remove {
       position: absolute;
-      top: 2px;
-      right: 2px;
-      width: 20px;
-      height: 20px;
+      top: 4px;
+      right: 4px;
+      width: 22px;
+      height: 22px;
+      min-height: 22px;
       border-radius: 999px;
-      background: rgba(9, 13, 22, 0.88);
-      color: var(--danger);
-      border: 1px solid var(--danger);
-      font-size: 0.72rem;
+      background: rgba(10, 18, 31, 0.85);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      font-size: 0.8rem;
       font-weight: 800;
       padding: 0;
       line-height: 1;
@@ -289,31 +624,43 @@
       justify-content: center;
     }
 
-    /* Date Bar */
+    .thumb-remove:active:not(:disabled) {
+      background: var(--danger);
+    }
+
+    .photo-status-row {
+      justify-content: space-between;
+      margin: 10px 0 14px;
+      min-height: 38px;
+    }
+
+    /* ================================================================
+       DATE BAR
+       ================================================================ */
     .date-nav {
       display: flex;
       align-items: center;
-      justify-content: space-between;
       gap: 8px;
-      margin-bottom: 12px;
-    }
-
-    .date-nav button {
-      background: var(--card);
-      color: var(--text);
-      border: 1px solid var(--border);
-      padding: 9px 13px;
+      margin-bottom: 14px;
     }
 
     .date-nav input[type="date"] {
+      flex: 1;
+      min-width: 0;
       text-align: center;
-      font-weight: 700;
+      font-weight: 800;
       background: var(--card);
       border-color: var(--border);
-      flex: 1;
     }
 
-    /* Macro Progress & Counters */
+    .date-nav .today-btn {
+      min-height: 46px;
+      flex-shrink: 0;
+    }
+
+    /* ================================================================
+       MACRO PROGRESS & COUNTERS
+       ================================================================ */
     .macro-main-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -324,57 +671,79 @@
     .macro-box {
       background: var(--input-bg);
       border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 12px;
+      border-radius: var(--radius-md);
+      padding: 14px;
+      min-width: 0;
+    }
+
+    .macro-box-cal {
+      background: radial-gradient(130% 100% at 100% 0%, rgba(249, 115, 22, 0.18), transparent 60%), var(--input-bg);
+      border-color: rgba(249, 115, 22, 0.28);
     }
 
     .macro-box-header {
       display: flex;
       justify-content: space-between;
-      align-items: baseline;
-      margin-bottom: 4px;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 8px;
     }
 
     .macro-box-title {
-      font-size: 0.78rem;
-      font-weight: 700;
+      font-size: 0.72rem;
+      font-weight: 800;
       text-transform: uppercase;
       color: var(--text-muted);
-      letter-spacing: 0.03em;
+      letter-spacing: 0.08em;
     }
 
     .macro-big-num {
-      font-size: 1.35rem;
-      font-weight: 800;
+      font-size: 1.9rem;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      line-height: 1.05;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .macro-unit {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: 0;
+      margin-left: 4px;
     }
 
     .macro-sub {
       font-size: 0.8rem;
+      font-weight: 600;
       color: var(--text-muted);
-      margin-top: 4px;
     }
 
     .progress-track {
-      height: 7px;
-      background: #1e293b;
+      height: 8px;
+      background: rgba(148, 163, 184, 0.12);
       border-radius: 999px;
       overflow: hidden;
-      margin: 7px 0;
+      margin: 10px 0 8px;
     }
 
     .progress-fill {
       height: 100%;
-      background: var(--accent);
+      background: linear-gradient(90deg, var(--accent-dark), var(--accent) 55%, var(--highlight));
       border-radius: 999px;
-      transition: width 0.25s ease;
+      box-shadow: 0 0 12px rgba(249, 115, 22, 0.55);
+      transition: width 0.5s var(--ease);
     }
 
     .progress-fill.over-limit {
-      background: var(--danger);
+      background: linear-gradient(90deg, #dc2626, var(--danger));
+      box-shadow: 0 0 12px rgba(239, 68, 68, 0.55);
     }
 
     .progress-fill.target-hit {
-      background: var(--success);
+      background: linear-gradient(90deg, #16a34a, var(--success));
+      box-shadow: 0 0 12px rgba(34, 197, 94, 0.5);
     }
 
     .secondary-macros {
@@ -386,30 +755,39 @@
     .plain-counter {
       background: var(--input-bg);
       border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 9px 12px;
+      border-radius: 12px;
+      padding: 11px 14px;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
 
     .plain-counter span:first-child {
-      font-size: 0.82rem;
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
       color: var(--text-muted);
-      font-weight: 600;
     }
 
     .plain-counter span:last-child {
       font-size: 1.05rem;
       font-weight: 700;
+      color: var(--text-muted);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .plain-counter strong {
+      color: var(--text);
+      font-weight: 800;
     }
 
     .avg-strip {
       margin-top: 10px;
-      padding: 9px 12px;
-      background: rgba(56, 189, 248, 0.07);
-      border: 1px solid rgba(56, 189, 248, 0.22);
-      border-radius: 8px;
+      padding: 11px 14px;
+      background: linear-gradient(90deg, rgba(249, 115, 22, 0.1), rgba(251, 191, 36, 0.05));
+      border: 1px solid rgba(249, 115, 22, 0.22);
+      border-radius: 12px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -420,82 +798,122 @@
 
     .avg-strip-title {
       color: var(--text-muted);
-      font-weight: 600;
+      font-weight: 700;
     }
 
     .avg-strip-values {
-      font-weight: 700;
-      color: var(--text);
+      font-weight: 800;
+      color: var(--highlight);
+      font-variant-numeric: tabular-nums;
     }
 
-    /* Badges & Flags */
+    /* ================================================================
+       BADGES & ALERTS
+       ================================================================ */
     .badge {
       display: inline-flex;
       align-items: center;
-      padding: 3px 8px;
+      padding: 4px 9px;
       border-radius: 999px;
-      font-size: 0.72rem;
+      font-size: 0.66rem;
       font-weight: 800;
+      line-height: 1.2;
       text-transform: uppercase;
-      letter-spacing: 0.03em;
+      letter-spacing: 0.06em;
+      white-space: nowrap;
     }
 
     .badge-clickable {
       cursor: pointer;
       user-select: none;
+      -webkit-user-select: none;
     }
 
     .badge-estimate {
-      background: var(--warning-bg);
-      color: var(--warning);
-      border: 1px solid var(--warning);
+      background: rgba(249, 115, 22, 0.08);
+      color: #fdba74;
+      border: 1px dashed rgba(249, 115, 22, 0.6);
     }
 
     .badge-label {
-      background: var(--success-bg);
-      color: var(--success);
-      border: 1px solid var(--success);
+      background: var(--highlight-tint);
+      color: #fcd34d;
+      border: 1px solid rgba(251, 191, 36, 0.45);
     }
 
     .badge-neutral {
-      background: var(--card-alt);
-      color: var(--text-muted);
+      background: rgba(148, 163, 184, 0.1);
+      color: var(--text-soft);
       border: 1px solid var(--border-light);
     }
 
+    /* Protein "Target hit" = the only green in the app */
+    #proStatusBadge.badge-label {
+      background: var(--success-bg);
+      color: #4ade80;
+      border-color: rgba(34, 197, 94, 0.5);
+    }
+
+    /* Calories over the ceiling */
+    #calStatusBadge.badge-estimate {
+      background: var(--danger-bg);
+      color: #fca5a5;
+      border: 1px solid rgba(239, 68, 68, 0.5);
+    }
+
     .alert-box {
-      padding: 11px 12px;
-      border-radius: 8px;
+      padding: 12px 14px;
+      border-radius: 12px;
       font-size: 0.86rem;
-      margin-top: 10px;
+      font-weight: 600;
+      line-height: 1.45;
+      margin-top: 12px;
+      border: 1px solid transparent;
+      border-left-width: 3px;
     }
 
     .alert-warning {
       background: var(--warning-bg);
-      border-left: 4px solid var(--warning);
-      color: #fde68a;
+      border-color: rgba(249, 115, 22, 0.3);
+      border-left-color: var(--accent);
+      color: #fed7aa;
     }
 
     .alert-danger {
       background: var(--danger-bg);
-      border-left: 4px solid var(--danger);
-      color: #fecdd3;
+      border-color: rgba(239, 68, 68, 0.3);
+      border-left-color: var(--danger);
+      color: #fecaca;
     }
 
     .alert-success {
-      background: var(--success-bg);
-      border-left: 4px solid var(--success);
-      color: #a7f3d0;
+      background: var(--highlight-tint);
+      border-color: rgba(251, 191, 36, 0.28);
+      border-left-color: var(--highlight);
+      color: #fde68a;
     }
 
-    /* Meals List */
+    /* ================================================================
+       MEALS LIST & PAST-DAY RE-LOG BAR
+       ================================================================ */
     .meal-item {
       background: var(--input-bg);
       border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 12px;
-      margin-bottom: 9px;
+      border-radius: var(--radius-md);
+      padding: 13px 14px;
+      margin-bottom: 10px;
       cursor: pointer;
+      transition: border-color 0.2s, transform 0.12s var(--ease), background-color 0.2s;
+    }
+
+    .meal-item:active {
+      transform: scale(0.985);
+      border-color: rgba(249, 115, 22, 0.45);
+      background: rgba(249, 115, 22, 0.05);
+    }
+
+    @media (hover: hover) {
+      .meal-item:hover { border-color: rgba(249, 115, 22, 0.35); }
     }
 
     .meal-item:last-child {
@@ -506,84 +924,204 @@
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      gap: 8px;
-      margin-bottom: 6px;
+      gap: 10px;
+      margin-bottom: 8px;
     }
 
     .meal-item-name {
-      font-weight: 700;
-      font-size: 0.96rem;
+      font-weight: 800;
+      font-size: 0.98rem;
+      letter-spacing: -0.005em;
     }
 
     .meal-item-macros {
-      font-size: 0.83rem;
+      font-size: 0.82rem;
       color: var(--text-muted);
       display: flex;
-      gap: 10px;
+      gap: 4px 14px;
       flex-wrap: wrap;
+      font-variant-numeric: tabular-nums;
     }
 
     .meal-item-macros strong {
       color: var(--text);
+      font-weight: 800;
+    }
+
+    .meal-item-macros span:first-child strong {
+      color: var(--accent-light);
+    }
+
+    /* Past day "+ Add to today" bar inside meal item */
+    .meal-relog-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+      cursor: default;
     }
 
     /* Multiplier Bar */
     .mult-bar {
-      display: flex;
-      flex-wrap: wrap;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(54px, 1fr));
       gap: 6px;
-      margin-top: 6px;
     }
 
     .mult-btn {
+      min-height: 40px;
+      padding: 8px 6px;
+      font-size: 0.84rem;
+      font-weight: 800;
+      border-radius: 10px;
       background: var(--input-bg);
       color: var(--text-muted);
       border: 1px solid var(--border-light);
-      padding: 6px 10px;
-      font-size: 0.8rem;
-      border-radius: 6px;
-      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .mult-btn:active:not(:disabled) {
+      border-color: rgba(249, 115, 22, 0.5);
+      color: var(--text);
     }
 
     .mult-btn.active {
-      background: var(--accent);
-      color: #061320;
-      border-color: var(--accent);
+      background: linear-gradient(135deg, var(--accent-light), var(--accent-dark));
+      color: #fff;
+      border-color: transparent;
+      box-shadow: 0 6px 16px -6px var(--accent-glow);
     }
 
-    /* Ingredient Row Editor Cards (Log Screen & Modal) */
+    /* Big Meal-Level Servings Control Box */
+    .meal-servings-box {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 12px 14px;
+      background: rgba(249, 115, 22, 0.07);
+      border: 1px solid rgba(249, 115, 22, 0.22);
+      border-radius: var(--radius-md);
+      margin-bottom: 12px;
+    }
+
+    .meal-servings-box .srv-title {
+      font-size: 0.76rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--text-soft);
+    }
+
+    .meal-servings-box .srv-sub {
+      font-size: 0.74rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .big-step-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .big-step-btn {
+      width: 44px;
+      height: 44px;
+      min-height: 44px;
+      padding: 0;
+      border-radius: 12px;
+      background: var(--card-alt);
+      color: var(--text);
+      border: 1px solid var(--border-light);
+      font-size: 1.3rem;
+      font-weight: 800;
+    }
+
+    .big-step-btn:active:not(:disabled) {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .big-srv-input {
+      width: 78px !important;
+      min-height: 44px !important;
+      padding: 8px !important;
+      text-align: center;
+      font-size: 1.05rem !important;
+      font-weight: 800;
+      background: var(--input-bg) !important;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* ================================================================
+       INGREDIENT ROW EDITOR CARDS (Log Screen & Modal)
+       ================================================================ */
     .ing-list {
       display: flex;
       flex-direction: column;
       gap: 10px;
-      margin-top: 10px;
+      margin-top: 12px;
     }
 
     .ing-row-card {
       background: var(--input-bg);
       border: 1px solid var(--border-light);
-      border-radius: 10px;
-      padding: 10px;
+      border-radius: var(--radius-md);
+      padding: 12px;
+    }
+
+    .ing-row-card input,
+    .ing-row-card select {
+      background: var(--card);
     }
 
     .ing-row-top {
-      display: flex;
-      gap: 6px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      gap: 8px;
       align-items: center;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
     }
 
     .ing-row-top input.ing-name-input {
-      flex: 1.4;
-      padding: 7px 9px;
-      font-size: 0.88rem;
-      font-weight: 600;
+      min-height: 42px;
+      padding: 10px 12px;
+      font-size: 0.95rem;
+      font-weight: 700;
     }
 
-    .ing-row-top input.ing-desc-input {
-      flex: 1;
-      padding: 7px 9px;
-      font-size: 0.82rem;
+    .ing-row-top .badge-clickable {
+      min-height: 30px;
+    }
+
+    .ing-row-top .btn-danger {
+      width: 38px;
+      min-height: 38px;
+      padding: 0;
+      font-size: 1.15rem;
+    }
+
+    .ing-amt-unit-grid {
+      display: grid;
+      grid-template-columns: minmax(76px, 1fr) minmax(118px, 1.3fr);
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .ing-amt-unit-grid input,
+    .ing-amt-unit-grid select {
+      min-height: 42px;
+      padding-top: 8px;
+      padding-bottom: 8px;
+      font-size: 0.92rem;
+      font-weight: 700;
     }
 
     .ing-row-mid {
@@ -591,40 +1129,57 @@
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
-      gap: 8px;
-      padding: 6px 8px;
-      background: var(--card);
-      border-radius: 8px;
-      margin-bottom: 8px;
+      gap: 6px 10px;
+      padding: 8px 10px;
+      background: rgba(249, 115, 22, 0.06);
+      border: 1px solid rgba(249, 115, 22, 0.15);
+      border-radius: 12px;
+      margin-bottom: 10px;
+    }
+
+    .base-ref-tag {
+      font-size: 0.74rem;
+      font-weight: 600;
+      color: var(--text-muted);
     }
 
     .servings-Control {
       display: flex;
       align-items: center;
-      gap: 5px;
+      gap: 6px;
     }
 
     .servings-Control span.srv-label {
-      font-size: 0.78rem;
-      font-weight: 700;
+      font-size: 0.7rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
       color: var(--text-muted);
       margin-right: 2px;
     }
 
     .step-btn {
-      width: 30px;
-      height: 30px;
+      width: 36px;
+      height: 36px;
+      min-height: 36px;
       padding: 0;
-      border-radius: 6px;
+      border-radius: 10px;
       background: var(--card-alt);
       color: var(--text);
       border: 1px solid var(--border-light);
-      font-size: 1rem;
+      font-size: 1.1rem;
       font-weight: 800;
+    }
+
+    .step-btn:active:not(:disabled) {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
     }
 
     .srv-input {
       width: 62px !important;
+      min-height: 36px !important;
       text-align: center;
       padding: 5px 6px !important;
       font-size: 0.88rem !important;
@@ -633,150 +1188,274 @@
 
     .row-calc-totals {
       font-size: 0.8rem;
-      font-weight: 700;
-      color: var(--accent);
+      font-weight: 800;
+      color: var(--highlight);
+      font-variant-numeric: tabular-nums;
     }
 
     .ing-per-serving-grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 6px;
     }
 
     .ing-per-serving-cell label {
-      font-size: 0.68rem;
-      color: var(--text-muted);
-      margin-bottom: 2px;
-      text-transform: uppercase;
+      font-size: 0.6rem;
+      letter-spacing: 0.03em;
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .ing-per-serving-cell input {
-      padding: 5px 6px;
-      font-size: 0.82rem;
+      min-height: 38px;
+      padding: 8px 4px;
+      font-size: 0.88rem;
+      font-weight: 700;
       text-align: center;
+    }
+
+    .totals-row {
+      justify-content: space-between;
+      margin-top: 12px;
+      margin-bottom: 14px;
+    }
+
+    .action-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
     }
 
     /* Checkbox Row */
     .checkbox-row {
       display: flex;
       align-items: center;
-      gap: 9px;
-      padding: 10px 12px;
+      gap: 10px;
+      min-height: 48px;
+      padding: 12px 14px;
       background: var(--input-bg);
       border: 1px solid var(--border-light);
-      border-radius: 8px;
+      border-radius: 12px;
       cursor: pointer;
-      font-size: 0.88rem;
-      font-weight: 600;
+      font-size: 0.9rem;
+      font-weight: 700;
+      text-transform: none;
+      letter-spacing: 0;
       color: var(--text);
       margin-bottom: 12px;
     }
 
     .checkbox-row input[type="checkbox"] {
-      width: 18px;
-      height: 18px;
+      width: 20px;
+      height: 20px;
+      margin: 0;
       accent-color: var(--accent);
       cursor: pointer;
     }
 
-    /* Bottom Navigation */
+    .key-row .btn-sm {
+      min-height: 46px;
+      min-width: 68px;
+      flex-shrink: 0;
+    }
+
+    /* ================================================================
+       BOTTOM NAVIGATION
+       ================================================================ */
     .bottom-nav {
       position: fixed;
       bottom: 0;
       left: 0;
       right: 0;
       height: calc(var(--nav-h) + env(safe-area-inset-bottom, 0px));
-      padding-bottom: env(safe-area-inset-bottom, 0px);
-      background: rgba(17, 24, 39, 0.96);
-      backdrop-filter: blur(10px);
+      padding: 0 8px env(safe-area-inset-bottom, 0px);
+      background: rgba(10, 18, 31, 0.9);
+      -webkit-backdrop-filter: blur(16px) saturate(140%);
+      backdrop-filter: blur(16px) saturate(140%);
       border-top: 1px solid var(--border);
+      box-shadow: 0 -12px 30px -14px rgba(0, 0, 0, 0.7);
       display: flex;
       justify-content: space-around;
-      align-items: center;
+      align-items: stretch;
       z-index: 900;
     }
 
     .nav-tab {
       flex: 1;
-      height: 100%;
+      height: var(--nav-h);
+      min-height: 0;
+      max-width: 140px;
       background: none;
       border: none;
+      border-radius: 0;
       color: var(--text-muted);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 3px;
-      font-size: 0.72rem;
+      gap: 4px;
+      font-size: 0.7rem;
       font-weight: 700;
+      letter-spacing: 0.02em;
       padding: 6px 0;
+    }
+
+    .nav-tab:active:not(:disabled) {
+      transform: none;
+    }
+
+    .nav-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 56px;
+      height: 30px;
+      border-radius: 999px;
+      transition: background-color 0.25s, transform 0.2s var(--ease);
+    }
+
+    .nav-icon svg {
+      width: 22px;
+      height: 22px;
+      display: block;
+    }
+
+    .nav-tab:active .nav-icon {
+      transform: scale(0.9);
     }
 
     .nav-tab.active {
       color: var(--accent);
     }
 
-    .nav-icon {
-      font-size: 1.2rem;
-      line-height: 1;
+    .nav-tab.active .nav-icon {
+      background: var(--accent-tint);
+      box-shadow: inset 0 0 0 1px rgba(249, 115, 22, 0.25);
     }
 
-    /* Modal */
+    /* ================================================================
+       MODAL (bottom sheet on phones)
+       ================================================================ */
     .modal-backdrop {
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.76);
+      background: rgba(3, 7, 14, 0.72);
+      -webkit-backdrop-filter: blur(4px);
+      backdrop-filter: blur(4px);
       z-index: 1100;
-      align-items: center;
+      align-items: flex-end;
       justify-content: center;
-      padding: 12px;
+      padding: 0;
     }
 
     .modal-backdrop.open {
       display: flex;
+      animation: fade-in 0.2s ease;
     }
 
     .modal-card {
       background: var(--card);
       border: 1px solid var(--border-light);
-      border-radius: var(--radius);
+      border-bottom: none;
+      border-radius: 24px 24px 0 0;
       width: 100%;
-      max-width: 560px;
+      max-width: 600px;
       max-height: 92vh;
       overflow-y: auto;
-      padding: 15px;
+      padding: 0 16px calc(18px + env(safe-area-inset-bottom, 0px));
+      box-shadow: 0 -20px 50px rgba(0, 0, 0, 0.55);
+      animation: sheet-up 0.32s var(--ease);
+    }
+
+    .modal-card > .card-title {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      background: var(--card);
+      padding: 18px 0 12px;
+      margin-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .modal-card .row > .btn-primary,
+    .modal-card .row > .btn-secondary,
+    .modal-card .row > .btn-danger {
+      min-height: 50px;
+    }
+
+    @media (min-width: 640px) {
+      .modal-backdrop { align-items: center; padding: 16px; }
+      .modal-card { border-radius: 22px; border-bottom: 1px solid var(--border-light); }
+    }
+
+    @keyframes fade-in {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    @keyframes sheet-up {
+      from { transform: translateY(40px); opacity: 0.4; }
+      to   { transform: translateY(0); opacity: 1; }
     }
 
     /* Toast */
     #toast {
       position: fixed;
-      bottom: calc(var(--nav-h) + 18px);
+      bottom: calc(var(--nav-h) + env(safe-area-inset-bottom, 0px) + 14px);
       left: 50%;
       transform: translateX(-50%);
-      background: #1e293b;
-      color: #f8fafc;
-      border: 1px solid var(--accent);
-      padding: 9px 16px;
-      border-radius: 999px;
-      font-size: 0.85rem;
-      font-weight: 600;
+      width: max-content;
+      max-width: calc(100vw - 32px);
+      background: rgba(24, 36, 58, 0.97);
+      color: var(--text);
+      border: 1px solid rgba(249, 115, 22, 0.5);
+      padding: 10px 18px;
+      border-radius: 16px;
+      font-size: 0.86rem;
+      font-weight: 700;
+      text-align: center;
       z-index: 1200;
       display: none;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
-      white-space: nowrap;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5), 0 0 0 4px rgba(249, 115, 22, 0.08);
+      animation: toast-in 0.25s var(--ease);
+    }
+
+    @keyframes toast-in {
+      from { opacity: 0; transform: translate(-50%, 10px); }
+      to   { opacity: 1; transform: translate(-50%, 0); }
     }
 
     .muted-text {
       color: var(--text-muted);
-      font-size: 0.83rem;
+      font-size: 0.82rem;
     }
 
     .empty-state {
       text-align: center;
-      padding: 24px 12px;
+      padding: 26px 14px;
       color: var(--text-muted);
       font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    #todayMealsList .empty-state {
+      border: 1px dashed var(--border-light);
+      border-radius: var(--radius-md);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+      .mic-btn.recording {
+        animation: none !important;
+        box-shadow: 0 0 0 4px rgba(255, 74, 28, 0.35);
+      }
     }
   </style>
 </head>
@@ -789,13 +1468,39 @@
 
   <div class="app-shell">
 
+    <!-- Brand Header -->
+    <header class="app-header">
+      <img class="app-logo" src="./icon-192.png" alt="" width="36" height="36" />
+      <h1 class="app-wordmark">
+        <svg viewBox="0 0 424 108" role="img" aria-label="Fuel-Trak" fill="none" stroke-width="14" stroke-linecap="round" stroke-linejoin="round">
+          <g class="wm-fuel">
+            <path d="M26 92V36A20 20 0 0 1 46 16H51M15 54H46"/>
+            <path d="M71 54V73A21 19 0 0 0 113 73M113 54V92"/>
+            <path d="M135 73H177A21 19 0 1 0 165.85 89.78"/>
+            <path d="M199 16V92"/>
+          </g>
+          <g class="wm-trak">
+            <path d="M232 24V92M220 54H250"/>
+            <path d="M271 92V75A21 21 0 0 1 292 54H297"/>
+            <ellipse cx="334" cy="73" rx="21" ry="19"/>
+            <path d="M355 54V92"/>
+            <path d="M377 16V92M405 54L377 77M389 67.1L409 92"/>
+          </g>
+        </svg>
+      </h1>
+    </header>
+
     <!-- ==================== 1. TODAY SCREEN ==================== -->
     <section id="screen-today" class="screen active">
       <div class="date-nav">
-        <button type="button" onclick="shiftDate(-1)" aria-label="Previous day">&larr;</button>
+        <button type="button" class="icon-btn" onclick="shiftDate(-1)" aria-label="Previous day">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
         <input type="date" id="todayDatePicker" onchange="onDatePickerChange(this.value)" />
-        <button type="button" onclick="shiftDate(1)" aria-label="Next day">&rarr;</button>
-        <button type="button" class="btn-secondary btn-sm" onclick="jumpToToday()">Today</button>
+        <button type="button" class="icon-btn" onclick="shiftDate(1)" aria-label="Next day">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
+        </button>
+        <button type="button" class="btn-secondary btn-sm today-btn" onclick="jumpToToday()">Today</button>
       </div>
 
       <!-- Backup status reminder banner on Today if needed -->
@@ -804,12 +1509,12 @@
       <div class="card">
         <div class="macro-main-grid">
           <!-- Calories -->
-          <div class="macro-box">
+          <div class="macro-box macro-box-cal">
             <div class="macro-box-header">
               <span class="macro-box-title">Calories</span>
               <span id="calStatusBadge" class="badge badge-neutral">0 / 2200</span>
             </div>
-            <div class="macro-big-num" id="calUsedText">0</div>
+            <div class="macro-big-num"><span id="calUsedText">0</span><span class="macro-unit">kcal</span></div>
             <div class="progress-track">
               <div id="calProgressBar" class="progress-fill" style="width: 0%;"></div>
             </div>
@@ -822,7 +1527,7 @@
               <span class="macro-box-title">Protein</span>
               <span id="proStatusBadge" class="badge badge-neutral">170–190g</span>
             </div>
-            <div class="macro-big-num"><span id="proUsedText">0</span>g</div>
+            <div class="macro-big-num"><span id="proUsedText">0</span><span class="macro-unit">g</span></div>
             <div class="progress-track">
               <div id="proProgressBar" class="progress-fill" style="width: 0%;"></div>
             </div>
@@ -851,7 +1556,7 @@
       <div class="card">
         <div class="card-title">
           <span id="mealsCardHeading">Logged Meals</span>
-          <button type="button" class="btn-secondary btn-sm" onclick="copyDaySummary()">Copy today's summary</button>
+          <button type="button" class="btn-secondary btn-sm" onclick="copyDaySummary()">Copy summary</button>
         </div>
         <div id="todayMealsList"></div>
       </div>
@@ -861,58 +1566,60 @@
     <section id="screen-log" class="screen">
       <div class="card">
         <div class="card-title">
-          <span>AI Meal &amp; Label Analyzer</span>
+          <span>AI Meal Analyzer</span>
           <span class="badge badge-neutral" id="logTargetDateBadge"></span>
         </div>
 
-        <div class="row" style="margin-bottom: 10px;">
-          <div class="col">
-            <label for="analysisMode">Mode</label>
-            <select id="analysisMode" onchange="onModeChange()">
-              <option value="meal">Meal / Plate / Recipe</option>
-              <option value="label">Supplement / Nutrition Label</option>
-            </select>
-          </div>
-          <div class="col">
-            <label for="photoInput">Add Photos (Up to 6)</label>
-            <input type="file" id="photoInput" accept="image/*" multiple onchange="handlePhotoInput(this.files)" />
-          </div>
+        <div class="field">
+          <label for="analysisMode">Mode</label>
+          <select id="analysisMode" onchange="onModeChange()">
+            <option value="meal">Meal / Plate / Recipe</option>
+            <option value="label">Supplement / Nutrition Label</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="photoInput">Photos <span class="label-hint">up to 6</span></label>
+          <input type="file" id="photoInput" accept="image/*" multiple onchange="handlePhotoInput(this.files)" />
         </div>
 
         <!-- Thumbnails Strip -->
         <div id="photoThumbnailsGrid" class="thumb-grid" style="display:none;"></div>
 
-        <div class="row-wrap" style="justify-content: space-between; margin-bottom: 10px;">
+        <div class="row-wrap photo-status-row">
           <span class="muted-text" id="photoCountStatus">0 photo(s) attached</span>
           <button type="button" class="btn-secondary btn-sm" id="clearPhotosBtn" style="display:none;" onclick="clearAttachedPhotos()">Clear all</button>
         </div>
 
         <!-- Recipe Box + Mic -->
-        <div style="margin-bottom: 10px;">
-          <div class="label-row">
-            <label for="recipeInput">Recipe / Full Batch Text (Optional)</label>
-            <button type="button" class="mic-btn" id="micBtnRecipe" onclick="toggleSpeech('recipeInput', 'micBtnRecipe')">&#127908; Dictate</button>
+        <div class="field">
+          <label for="recipeInput">Recipe or batch <span class="label-hint">optional</span></label>
+          <div class="textarea-wrap">
+            <textarea id="recipeInput" placeholder="Paste or dictate full pot/batch ingredients if logging a homemade recipe..."></textarea>
+            <button type="button" class="mic-btn" id="micBtnRecipe" onclick="toggleSpeech('recipeInput', 'micBtnRecipe')" title="Dictate">Dictate</button>
           </div>
-          <textarea id="recipeInput" placeholder="Paste or dictate full pot/batch ingredients if logging a homemade recipe..."></textarea>
         </div>
 
         <!-- Note Box + Mic -->
-        <div style="margin-bottom: 12px;">
-          <div class="label-row">
-            <label for="noteInput">Your Note / Portion Description</label>
-            <button type="button" class="mic-btn" id="micBtnNote" onclick="toggleSpeech('noteInput', 'micBtnNote')">&#127908; Dictate</button>
+        <div class="field">
+          <label for="noteInput">Note / portion</label>
+          <div class="textarea-wrap">
+            <textarea id="noteInput" placeholder="e.g., 1 scoop protein, 1 cup almond milk, 250 mL coconut water..."></textarea>
+            <button type="button" class="mic-btn" id="micBtnNote" onclick="toggleSpeech('noteInput', 'micBtnNote')" title="Dictate">Dictate</button>
           </div>
-          <textarea id="noteInput" placeholder="e.g., 1 scoop protein, 1 cup almond milk, 250 mL coconut water..."></textarea>
         </div>
 
-        <button type="button" class="btn-primary" id="analyzeBtn" onclick="runGeminiAnalysis()">Analyze with AI</button>
+        <button type="button" class="btn-primary" id="analyzeBtn" onclick="runGeminiAnalysis()">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M11 2.5l2.1 5.4 5.4 2.1-5.4 2.1L11 17.5l-2.1-5.4L3.5 10l5.4-2.1z"/><path d="M18.5 14.5l.9 2.1 2.1.9-2.1.9-.9 2.1-.9-2.1-2.1-.9 2.1-.9z"/></svg>
+          Analyze with AI
+        </button>
         <div id="analysisStatusBox" style="display:none;"></div>
       </div>
 
       <!-- Editable Breakdown & Logging Card -->
       <div class="card">
         <div class="card-title">
-          <span>Meal Breakdown &amp; Servings</span>
+          <span>Meal Breakdown</span>
           <div id="resultBadgesWrap" class="row-wrap">
             <span class="badge badge-estimate" id="sourceDataBadge">ESTIMATE</span>
           </div>
@@ -921,14 +1628,27 @@
         <div id="aiMetaLine" class="muted-text" style="margin-bottom: 8px; display:none;"></div>
         <div id="vaguePortionBanner" class="alert-box alert-warning" style="display:none; margin-bottom: 10px;"></div>
 
-        <div style="margin-bottom: 10px;">
-          <label for="mealTitleInput">Meal / Item Name</label>
+        <div class="field">
+          <label for="mealTitleInput">Meal name</label>
           <input type="text" id="mealTitleInput" placeholder="e.g., Post-Workout Shake or Chicken & Rice" />
         </div>
 
-        <!-- Whole-Meal Multiplier Buttons (Scales Servings, Never Overwrites Per-Serving Numbers) -->
-        <div style="margin-bottom: 12px;">
-          <label>Whole-Meal Multiplier (Scales Servings)</label>
+        <!-- Meal-Level Servings Control -->
+        <div class="meal-servings-box">
+          <div>
+            <div class="srv-title">Servings</div>
+            <div class="srv-sub">Multiplies on top of all ingredients</div>
+          </div>
+          <div class="big-step-controls">
+            <button type="button" class="big-step-btn" onclick="stepLogMealServings(-0.5)" aria-label="Decrease servings">&minus;</button>
+            <input type="number" step="0.5" min="0.1" class="big-srv-input" id="logMealServingsInput" value="1" oninput="onLogMealServingsInput(this.value)" />
+            <button type="button" class="big-step-btn" onclick="stepLogMealServings(0.5)" aria-label="Increase servings">+</button>
+          </div>
+        </div>
+
+        <!-- Whole-Meal Multiplier Shortcuts -->
+        <div class="field">
+          <label>Portion multiplier <span class="label-hint">sets meal servings</span></label>
           <div class="mult-bar" id="multButtonsBar">
             <button type="button" class="mult-btn" onclick="applyLogMealMultiplier(1/6, '1/6')">1/6</button>
             <button type="button" class="mult-btn" onclick="applyLogMealMultiplier(0.25, '1/4')">1/4</button>
@@ -945,14 +1665,14 @@
         <!-- Editable Ingredient Rows -->
         <div id="logIngredientsList" class="ing-list"></div>
 
-        <div class="row-wrap" style="justify-content: space-between; margin-top: 10px; margin-bottom: 12px;">
-          <button type="button" class="btn-secondary btn-sm" onclick="addLogIngredientRow()">+ Add Ingredient</button>
+        <div class="row-wrap totals-row">
+          <button type="button" class="btn-secondary btn-sm" onclick="addLogIngredientRow()">+ Add ingredient</button>
           <div class="muted-text" id="liveTableTotalsText" style="font-weight:700; color:var(--text);">Total: 0 kcal | 0P | 0C | 0F</div>
         </div>
 
-        <div class="row" style="flex-direction: column; gap: 8px;">
-          <button type="button" class="btn-success" id="logToDateBtn" onclick="commitCurrentMeal(false)">Log to Today</button>
-          <button type="button" class="btn-secondary" style="width:100%;" onclick="commitCurrentMeal(true)">Log &amp; Also Save as Staple / Saved Meal</button>
+        <div class="action-stack">
+          <button type="button" class="btn-primary" id="logToDateBtn" onclick="commitCurrentMeal(false)">Log to Today</button>
+          <button type="button" class="btn-secondary" style="width:100%;" onclick="commitCurrentMeal(true)">Log &amp; Save to Saved Meals</button>
         </div>
       </div>
     </section>
@@ -961,10 +1681,13 @@
     <section id="screen-saved" class="screen">
       <div class="card">
         <div class="card-title">
-          <span>Saved Staples &amp; Meals</span>
+          <span>Saved Meals</span>
           <button type="button" class="btn-secondary btn-sm" onclick="openNewStapleModal()">+ New Saved Meal</button>
         </div>
-        <input type="text" id="savedSearchInput" placeholder="Search staples or saved meals..." oninput="renderSavedScreen()" />
+        <div class="search-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+          <input type="text" id="savedSearchInput" placeholder="Search saved meals..." oninput="renderSavedScreen()" />
+        </div>
       </div>
 
       <div id="savedListContainer"></div>
@@ -974,41 +1697,47 @@
     <section id="screen-settings" class="screen">
       <div class="card">
         <div class="card-title">
-          <span>Gemini API Key &amp; Model</span>
+          <span>Gemini API</span>
           <span class="badge badge-neutral">Local Only</span>
         </div>
-        <label for="settingsApiKey">AI Studio Key (Sent via <code>x-goog-api-key</code> header)</label>
-        <div class="row" style="margin-bottom: 10px;">
-          <input type="password" id="settingsApiKey" placeholder="Paste AIzaSy... key" />
-          <button type="button" class="btn-secondary btn-sm" onclick="toggleApiKeyVisibility()" id="toggleKeyBtn">Show</button>
+        <div class="field">
+          <label for="settingsApiKey">API key</label>
+          <div class="row key-row">
+            <input type="password" id="settingsApiKey" placeholder="Paste AIzaSy... key" />
+            <button type="button" class="btn-secondary btn-sm" onclick="toggleApiKeyVisibility()" id="toggleKeyBtn">Show</button>
+          </div>
+          <p class="field-hint">Sent via the <code>x-goog-api-key</code> header.</p>
         </div>
 
-        <label for="settingsModel">Primary AI Model (Auto-falls back to Flash-Lite on 503)</label>
-        <select id="settingsModel" style="margin-bottom: 12px;">
-          <option value="gemini-3.8-flash">gemini-3.8-flash (Main)</option>
-          <option value="gemini-3.5-flash-lite">gemini-3.5-flash-lite (Fallback / Fast)</option>
-        </select>
+        <div class="field">
+          <label for="settingsModel">Model</label>
+          <select id="settingsModel">
+            <option value="gemini-3.8-flash">gemini-3.8-flash (Main)</option>
+            <option value="gemini-3.5-flash-lite">gemini-3.5-flash-lite (Fallback / Fast)</option>
+          </select>
+          <p class="field-hint">Auto-falls back to Flash-Lite on 503.</p>
+        </div>
 
         <button type="button" class="btn-primary" onclick="saveApiSettings()">Save Key &amp; Model</button>
       </div>
 
       <div class="card">
         <div class="card-title">Daily Targets</div>
-        <div class="row" style="margin-bottom: 10px;">
+        <div class="row field">
           <div class="col">
-            <label for="targetCaloriesInput">Calorie Ceiling</label>
+            <label for="targetCaloriesInput">Calories</label>
             <input type="number" id="targetCaloriesInput" value="2200" />
           </div>
           <div class="col">
-            <label for="targetProteinMinInput">Protein Target Min (g)</label>
+            <label for="targetProteinMinInput">Protein min</label>
             <input type="number" id="targetProteinMinInput" value="170" />
           </div>
           <div class="col">
-            <label for="targetProteinMaxInput">Protein Target Max (g)</label>
+            <label for="targetProteinMaxInput">Protein max</label>
             <input type="number" id="targetProteinMaxInput" value="190" />
           </div>
         </div>
-        <button type="button" class="btn-secondary" style="width:100%;" onclick="saveTargetSettings()">Save Targets</button>
+        <button type="button" class="btn-primary" onclick="saveTargetSettings()">Save Targets</button>
       </div>
 
       <div class="card">
@@ -1016,14 +1745,14 @@
           <span>Backup &amp; Restore</span>
           <span class="badge badge-neutral" id="storagePersistBadge">Checking storage...</span>
         </div>
-        <div id="backupStatusAlert" class="alert-box alert-warning" style="margin-bottom: 12px;">
+        <div id="backupStatusAlert" class="alert-box alert-warning" style="margin-bottom: 14px;">
           No backup yet
         </div>
-        <div class="row" style="margin-bottom: 10px;">
+        <div class="field">
           <button type="button" class="btn-primary" onclick="exportBackupJson()">Export Backup (.json)</button>
         </div>
         <div>
-          <label for="importBackupFile">Restore / Import from Backup File</label>
+          <label for="importBackupFile">Restore from backup file</label>
           <input type="file" id="importBackupFile" accept=".json,application/json" onchange="importBackupJson(this.files)" />
         </div>
       </div>
@@ -1034,19 +1763,27 @@
   <!-- Bottom Tab Navigation -->
   <nav class="bottom-nav">
     <button type="button" class="nav-tab active" data-target="today" onclick="switchTab('today')">
-      <span class="nav-icon">&#128197;</span>
+      <span class="nav-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>
+      </span>
       <span>Today</span>
     </button>
     <button type="button" class="nav-tab" data-target="log" onclick="switchTab('log')">
-      <span class="nav-icon">&#10133;</span>
+      <span class="nav-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>
+      </span>
       <span>Log Meal</span>
     </button>
     <button type="button" class="nav-tab" data-target="saved" onclick="switchTab('saved')">
-      <span class="nav-icon">&#11088;</span>
+      <span class="nav-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3.5h10A1.5 1.5 0 0 1 18.5 5v15.5L12 16.5l-6.5 4V5A1.5 1.5 0 0 1 7 3.5z"/></svg>
+      </span>
       <span>Saved</span>
     </button>
     <button type="button" class="nav-tab" data-target="settings" onclick="switchTab('settings')">
-      <span class="nav-icon">&#9881;&#65039;</span>
+      <span class="nav-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/></svg>
+      </span>
       <span>Settings</span>
     </button>
   </nav>
@@ -1056,9 +1793,20 @@
     <div class="modal-card">
       <div class="card-title">
         <span id="editModalTitle">Edit Item</span>
-        <button type="button" class="btn-secondary btn-sm" onclick="closeEditModal()">Close</button>
+        <button type="button" class="btn-secondary btn-sm" onclick="closeEditModal()">Cancel</button>
       </div>
       <div id="editModalBody"></div>
+    </div>
+  </div>
+
+  <!-- Quick "+ Log" Sheet for Saved Foods -->
+  <div id="quickLogModal" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="card-title">
+        <span id="quickLogModalTitle">Log Saved Food</span>
+        <button type="button" class="btn-secondary btn-sm" onclick="closeQuickLogModal()">Cancel</button>
+      </div>
+      <div id="quickLogModalBody"></div>
     </div>
   </div>
 
@@ -1066,7 +1814,7 @@
 
   <script>
     /********************************************************************
-     * 1. LOCAL DATE UTILITIES, DATA NORMALIZATION & GLOBAL STATE
+     * 1. LOCAL DATE UTILITIES, UNIT CONVERSION ENGINE & DATA MODEL
      ********************************************************************/
     function getLocalYYYYMMDD(dateObj = new Date()) {
       const y = dateObj.getFullYear();
@@ -1095,76 +1843,192 @@
     const FALLBACK_MODEL = 'gemini-3.5-flash-lite';
     const MAX_PHOTOS = 6;
 
-    // Normalize an ingredient item (migrates legacy items to { name, servingDesc, baseCal, baseP, baseC, baseF, servings, initialServings, isLabelData })
+    // Exact Canadian & standard unit definitions
+    // Volume: tsp = 5 mL, tbsp = 15 mL, cup = 250 mL, fl oz = 29.57 mL, mL = 1 mL
+    // Weight: g = 1 g, oz = 28.35 g, lb = 453.6 g
+    // Count: serving, scoop, piece, slice, each = 1
+    const UNIT_META = {
+      'mL':      { type: 'volume', toStd: 1,     label: 'mL',      pluralName: 'mL' },
+      'tsp':     { type: 'volume', toStd: 5,     label: 'tsp',     pluralName: 'tsp' },
+      'tbsp':    { type: 'volume', toStd: 15,    label: 'tbsp',    pluralName: 'tbsp' },
+      'fl oz':   { type: 'volume', toStd: 29.57, label: 'fl oz',   pluralName: 'fl oz' },
+      'cup':     { type: 'volume', toStd: 250,   label: 'cup',     pluralName: 'cups' },
+      'g':       { type: 'weight', toStd: 1,     label: 'g',       pluralName: 'grams' },
+      'oz':      { type: 'weight', toStd: 28.35, label: 'oz',      pluralName: 'oz' },
+      'lb':      { type: 'weight', toStd: 453.6, label: 'lb',      pluralName: 'lbs' },
+      'serving': { type: 'count',  toStd: 1,     label: 'serving', pluralName: 'servings' },
+      'scoop':   { type: 'count',  toStd: 1,     label: 'scoop',   pluralName: 'scoops' },
+      'piece':   { type: 'count',  toStd: 1,     label: 'piece',   pluralName: 'pieces' },
+      'slice':   { type: 'count',  toStd: 1,     label: 'slice',   pluralName: 'slices' },
+      'each':    { type: 'count',  toStd: 1,     label: 'each',    pluralName: 'each' }
+    };
+
+    const UNIT_GROUPS = [
+      { groupLabel: 'Count',  units: ['serving', 'scoop', 'piece', 'slice', 'each'] },
+      { groupLabel: 'Weight', units: ['g', 'oz', 'lb'] },
+      { groupLabel: 'Volume', units: ['mL', 'tsp', 'tbsp', 'cup', 'fl oz'] }
+    ];
+
+    function canonicalizeUnit(rawUnit) {
+      if (!rawUnit) return 'serving';
+      const raw = String(rawUnit).trim();
+      if (UNIT_META[raw]) return raw;
+      const lower = raw.toLowerCase().replace(/\./g, '').trim();
+      const map = {
+        'ml': 'mL', 'milliliter': 'mL', 'milliliters': 'mL', 'millilitre': 'mL', 'millilitres': 'mL',
+        'tsp': 'tsp', 'teaspoon': 'tsp', 'teaspoons': 'tsp',
+        'tbsp': 'tbsp', 'tablespoon': 'tbsp', 'tablespoons': 'tbsp', 'tbs': 'tbsp',
+        'fl oz': 'fl oz', 'floz': 'fl oz', 'fluid oz': 'fl oz', 'fluid ounce': 'fl oz', 'fluid ounces': 'fl oz',
+        'cup': 'cup', 'cups': 'cup', 'c': 'cup',
+        'g': 'g', 'gram': 'g', 'grams': 'g', 'gm': 'g',
+        'oz': 'oz', 'ounce': 'oz', 'ounces': 'oz',
+        'lb': 'lb', 'lbs': 'lb', 'pound': 'lb', 'pounds': 'lb',
+        'serving': 'serving', 'servings': 'serving', 'srv': 'serving',
+        'scoop': 'scoop', 'scoops': 'scoop',
+        'piece': 'piece', 'pieces': 'piece', 'pc': 'piece', 'pcs': 'piece',
+        'slice': 'slice', 'slices': 'slice',
+        'each': 'each', 'ea': 'each', 'unit': 'each', 'item': 'each'
+      };
+      return map[lower] || 'serving';
+    }
+
+    function areUnitsCompatible(unitA, unitB) {
+      const metaA = UNIT_META[canonicalizeUnit(unitA)];
+      const metaB = UNIT_META[canonicalizeUnit(unitB)];
+      if (!metaA || !metaB) return false;
+      return metaA.type === metaB.type;
+    }
+
+    // Converts `amount` from `fromUnit` into `toBaseUnit` within the same unit type
+    function convertAmountToBaseUnit(amount, fromUnit, toBaseUnit) {
+      const uFrom = canonicalizeUnit(fromUnit);
+      const uBase = canonicalizeUnit(toBaseUnit);
+      const metaFrom = UNIT_META[uFrom];
+      const metaBase = UNIT_META[uBase];
+      if (!metaFrom || !metaBase || metaFrom.type !== metaBase.type) {
+        return null;
+      }
+      const amt = Number(amount) || 0;
+      const inStd = amt * metaFrom.toStd;
+      return inStd / metaBase.toStd;
+    }
+
+    function getCannotConvertMessage(fromUnit, toUnit) {
+      const uFrom = UNIT_META[canonicalizeUnit(fromUnit)] || UNIT_META['serving'];
+      const uTo = UNIT_META[canonicalizeUnit(toUnit)] || UNIT_META['serving'];
+      return `Can't convert ${uFrom.pluralName} to ${uTo.pluralName}. Enter it in the original unit or edit the numbers.`;
+    }
+
+    // Read a number from the first field name that exists (older app versions used cal/pro/carb/fat, calories/protein_g/carbs_g/fat_g)
+    const LEGACY_KEYS = {
+      cal: ['cal', 'calories', 'kcal'],
+      p: ['p', 'pro', 'protein', 'protein_g'],
+      c: ['c', 'carb', 'carbs', 'carbs_g'],
+      f: ['f', 'fat', 'fat_g']
+    };
+    function legacyNum(obj, field) {
+      if (!obj) return 0;
+      for (const k of LEGACY_KEYS[field]) {
+        if (obj[k] !== undefined && obj[k] !== null && !isNaN(Number(obj[k]))) return Number(obj[k]);
+      }
+      return 0;
+    }
+
+    // Normalize an ingredient item (migrates old items to baseAmount = 1, baseUnit = 'serving')
     function normalizeIngredientItem(raw, fallbackIsLabel = false) {
       if (!raw || typeof raw !== 'object') {
         return {
           name: '',
-          servingDesc: '1 serving',
+          baseAmount: 1,
+          baseUnit: 'serving',
           baseCal: 0,
           baseP: 0,
           baseC: 0,
           baseF: 0,
-          servings: 1,
-          initialServings: 1,
-          isLabelData: Boolean(fallbackIsLabel)
+          amount: 1,
+          unit: 'serving',
+          servingDesc: '1 serving',
+          isLabelData: Boolean(fallbackIsLabel),
+          conversionError: ''
         };
       }
 
-      const servings = (raw.servings !== undefined && raw.servings !== null && !isNaN(Number(raw.servings)))
-        ? Math.max(0, Number(raw.servings))
+      const legacyServings = (raw.servings !== undefined && raw.servings !== null && !isNaN(Number(raw.servings)) && Number(raw.servings) > 0)
+        ? Number(raw.servings)
         : 1;
+
+      const hasBaseModel = raw.baseUnit !== undefined && raw.baseAmount !== undefined;
+      const baseUnit = hasBaseModel ? canonicalizeUnit(raw.baseUnit) : 'serving';
+      const baseAmount = (hasBaseModel && Number(raw.baseAmount) > 0) ? round2(Number(raw.baseAmount)) : 1;
 
       const hasPerServing = raw.baseCal !== undefined || raw.perServingCal !== undefined;
       const baseCal = hasPerServing
         ? (Number(raw.baseCal ?? raw.perServingCal) || 0)
-        : (servings > 0 ? (Number(raw.cal) || 0) / servings : (Number(raw.cal) || 0));
+        : (legacyServings > 0 ? legacyNum(raw, 'cal') / legacyServings : legacyNum(raw, 'cal'));
       const baseP = hasPerServing
         ? (Number(raw.baseP ?? raw.perServingP) || 0)
-        : (servings > 0 ? (Number(raw.p) || 0) / servings : (Number(raw.p) || 0));
+        : (legacyServings > 0 ? legacyNum(raw, 'p') / legacyServings : legacyNum(raw, 'p'));
       const baseC = hasPerServing
         ? (Number(raw.baseC ?? raw.perServingC) || 0)
-        : (servings > 0 ? (Number(raw.c) || 0) / servings : (Number(raw.c) || 0));
+        : (legacyServings > 0 ? legacyNum(raw, 'c') / legacyServings : legacyNum(raw, 'c'));
       const baseF = hasPerServing
         ? (Number(raw.baseF ?? raw.perServingF) || 0)
-        : (servings > 0 ? (Number(raw.f) || 0) / servings : (Number(raw.f) || 0));
+        : (legacyServings > 0 ? legacyNum(raw, 'f') / legacyServings : legacyNum(raw, 'f'));
 
-      const servingDesc = String(raw.servingDesc ?? raw.qty ?? '1 serving').trim() || '1 serving';
+      let unit = raw.unit ? canonicalizeUnit(raw.unit) : baseUnit;
+      if (!areUnitsCompatible(unit, baseUnit)) {
+        unit = baseUnit;
+      }
+
+      const amount = (raw.amount !== undefined && raw.amount !== null && !isNaN(Number(raw.amount)))
+        ? Math.max(0, round2(Number(raw.amount)))
+        : round2(legacyServings * baseAmount);
+
+      const servingDesc = String(raw.servingDesc ?? raw.qty ?? `${baseAmount} ${baseUnit}`).trim() || `${baseAmount} ${baseUnit}`;
       const isLabelData = raw.isLabelData !== undefined ? Boolean(raw.isLabelData) : Boolean(fallbackIsLabel);
-      const initialServings = (raw.initialServings !== undefined && !isNaN(Number(raw.initialServings)) && Number(raw.initialServings) > 0)
-        ? Number(raw.initialServings)
-        : (servings > 0 ? servings : 1);
 
       return {
         name: String(raw.name || ''),
-        servingDesc,
+        baseAmount,
+        baseUnit,
         baseCal: round1(baseCal),
         baseP: round1(baseP),
         baseC: round1(baseC),
         baseF: round1(baseF),
-        servings: round2(servings),
-        initialServings: round2(initialServings),
-        isLabelData
+        amount,
+        unit,
+        servingDesc,
+        isLabelData,
+        conversionError: ''
       };
     }
 
-    function computeItemTotals(item) {
-      const s = Number(item.servings) || 0;
+    // Exact ingredient macro math:
+    // Convert current (amount, unit) to baseUnit, then macros = baseMacros * (convertedAmount / baseAmount) * mealServings
+    function computeItemTotals(item, mealServings = 1) {
+      const mSrv = (mealServings !== undefined && mealServings !== null && !isNaN(Number(mealServings)))
+        ? Math.max(0, Number(mealServings))
+        : 1;
+      const baseAmt = Number(item.baseAmount) > 0 ? Number(item.baseAmount) : 1;
+      const converted = convertAmountToBaseUnit(item.amount, item.unit, item.baseUnit);
+      const effectiveInBase = converted !== null ? converted : (Number(item.amount) || 0);
+      const ratio = (effectiveInBase / baseAmt) * mSrv;
+
       return {
-        cal: Math.round((Number(item.baseCal) || 0) * s),
-        p: round1((Number(item.baseP) || 0) * s),
-        c: round1((Number(item.baseC) || 0) * s),
-        f: round1((Number(item.baseF) || 0) * s)
+        cal: Math.round((Number(item.baseCal) || 0) * ratio),
+        p: round1((Number(item.baseP) || 0) * ratio),
+        c: round1((Number(item.baseC) || 0) * ratio),
+        f: round1((Number(item.baseF) || 0) * ratio)
       };
     }
 
-    function computeItemsListTotals(items) {
+    function computeItemsListTotals(items, mealServings = 1) {
       return (items || []).reduce((acc, it) => {
-        const t = computeItemTotals(it);
+        const t = computeItemTotals(it, mealServings);
         acc.cal += t.cal;
-        acc.p += t.p;
-        acc.c += t.c;
-        acc.f += t.f;
+        acc.p = round1(acc.p + t.p);
+        acc.c = round1(acc.c + t.c);
+        acc.f = round1(acc.f + t.f);
         return acc;
       }, { cal: 0, p: 0, c: 0, f: 0 });
     }
@@ -1177,25 +2041,33 @@
     // Migrate/normalize any logged meal or saved staple record
     function normalizeRecord(rec) {
       if (!rec || typeof rec !== 'object') return rec;
-      const fallbackLabel = Boolean(rec.isLabelData);
-      let items = Array.isArray(rec.items) && rec.items.length > 0
+      const fallbackLabel = Boolean(rec.isLabelData) || /label/i.test(String(rec.source || ''));
+      const mealServings = (rec.servings !== undefined && rec.servings !== null && !isNaN(Number(rec.servings)) && Number(rec.servings) > 0)
+        ? round2(Number(rec.servings))
+        : 1;
+
+      const items = Array.isArray(rec.items) && rec.items.length > 0
         ? rec.items.map(it => normalizeIngredientItem(it, fallbackLabel))
         : [
             normalizeIngredientItem({
               name: rec.name || 'Item',
-              servingDesc: rec.baseGrams ? `${rec.baseGrams}g` : '1 serving',
-              servings: 1,
-              baseCal: Number(rec.cal) || 0,
-              baseP: Number(rec.p) || 0,
-              baseC: Number(rec.c) || 0,
-              baseF: Number(rec.f) || 0,
+              baseAmount: 1,
+              baseUnit: 'serving',
+              amount: 1,
+              unit: 'serving',
+              servingDesc: '1 serving',
+              baseCal: legacyNum(rec, 'cal'),
+              baseP: legacyNum(rec, 'p'),
+              baseC: legacyNum(rec, 'c'),
+              baseF: legacyNum(rec, 'f'),
               isLabelData: fallbackLabel
             }, fallbackLabel)
           ];
 
-      const totals = computeItemsListTotals(items);
+      const totals = computeItemsListTotals(items, mealServings);
       return {
         ...rec,
+        servings: mealServings,
         cal: Math.round(totals.cal),
         p: round1(totals.p),
         c: round1(totals.c),
@@ -1223,18 +2095,22 @@
         aiPhotosReceived: null,
         modelUsed: null,
         vagueWarning: '',
-        multiplier: 1,
+        servings: 1,
         items: [
-          normalizeIngredientItem({ name: '', servingDesc: '1 serving', baseCal: 0, baseP: 0, baseC: 0, baseF: 0, servings: 1, isLabelData: false })
+          normalizeIngredientItem({ name: '', baseAmount: 1, baseUnit: 'serving', amount: 1, unit: 'serving', baseCal: 0, baseP: 0, baseC: 0, baseF: 0, isLabelData: false })
         ]
       },
       modalEditor: {
         mode: null, // 'meal' | 'staple' | 'new-staple'
         targetId: null,
         name: '',
-        baseGrams: 100,
-        multiplier: 1,
+        servings: 1,
         items: []
+      },
+      quickLogDraft: {
+        stapleId: null,
+        servings: 1,
+        date: getLocalYYYYMMDD()
       },
       swWaitingWorker: null
     };
@@ -1353,11 +2229,67 @@
         await saveSettingsToDB();
       }
 
-      const rawMeals = await dbGetAll('meals');
-      const rawStaples = await dbGetAll('staples');
+      let rawMeals = await dbGetAll('meals');
+      let rawStaples = await dbGetAll('staples');
+
+      // One-time move from the older database name ('nutrition_db') if this one is empty
+      if (rawMeals.length === 0 && rawStaples.length === 0) {
+        const moved = await importFromLegacyDatabase();
+        if (moved) {
+          rawMeals = await dbGetAll('meals');
+          rawStaples = await dbGetAll('staples');
+        }
+      }
 
       state.meals = rawMeals.map(normalizeRecord);
       state.staples = rawStaples.map(normalizeRecord);
+    }
+
+    async function importFromLegacyDatabase() {
+      const LEGACY_DB = 'nutrition_db';
+      try {
+        if (indexedDB.databases) {
+          const list = await indexedDB.databases();
+          if (!list.some(d => d.name === LEGACY_DB)) return false;
+        }
+        const oldDb = await new Promise((resolve, reject) => {
+          const req = indexedDB.open(LEGACY_DB);
+          req.onupgradeneeded = (e) => { e.target.transaction.abort(); };
+          req.onsuccess = (e) => resolve(e.target.result);
+          req.onerror = () => resolve(null);
+        });
+        if (!oldDb) return false;
+        const readAll = (store) => new Promise((resolve) => {
+          if (!oldDb.objectStoreNames.contains(store)) return resolve([]);
+          const req = oldDb.transaction(store, 'readonly').objectStore(store).getAll();
+          req.onsuccess = () => resolve(req.result || []);
+          req.onerror = () => resolve([]);
+        });
+        const oldMeals = await readAll('meals');
+        const oldStaples = await readAll('staples');
+        const oldSettings = await readAll('settings');
+        oldDb.close();
+        if (oldMeals.length === 0 && oldStaples.length === 0) return false;
+
+        for (const m of oldMeals) await dbPut('meals', normalizeRecord(m));
+        for (const st of oldStaples) await dbPut('staples', normalizeRecord(st));
+
+        const getOld = (k) => { const row = oldSettings.find(r => r.key === k); return row ? row.value : null; };
+        const oldKey = getOld('apiKey');
+        if (oldKey && !state.settings.apiKey) state.settings.apiKey = oldKey;
+        const t = getOld('targets');
+        if (t && typeof t === 'object') {
+          if (Number(t.calories)) state.settings.targetCal = Number(t.calories);
+          if (Number(t.proteinMin)) state.settings.targetProMin = Number(t.proteinMin);
+          if (Number(t.proteinMax)) state.settings.targetProMax = Number(t.proteinMax);
+        }
+        await saveSettingsToDB();
+        showToast(`Moved ${oldMeals.length} meals & ${oldStaples.length} saved foods to the new version`);
+        return true;
+      } catch (err) {
+        console.error('Legacy import failed', err);
+        return false;
+      }
     }
 
     async function saveSettingsToDB() {
@@ -1649,7 +2581,7 @@
     }
 
     /********************************************************************
-     * 4. NAVIGATION & TODAY DASHBOARD (WITH 7-DAY AVERAGE)
+     * 4. NAVIGATION & TODAY DASHBOARD (WITH PAST-DAY RE-LOG & 7-DAY AVG)
      ********************************************************************/
     function switchTab(tabName) {
       if (tabName !== 'log' && userWantsMic) {
@@ -1727,6 +2659,8 @@
 
     function renderTodayScreen() {
       document.getElementById('todayDatePicker').value = state.currentDate;
+      const todayYMD = getLocalYYYYMMDD();
+      const isViewingOtherDay = state.currentDate !== todayYMD;
 
       const dayMeals = state.meals.filter(m => m.date === state.currentDate);
       const totals = dayMeals.reduce((acc, m) => {
@@ -1805,12 +2739,27 @@
             ? `<span class="badge badge-label">LABEL DATA</span>`
             : `<span class="badge badge-estimate">ESTIMATE</span>`;
           const itemCount = Array.isArray(m.items) ? m.items.length : 1;
+          const mealSrv = Number(m.servings) || 1;
+
+          // Feature 2: When viewing any past/other day, show "+ Add to today" with a servings box
+          const relogHtml = isViewingOtherDay ? `
+            <div class="meal-relog-bar" onclick="event.stopPropagation()">
+              <div class="servings-Control">
+                <span class="srv-label">Servings:</span>
+                <button type="button" class="step-btn" onclick="stepRelogServings('${m.id}', -0.5)">&minus;</button>
+                <input type="number" step="0.5" min="0.1" class="srv-input" id="relogSrv_${m.id}" value="${mealSrv}" />
+                <button type="button" class="step-btn" onclick="stepRelogServings('${m.id}', 0.5)">+</button>
+              </div>
+              <button type="button" class="btn-primary btn-inline-primary" onclick="relogMealToToday('${m.id}')">+ Add to today</button>
+            </div>
+          ` : '';
+
           return `
             <div class="meal-item" onclick="openEditMealModal('${m.id}')">
               <div class="meal-item-top">
                 <div>
                   <span class="meal-item-name">${escapeHtml(m.name || 'Logged Meal')}</span>
-                  <div class="muted-text" style="font-size:0.75rem;">${itemCount} ingredient(s) &middot; Tap to edit servings</div>
+                  <div class="muted-text" style="font-size:0.75rem;">${mealSrv} serving(s) &middot; ${itemCount} ingredient(s) &middot; Tap to edit</div>
                 </div>
                 ${badge}
               </div>
@@ -1820,10 +2769,53 @@
                 <span><strong>${round1(m.c)}g</strong> C</span>
                 <span><strong>${round1(m.f)}g</strong> F</span>
               </div>
+              ${relogHtml}
             </div>
           `;
         }).join('');
       }
+    }
+
+    function stepRelogServings(mealId, delta) {
+      const inp = document.getElementById(`relogSrv_${mealId}`);
+      if (!inp) return;
+      const cur = Number(inp.value) || 1;
+      const next = Math.max(0.5, round2(cur + delta));
+      inp.value = next;
+    }
+
+    async function relogMealToToday(mealId) {
+      const sourceMeal = state.meals.find(x => x.id === mealId);
+      if (!sourceMeal) return;
+
+      const normalized = normalizeRecord(sourceMeal);
+      const srvInput = document.getElementById(`relogSrv_${mealId}`);
+      const chosenServings = srvInput ? Math.max(0.1, round2(Number(srvInput.value) || normalized.servings || 1)) : (normalized.servings || 1);
+
+      const copiedItems = normalized.items.map(it => normalizeIngredientItem({ ...it }, it.isLabelData));
+      const totals = computeItemsListTotals(copiedItems, chosenServings);
+      const todayYMD = getLocalYYYYMMDD();
+
+      const newMeal = {
+        id: 'meal_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
+        date: todayYMD,
+        name: normalized.name,
+        servings: chosenServings,
+        cal: Math.round(totals.cal),
+        p: round1(totals.p),
+        c: round1(totals.c),
+        f: round1(totals.f),
+        isLabelData: deriveMealIsLabel(copiedItems, normalized.isLabelData),
+        savedStapleId: normalized.savedStapleId || null,
+        aiPhotosReceived: null,
+        note: `Re-logged from ${sourceMeal.date}`,
+        items: JSON.parse(JSON.stringify(copiedItems))
+      };
+
+      state.meals.push(newMeal);
+      await dbPut('meals', newMeal);
+      renderTodayScreen();
+      showToast(`Added "${newMeal.name}" (${chosenServings} srv) to Today`);
     }
 
     function copyDaySummary() {
@@ -1842,7 +2834,7 @@
         : `7-Day Avg: No days logged`;
 
       const lines = [
-        `MacroTrack Summary — ${state.currentDate}`,
+        `Fuel-Trak Summary — ${state.currentDate}`,
         `Totals: ${Math.round(totals.cal)} / ${state.settings.targetCal} kcal | ${round1(totals.p)}g P (Target ${state.settings.targetProMin}-${state.settings.targetProMax}g) | ${round1(totals.c)}g C | ${round1(totals.f)}g F`,
         avgLine,
         `---`
@@ -1994,7 +2986,7 @@
     }
 
     /********************************************************************
-     * 6. GEMINI API CALL (MULTI-LABEL SUPPORT + 429 vs 503 + RULES 1-8)
+     * 6. GEMINI API CALL (MULTI-LABEL SUPPORT + BASE AMOUNT/UNIT MODEL)
      ********************************************************************/
     function sleep(ms) {
       return new Promise(res => setTimeout(res, ms));
@@ -2081,12 +3073,15 @@
 You are a precision nutrition & macro analyzer for a Canadian user.
 STRICT OPERATING RULES:
 1. Receive and inspect all attached images (${photoCount} photo(s) attached).
-2. Read Canadian Nutrition Facts and Canadian Supplemented Food Facts tables accurately when present.
-3. MULTIPLE LABELS / PRODUCTS: When multiple Nutrition/Supplemented Food Facts labels are attached (e.g. protein powder + almond milk + coconut water), read EACH label separately and return ONE ingredient row per product.
-4. PER-SERVING SEPARATION: For each ingredient row, return:
-   - "servingDesc": the single-serving description from the label or standard reference (e.g. "1 scoop (34g)", "1 cup (240 mL)", "100g").
-   - "perServingCal", "perServingP", "perServingC", "perServingF": the exact macros for ONE single serving of that product.
-   - "servings": the number of servings the user actually had based on their Note (e.g., if label serving is 250 mL and user note says "250 mL coconut water", servings = 1; if label serving is 1 cup (240 mL) and note says "1.5 cups almond milk", servings = 1.5; if note doesn't specify, default servings = 1).
+2. Read Canadian Nutrition Facts and Canadian Supplemented Food Facts tables accurately when present (note: Canadian standard 1 cup = 250 mL).
+3. MULTIPLE LABELS / PRODUCTS: When multiple Nutrition/Supplemented Food Facts labels are attached (e.g. protein powder + almond milk + coconut water), read EACH label separately and return ONE ingredient row per product with its own per-serving numbers.
+4. BASE MODEL & USER AMOUNT:
+   Allowed units ONLY: "mL", "tsp", "tbsp", "fl oz", "cup", "g", "oz", "lb", "serving", "scoop", "piece", "slice", "each".
+   For each ingredient row, return:
+   - "baseAmount" and "baseUnit": the single-serving reference amount and unit from the label (or standard reference), e.g., if label is per 1 scoop -> baseAmount: 1, baseUnit: "scoop"; if label is per 1 cup (250 mL) and user note uses cups -> baseAmount: 1, baseUnit: "cup"; if label is per 250 mL and user note uses mL -> baseAmount: 250, baseUnit: "mL"; if food is weighed in grams -> baseAmount: 100, baseUnit: "g".
+   - "perServingCal", "perServingP", "perServingC", "perServingF": the exact macros for ONE base serving (i.e. for baseAmount of baseUnit).
+   - "amount" and "unit": the actual amount and unit the user consumed based on their Note. IMPORTANT: "unit" MUST be in the SAME unit family as "baseUnit" (Volume: mL/tsp/tbsp/fl oz/cup; Weight: g/oz/lb; Count: serving/scoop/piece/slice/each). If the user's note does not specify an amount for an item, set amount = baseAmount and unit = baseUnit.
+   - "servingDesc": human-readable label serving description (e.g. "1 scoop (34g)" or "1 cup (250 mL)").
 5. NEVER claim the user's note or recipe text specified a measurement, quantity, or ingredient that was not explicitly written in the user's note/recipe.
 6. Set "isLabelData": true on an ingredient row ONLY if you directly read that product's Nutrition Facts / Supplemented Food Facts table from an attached photo. For any estimated ingredient without a read label photo, set "isLabelData": false.
 7. If the user's portion description is vague (e.g., "a bowl", "a plate", "some", "a piece", or unweighed portion), set "vaguePortionFlag": true and state the exact assumed gram/cup/ml quantity in "assumedPortionNote" so the user can verify or override it.
@@ -2098,12 +3093,15 @@ STRICT OPERATING RULES:
   "items": [
     {
       "name": "string",
-      "servingDesc": "string (e.g. '1 scoop (34g)' or '1 cup (250 mL)')",
-      "servings": number,
+      "servingDesc": "string",
+      "baseAmount": number,
+      "baseUnit": "mL|tsp|tbsp|fl oz|cup|g|oz|lb|serving|scoop|piece|slice|each",
       "perServingCal": number,
       "perServingP": number,
       "perServingC": number,
       "perServingF": number,
+      "amount": number,
+      "unit": "mL|tsp|tbsp|fl oz|cup|g|oz|lb|serving|scoop|piece|slice|each",
       "isLabelData": boolean
     }
   ]
@@ -2120,7 +3118,7 @@ STRICT OPERATING RULES:
       });
 
       userParts.push({
-        text: `Mode: ${mode === 'label' ? 'Nutrition/Supplement Label (read each label separately)' : 'Meal/Recipe'}\nAttached Photo Count: ${photoCount}\nUser Recipe Text (verbatim): ${recipeText || '(none)'}\nUser Note (verbatim): ${noteText || '(none)'}`
+        text: `Mode: ${mode === 'label' ? 'Nutrition/Supplement Label (read each attached label separately and return one row per product)' : 'Meal/Recipe'}\nAttached Photo Count: ${photoCount}\nUser Recipe Text (verbatim): ${recipeText || '(none)'}\nUser Note (verbatim): ${noteText || '(none)'}`
       });
 
       const payload = {
@@ -2180,7 +3178,7 @@ STRICT OPERATING RULES:
         const localVagueMatch = /\b(a bowl|bowl|a plate|plate|some|handful|glass|mug|piece|slice)\b/i.test(noteText);
         if (parsed.vaguePortionFlag || localVagueMatch) {
           state.logDraft.vagueWarning = parsed.assumedPortionNote
-            ? `Assumed portion: ${parsed.assumedPortionNote} — adjust servings or per-serving values below if needed.`
+            ? `Assumed portion: ${parsed.assumedPortionNote} — adjust amounts, units, or servings below if needed.`
             : `Vague portion detected in note (${noteText || 'unweighed serving'}). Check assumed amounts below and adjust if needed.`;
         } else {
           state.logDraft.vagueWarning = '';
@@ -2188,27 +3186,35 @@ STRICT OPERATING RULES:
 
         const items = Array.isArray(parsed.items) && parsed.items.length > 0
           ? parsed.items.map(it => {
-              // Rule 6: Never call numbers label data unless at least 1 photo was sent and AI read a label
               const rowIsLabel = Boolean(photoCount > 0 && (it.isLabelData ?? parsed.isLabelData));
-              const srv = (it.servings !== undefined && !isNaN(Number(it.servings)) && Number(it.servings) > 0)
-                ? Number(it.servings)
-                : 1;
+              const bUnit = canonicalizeUnit(it.baseUnit || it.unit || 'serving');
+              const bAmt = (Number(it.baseAmount) > 0) ? round2(Number(it.baseAmount)) : 1;
+              let uUnit = canonicalizeUnit(it.unit || bUnit);
+              let uAmt = (Number(it.amount) > 0) ? round2(Number(it.amount)) : (Number(it.servings) > 0 ? round2(Number(it.servings) * bAmt) : bAmt);
+              if (!areUnitsCompatible(uUnit, bUnit)) {
+                uUnit = bUnit;
+                uAmt = (Number(it.servings) > 0) ? round2(Number(it.servings) * bAmt) : bAmt;
+              }
               return normalizeIngredientItem({
                 name: String(it.name || 'Item'),
-                servingDesc: String(it.servingDesc || it.qty || '1 serving'),
-                servings: srv,
-                initialServings: srv,
+                servingDesc: String(it.servingDesc || `${bAmt} ${bUnit}`),
+                baseAmount: bAmt,
+                baseUnit: bUnit,
                 baseCal: Number(it.perServingCal ?? it.baseCal ?? it.cal) || 0,
                 baseP: Number(it.perServingP ?? it.baseP ?? it.p) || 0,
                 baseC: Number(it.perServingC ?? it.baseC ?? it.c) || 0,
                 baseF: Number(it.perServingF ?? it.baseF ?? it.f) || 0,
+                amount: uAmt,
+                unit: uUnit,
                 isLabelData: rowIsLabel
               }, rowIsLabel);
             })
-          : [normalizeIngredientItem({ name: parsed.mealName || 'Analyzed Item', servingDesc: '1 serving', servings: 1, baseCal: 0, baseP: 0, baseC: 0, baseF: 0, isLabelData: false })];
+          : [normalizeIngredientItem({ name: parsed.mealName || 'Analyzed Item', baseAmount: 1, baseUnit: 'serving', amount: 1, unit: 'serving', baseCal: 0, baseP: 0, baseC: 0, baseF: 0, isLabelData: false })];
 
         document.getElementById('mealTitleInput').value = parsed.mealName || items[0].name || 'Logged Meal';
-        state.logDraft.multiplier = 1;
+        state.logDraft.servings = 1;
+        const logSrvInp = document.getElementById('logMealServingsInput');
+        if (logSrvInp) logSrvInp.value = 1;
         state.logDraft.items = items;
 
         updateMultiplierHighlight('#multButtonsBar', '1x');
@@ -2263,7 +3269,7 @@ STRICT OPERATING RULES:
     }
 
     /********************************************************************
-     * 7. SHARED INGREDIENT ROW RENDERER & SERVINGS MATH (LOG & MODAL)
+     * 7. SHARED INGREDIENT ROW RENDERER, UNIT CONVERSION & SERVINGS MATH
      ********************************************************************/
     function updateMultiplierHighlight(containerSelector, labelStr) {
       document.querySelectorAll(`${containerSelector} .mult-btn`).forEach(btn => {
@@ -2271,26 +3277,61 @@ STRICT OPERATING RULES:
       });
     }
 
+    function buildUnitSelectOptionsHtml(selectedUnit) {
+      const canonical = canonicalizeUnit(selectedUnit);
+      return UNIT_GROUPS.map(grp => `
+        <optgroup label="${escapeHtml(grp.groupLabel)}">
+          ${grp.units.map(u => `<option value="${escapeHtml(u)}" ${u === canonical ? 'selected' : ''}>${escapeHtml(UNIT_META[u].label)}</option>`).join('')}
+        </optgroup>
+      `).join('');
+    }
+
+    function getTargetItemsArray(contextPrefix) {
+      return contextPrefix === 'log' ? state.logDraft.items : state.modalEditor.items;
+    }
+
+    function getContextMealServings(contextPrefix) {
+      return contextPrefix === 'log'
+        ? (Number(state.logDraft.servings) || 1)
+        : (Number(state.modalEditor.servings) || 1);
+    }
+
     function buildIngredientRowsHtml(items, contextPrefix) {
+      const mealServings = getContextMealServings(contextPrefix);
       return items.map((row, idx) => {
-        const rowTotals = computeItemTotals(row);
+        const rowTotals = computeItemTotals(row, mealServings);
         const badgeClass = row.isLabelData ? 'badge-label' : 'badge-estimate';
         const badgeText = row.isLabelData ? 'LABEL' : 'ESTIMATE';
+        const errHtml = row.conversionError
+          ? `<div class="alert-box alert-danger" id="${contextPrefix}_convErr_${idx}" style="margin-top:0; margin-bottom:10px; padding:9px 12px; font-size:0.8rem;">${escapeHtml(row.conversionError)}</div>`
+          : `<div class="alert-box alert-danger" id="${contextPrefix}_convErr_${idx}" style="display:none; margin-top:0; margin-bottom:10px; padding:9px 12px; font-size:0.8rem;"></div>`;
+
         return `
           <div class="ing-row-card">
             <div class="ing-row-top">
               <input type="text" class="ing-name-input" value="${escapeHtml(row.name)}" placeholder="Ingredient name" oninput="onIngredientFieldEdit('${contextPrefix}', ${idx}, 'name', this.value)" />
-              <input type="text" class="ing-desc-input" value="${escapeHtml(row.servingDesc)}" placeholder="1 serving" oninput="onIngredientFieldEdit('${contextPrefix}', ${idx}, 'servingDesc', this.value)" />
               <span class="badge ${badgeClass} badge-clickable" title="Tap to toggle LABEL / ESTIMATE" onclick="toggleIngredientLabelBadge('${contextPrefix}', ${idx})">${badgeText}</span>
               <button type="button" class="btn-danger btn-sm" onclick="removeIngredientItem('${contextPrefix}', ${idx})" aria-label="Delete row">&times;</button>
             </div>
 
+            <div class="ing-amt-unit-grid">
+              <div>
+                <label>Amount</label>
+                <input type="number" step="any" min="0" id="${contextPrefix}_amt_${idx}" value="${row.amount}" oninput="onIngredientAmountEdit('${contextPrefix}', ${idx}, this.value)" />
+              </div>
+              <div>
+                <label>Unit</label>
+                <select id="${contextPrefix}_unit_${idx}" onchange="onIngredientUnitChange('${contextPrefix}', ${idx}, this.value)">
+                  ${buildUnitSelectOptionsHtml(row.unit)}
+                </select>
+              </div>
+            </div>
+
+            ${errHtml}
+
             <div class="ing-row-mid">
-              <div class="servings-Control">
-                <span class="srv-label">Servings:</span>
-                <button type="button" class="step-btn" onclick="stepIngredientServings('${contextPrefix}', ${idx}, -0.5)">&minus;</button>
-                <input type="number" step="0.5" min="0" class="srv-input" id="${contextPrefix}_srv_${idx}" value="${row.servings}" oninput="onIngredientServingsInput('${contextPrefix}', ${idx}, this.value)" />
-                <button type="button" class="step-btn" onclick="stepIngredientServings('${contextPrefix}', ${idx}, 0.5)">+</button>
+              <div class="base-ref-tag" id="${contextPrefix}_baseRef_${idx}">
+                Base: ${row.baseAmount} ${escapeHtml(row.baseUnit)} (${row.baseCal} kcal &middot; ${row.baseP}P &middot; ${row.baseC}C &middot; ${row.baseF}F)
               </div>
               <div class="row-calc-totals" id="${contextPrefix}_rowTotal_${idx}">
                 = ${rowTotals.cal} kcal | ${rowTotals.p}P | ${rowTotals.c}C | ${rowTotals.f}F
@@ -2299,19 +3340,19 @@ STRICT OPERATING RULES:
 
             <div class="ing-per-serving-grid">
               <div class="ing-per-serving-cell">
-                <label>Per-Serv Cal</label>
+                <label>Base Cal</label>
                 <input type="number" step="1" value="${row.baseCal}" oninput="onIngredientFieldEdit('${contextPrefix}', ${idx}, 'baseCal', this.value)" />
               </div>
               <div class="ing-per-serving-cell">
-                <label>Per-Serv P (g)</label>
+                <label>Base P (g)</label>
                 <input type="number" step="0.5" value="${row.baseP}" oninput="onIngredientFieldEdit('${contextPrefix}', ${idx}, 'baseP', this.value)" />
               </div>
               <div class="ing-per-serving-cell">
-                <label>Per-Serv C (g)</label>
+                <label>Base C (g)</label>
                 <input type="number" step="0.5" value="${row.baseC}" oninput="onIngredientFieldEdit('${contextPrefix}', ${idx}, 'baseC', this.value)" />
               </div>
               <div class="ing-per-serving-cell">
-                <label>Per-Serv F (g)</label>
+                <label>Base F (g)</label>
                 <input type="number" step="0.5" value="${row.baseF}" oninput="onIngredientFieldEdit('${contextPrefix}', ${idx}, 'baseF', this.value)" />
               </div>
             </div>
@@ -2320,21 +3361,23 @@ STRICT OPERATING RULES:
       }).join('');
     }
 
-    function getTargetItemsArray(contextPrefix) {
-      return contextPrefix === 'log' ? state.logDraft.items : state.modalEditor.items;
-    }
-
-    function refreshContextTotalsOnly(contextPrefix, changedIdx = null) {
+    function refreshContextTotalsOnly(contextPrefix) {
       const items = getTargetItemsArray(contextPrefix);
-      if (changedIdx !== null && items[changedIdx]) {
-        const rt = computeItemTotals(items[changedIdx]);
-        const rowTotalEl = document.getElementById(`${contextPrefix}_rowTotal_${changedIdx}`);
+      const mealServings = getContextMealServings(contextPrefix);
+
+      items.forEach((row, idx) => {
+        const rt = computeItemTotals(row, mealServings);
+        const rowTotalEl = document.getElementById(`${contextPrefix}_rowTotal_${idx}`);
         if (rowTotalEl) {
           rowTotalEl.textContent = `= ${rt.cal} kcal | ${rt.p}P | ${rt.c}C | ${rt.f}F`;
         }
-      }
+        const baseRefEl = document.getElementById(`${contextPrefix}_baseRef_${idx}`);
+        if (baseRefEl) {
+          baseRefEl.innerHTML = `Base: ${row.baseAmount} ${escapeHtml(row.baseUnit)} (${row.baseCal} kcal &middot; ${row.baseP}P &middot; ${row.baseC}C &middot; ${row.baseF}F)`;
+        }
+      });
 
-      const t = computeItemsListTotals(items);
+      const t = computeItemsListTotals(items, mealServings);
       if (contextPrefix === 'log') {
         document.getElementById('liveTableTotalsText').textContent =
           `Total: ${Math.round(t.cal)} kcal | ${round1(t.p)}g P | ${round1(t.c)}g C | ${round1(t.f)}g F`;
@@ -2353,39 +3396,81 @@ STRICT OPERATING RULES:
       const row = items[idx];
       if (!row) return;
 
-      if (field === 'name' || field === 'servingDesc') {
-        row[field] = val;
+      if (field === 'name') {
+        row.name = val;
       } else {
         row[field] = Number(val) || 0;
-        refreshContextTotalsOnly(contextPrefix, idx);
+        // Clear any cross-type conversion warning if the user manually edits the numbers
+        row.conversionError = '';
+        const errEl = document.getElementById(`${contextPrefix}_convErr_${idx}`);
+        if (errEl) errEl.style.display = 'none';
+        refreshContextTotalsOnly(contextPrefix);
       }
     }
 
-    function onIngredientServingsInput(contextPrefix, idx, val) {
+    function onIngredientAmountEdit(contextPrefix, idx, val) {
       const items = getTargetItemsArray(contextPrefix);
       const row = items[idx];
       if (!row) return;
 
       const parsed = Math.max(0, Number(val) || 0);
-      row.servings = round2(parsed);
-      const activeMult = contextPrefix === 'log' ? (state.logDraft.multiplier || 1) : (state.modalEditor.multiplier || 1);
-      row.initialServings = activeMult > 0 ? round2(row.servings / activeMult) : row.servings;
-      refreshContextTotalsOnly(contextPrefix, idx);
+      row.amount = round2(parsed);
+
+      // If this is a brand-new blank row with 0 macros across the board, keep baseAmount synced until macros are entered
+      const isBlankNewRow = (row.baseCal === 0 && row.baseP === 0 && row.baseC === 0 && row.baseF === 0);
+      if (isBlankNewRow && parsed > 0) {
+        row.baseAmount = round2(parsed);
+      }
+
+      row.conversionError = '';
+      const errEl = document.getElementById(`${contextPrefix}_convErr_${idx}`);
+      if (errEl) errEl.style.display = 'none';
+
+      refreshContextTotalsOnly(contextPrefix);
     }
 
-    function stepIngredientServings(contextPrefix, idx, delta) {
+    function onIngredientUnitChange(contextPrefix, idx, newUnitVal) {
       const items = getTargetItemsArray(contextPrefix);
       const row = items[idx];
       if (!row) return;
 
-      const nextVal = Math.max(0, round2((Number(row.servings) || 0) + delta));
-      row.servings = nextVal;
-      const activeMult = contextPrefix === 'log' ? (state.logDraft.multiplier || 1) : (state.modalEditor.multiplier || 1);
-      row.initialServings = activeMult > 0 ? round2(row.servings / activeMult) : row.servings;
+      const nextUnit = canonicalizeUnit(newUnitVal);
+      const isBlankNewRow = (row.baseCal === 0 && row.baseP === 0 && row.baseC === 0 && row.baseF === 0);
 
-      const srvInput = document.getElementById(`${contextPrefix}_srv_${idx}`);
-      if (srvInput) srvInput.value = row.servings;
-      refreshContextTotalsOnly(contextPrefix, idx);
+      // If brand-new blank row with 0 macros, let user pick any initial unit for the new ingredient
+      if (isBlankNewRow) {
+        row.unit = nextUnit;
+        row.baseUnit = nextUnit;
+        row.conversionError = '';
+        const errEl = document.getElementById(`${contextPrefix}_convErr_${idx}`);
+        if (errEl) errEl.style.display = 'none';
+        refreshContextTotalsOnly(contextPrefix);
+        return;
+      }
+
+      // Check unit compatibility with the locked baseUnit
+      if (!areUnitsCompatible(nextUnit, row.baseUnit)) {
+        const msg = getCannotConvertMessage(row.unit, nextUnit);
+        row.conversionError = msg;
+        const selectEl = document.getElementById(`${contextPrefix}_unit_${idx}`);
+        if (selectEl) {
+          selectEl.value = row.unit; // Keep the old unit
+        }
+        const errEl = document.getElementById(`${contextPrefix}_convErr_${idx}`);
+        if (errEl) {
+          errEl.textContent = msg;
+          errEl.style.display = 'block';
+        }
+        showToast(msg);
+        return;
+      }
+
+      // Compatible unit within same family (Volume, Weight, or Count): update unit and recalculate from base
+      row.unit = nextUnit;
+      row.conversionError = '';
+      const errEl = document.getElementById(`${contextPrefix}_convErr_${idx}`);
+      if (errEl) errEl.style.display = 'none';
+      refreshContextTotalsOnly(contextPrefix);
     }
 
     function toggleIngredientLabelBadge(contextPrefix, idx) {
@@ -2404,7 +3489,7 @@ STRICT OPERATING RULES:
       const items = getTargetItemsArray(contextPrefix);
       items.splice(idx, 1);
       if (items.length === 0) {
-        items.push(normalizeIngredientItem({ name: '', servingDesc: '1 serving', baseCal: 0, baseP: 0, baseC: 0, baseF: 0, servings: 1, isLabelData: false }));
+        items.push(normalizeIngredientItem({ name: '', baseAmount: 1, baseUnit: 'serving', amount: 1, unit: 'serving', baseCal: 0, baseP: 0, baseC: 0, baseF: 0, isLabelData: false }));
       }
       if (contextPrefix === 'log') {
         renderLogIngredientsList();
@@ -2413,7 +3498,7 @@ STRICT OPERATING RULES:
       }
     }
 
-    // Log Screen Specific List & Multiplier Functions
+    // Log Screen Specific List & Servings Functions
     function renderLogIngredientsList() {
       const container = document.getElementById('logIngredientsList');
       container.innerHTML = buildIngredientRowsHtml(state.logDraft.items, 'log');
@@ -2423,28 +3508,42 @@ STRICT OPERATING RULES:
     function addLogIngredientRow() {
       state.logDraft.items.push(normalizeIngredientItem({
         name: '',
-        servingDesc: '1 serving',
+        baseAmount: 1,
+        baseUnit: 'serving',
+        amount: 1,
+        unit: 'serving',
         baseCal: 0,
         baseP: 0,
         baseC: 0,
         baseF: 0,
-        servings: 1,
-        initialServings: 1,
         isLabelData: false
       }));
       renderLogIngredientsList();
     }
 
-    function applyLogMealMultiplier(factor, labelStr) {
-      state.logDraft.multiplier = factor;
-      updateMultiplierHighlight('#multButtonsBar', labelStr);
+    function stepLogMealServings(delta) {
+      const cur = Number(state.logDraft.servings) || 1;
+      const next = Math.max(0.5, round2(cur + delta));
+      state.logDraft.servings = next;
+      const inp = document.getElementById('logMealServingsInput');
+      if (inp) inp.value = next;
+      updateMultiplierHighlight('#multButtonsBar', `${next}x`);
+      refreshContextTotalsOnly('log');
+    }
 
-      // Scales servings ONLY; never overwrites per-serving numbers (baseCal, baseP, baseC, baseF)
-      state.logDraft.items.forEach(item => {
-        const baseSrv = (item.initialServings !== undefined && item.initialServings > 0) ? item.initialServings : 1;
-        item.servings = round2(baseSrv * factor);
-      });
-      renderLogIngredientsList();
+    function onLogMealServingsInput(val) {
+      const parsed = Math.max(0.1, round2(Number(val) || 1));
+      state.logDraft.servings = parsed;
+      updateMultiplierHighlight('#multButtonsBar', `${parsed}x`);
+      refreshContextTotalsOnly('log');
+    }
+
+    function applyLogMealMultiplier(factor, labelStr) {
+      state.logDraft.servings = round2(factor);
+      const inp = document.getElementById('logMealServingsInput');
+      if (inp) inp.value = state.logDraft.servings;
+      updateMultiplierHighlight('#multButtonsBar', labelStr);
+      refreshContextTotalsOnly('log');
     }
 
     async function commitCurrentMeal(alsoSaveStaple) {
@@ -2452,12 +3551,9 @@ STRICT OPERATING RULES:
         stopSpeechRecognition();
       }
 
-      const cleanItems = state.logDraft.items.map(it => normalizeIngredientItem({
-        ...it,
-        initialServings: it.servings
-      }, it.isLabelData));
-
-      const totals = computeItemsListTotals(cleanItems);
+      const cleanItems = state.logDraft.items.map(it => normalizeIngredientItem(it, it.isLabelData));
+      const mealServings = Math.max(0.1, round2(Number(state.logDraft.servings) || 1));
+      const totals = computeItemsListTotals(cleanItems, mealServings);
       const titleInput = document.getElementById('mealTitleInput').value.trim();
       const firstItemName = cleanItems[0]?.name?.trim();
       const mealName = titleInput || firstItemName || 'Logged Meal';
@@ -2468,14 +3564,15 @@ STRICT OPERATING RULES:
       if (alsoSaveStaple) {
         const stapleId = 'staple_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7);
         linkedStapleId = stapleId;
+        const stapleTotals1x = computeItemsListTotals(cleanItems, 1);
         const staple = {
           id: stapleId,
           name: mealName,
-          baseGrams: 100,
-          cal: Math.round(totals.cal),
-          p: round1(totals.p),
-          c: round1(totals.c),
-          f: round1(totals.f),
+          servings: 1,
+          cal: Math.round(stapleTotals1x.cal),
+          p: round1(stapleTotals1x.p),
+          c: round1(stapleTotals1x.c),
+          f: round1(stapleTotals1x.f),
           isLabelData: mealIsLabel,
           items: JSON.parse(JSON.stringify(cleanItems))
         };
@@ -2487,6 +3584,7 @@ STRICT OPERATING RULES:
         id: 'meal_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
         date: state.currentDate,
         name: mealName,
+        servings: mealServings,
         cal: Math.round(totals.cal),
         p: round1(totals.p),
         c: round1(totals.c),
@@ -2508,9 +3606,11 @@ STRICT OPERATING RULES:
       document.getElementById('analysisStatusBox').style.display = 'none';
       state.logDraft.aiPhotosReceived = null;
       state.logDraft.vagueWarning = '';
-      state.logDraft.multiplier = 1;
+      state.logDraft.servings = 1;
+      const logSrvInp = document.getElementById('logMealServingsInput');
+      if (logSrvInp) logSrvInp.value = 1;
       state.logDraft.items = [
-        normalizeIngredientItem({ name: '', servingDesc: '1 serving', baseCal: 0, baseP: 0, baseC: 0, baseF: 0, servings: 1, isLabelData: false })
+        normalizeIngredientItem({ name: '', baseAmount: 1, baseUnit: 'serving', amount: 1, unit: 'serving', baseCal: 0, baseP: 0, baseC: 0, baseF: 0, isLabelData: false })
       ];
       updateMultiplierHighlight('#multButtonsBar', '1x');
       renderLogIngredientsList();
@@ -2521,7 +3621,7 @@ STRICT OPERATING RULES:
     }
 
     /********************************************************************
-     * 8. SAVED STAPLES & MEALS SCREEN
+     * 8. SAVED STAPLES & MEALS SCREEN + QUICK "+ LOG" SHEET
      ********************************************************************/
     function renderSavedScreen() {
       const q = (document.getElementById('savedSearchInput').value || '').toLowerCase().trim();
@@ -2537,85 +3637,139 @@ STRICT OPERATING RULES:
         const badge = s.isLabelData
           ? `<span class="badge badge-label">LABEL DATA</span>`
           : `<span class="badge badge-estimate">ESTIMATE</span>`;
-        const baseG = Number(s.baseGrams) || 100;
         const ingCount = Array.isArray(s.items) ? s.items.length : 1;
         return `
           <div class="card">
             <div class="meal-item-top">
               <div>
                 <div class="meal-item-name">${escapeHtml(s.name)}</div>
-                <div class="muted-text">1x = ${Math.round(s.cal)} kcal (${round1(s.p)}g P · ${round1(s.c)}g C · ${round1(s.f)}g F) · ${ingCount} item(s) · Base: ${baseG}g</div>
+                <div class="muted-text">1 serving = ${Math.round(s.cal)} kcal (${round1(s.p)}g P &middot; ${round1(s.c)}g C &middot; ${round1(s.f)}g F) &middot; ${ingCount} ingredient(s)</div>
               </div>
               ${badge}
             </div>
-            <div class="row-wrap" style="margin-top: 10px;">
-              <button type="button" class="btn-secondary btn-sm" onclick="quickLogStaple('${s.id}', 0.5, '0.5x')">Log 0.5x</button>
-              <button type="button" class="btn-primary btn-sm" style="width:auto;" onclick="quickLogStaple('${s.id}', 1, '1x')">Log 1x</button>
-              <button type="button" class="btn-secondary btn-sm" onclick="quickLogStaple('${s.id}', 1.5, '1.5x')">Log 1.5x</button>
-              <div class="row" style="gap:4px; max-width: 145px;">
-                <input type="number" id="gramInput_${s.id}" placeholder="${baseG}g" style="padding:5px 7px; font-size:0.8rem;" />
-                <button type="button" class="btn-secondary btn-sm" onclick="quickLogStapleGrams('${s.id}')">Log g</button>
+            <div class="row-wrap" style="margin-top: 12px; justify-content: space-between;">
+              <button type="button" class="btn-primary btn-inline-primary" onclick="openQuickLogModal('${s.id}')">+ Log</button>
+              <div class="row-wrap">
+                <button type="button" class="btn-secondary btn-sm" onclick="openEditStapleModal('${s.id}')">Edit</button>
+                <button type="button" class="btn-danger btn-sm" onclick="deleteStaple('${s.id}')">Delete</button>
               </div>
-            </div>
-            <div class="row-wrap" style="margin-top: 8px; justify-content: flex-end;">
-              <button type="button" class="btn-secondary btn-sm" onclick="openEditStapleModal('${s.id}')">Edit Ingredients / Servings</button>
-              <button type="button" class="btn-danger btn-sm" onclick="deleteStaple('${s.id}')">Delete</button>
             </div>
           </div>
         `;
       }).join('');
     }
 
-    async function quickLogStaple(stapleId, mult, labelSuffix) {
+    function openQuickLogModal(stapleId) {
       const s = state.staples.find(x => x.id === stapleId);
       if (!s) return;
 
-      const normalizedStaple = normalizeRecord(s);
-      // Scale each ingredient's servings by mult while keeping per-serving numbers untouched
-      const scaledItems = normalizedStaple.items.map(it => {
-        const newSrv = round2((Number(it.servings) || 1) * mult);
-        return normalizeIngredientItem({
-          ...it,
-          servings: newSrv,
-          initialServings: newSrv
-        }, it.isLabelData);
-      });
+      const normalized = normalizeRecord(s);
+      state.quickLogDraft = {
+        stapleId: normalized.id,
+        servings: Number(normalized.servings) || 1,
+        date: state.currentDate || getLocalYYYYMMDD()
+      };
 
-      const totals = computeItemsListTotals(scaledItems);
+      document.getElementById('quickLogModalTitle').textContent = `Log "${normalized.name}"`;
+      document.getElementById('quickLogModalBody').innerHTML = `
+        <div class="meal-servings-box" style="margin-top: 4px;">
+          <div>
+            <div class="srv-title">Servings</div>
+            <div class="srv-sub">Step 0.5 or enter amount</div>
+          </div>
+          <div class="big-step-controls">
+            <button type="button" class="big-step-btn" onclick="stepQuickLogServings(-0.5)" aria-label="Decrease servings">&minus;</button>
+            <input type="number" step="0.5" min="0.1" class="big-srv-input" id="quickLogServingsInput" value="${state.quickLogDraft.servings}" oninput="onQuickLogServingsInput(this.value)" />
+            <button type="button" class="big-step-btn" onclick="stepQuickLogServings(0.5)" aria-label="Increase servings">+</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="quickLogDateInput">Date to log</label>
+          <input type="date" id="quickLogDateInput" value="${state.quickLogDraft.date}" onchange="state.quickLogDraft.date = this.value" />
+        </div>
+
+        <div class="avg-strip" style="margin-bottom: 16px;">
+          <span class="avg-strip-title">Calculated Total</span>
+          <span class="avg-strip-values" id="quickLogLivePreviewText">0 kcal &middot; 0g P &middot; 0g C &middot; 0g F</span>
+        </div>
+
+        <div class="row">
+          <button type="button" class="btn-primary" onclick="confirmQuickLogStaple()">Log it</button>
+          <button type="button" class="btn-secondary" onclick="closeQuickLogModal()">Cancel</button>
+        </div>
+      `;
+
+      updateQuickLogLivePreview();
+      document.getElementById('quickLogModal').classList.add('open');
+    }
+
+    function stepQuickLogServings(delta) {
+      const cur = Number(state.quickLogDraft.servings) || 1;
+      const next = Math.max(0.5, round2(cur + delta));
+      state.quickLogDraft.servings = next;
+      const inp = document.getElementById('quickLogServingsInput');
+      if (inp) inp.value = next;
+      updateQuickLogLivePreview();
+    }
+
+    function onQuickLogServingsInput(val) {
+      state.quickLogDraft.servings = Math.max(0.1, round2(Number(val) || 1));
+      updateQuickLogLivePreview();
+    }
+
+    function updateQuickLogLivePreview() {
+      const s = state.staples.find(x => x.id === state.quickLogDraft.stapleId);
+      if (!s) return;
+      const normalized = normalizeRecord(s);
+      const srv = Number(state.quickLogDraft.servings) || 1;
+      const t = computeItemsListTotals(normalized.items, srv);
+      const el = document.getElementById('quickLogLivePreviewText');
+      if (el) {
+        el.textContent = `${Math.round(t.cal)} kcal · ${round1(t.p)}g P · ${round1(t.c)}g C · ${round1(t.f)}g F`;
+      }
+    }
+
+    async function confirmQuickLogStaple() {
+      const s = state.staples.find(x => x.id === state.quickLogDraft.stapleId);
+      if (!s) return;
+
+      const normalizedStaple = normalizeRecord(s);
+      const chosenServings = Math.max(0.1, round2(Number(state.quickLogDraft.servings) || 1));
+      const dateInputVal = document.getElementById('quickLogDateInput')?.value;
+      const targetDate = dateInputVal || state.currentDate || getLocalYYYYMMDD();
+
+      // Deep-copy items so editing in the day's log never alters the saved staple
+      const copiedItems = normalizedStaple.items.map(it => normalizeIngredientItem({ ...it }, it.isLabelData));
+      const totals = computeItemsListTotals(copiedItems, chosenServings);
 
       const meal = {
         id: 'meal_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
-        date: state.currentDate,
-        name: mult === 1 ? s.name : `${s.name} (${labelSuffix})`,
+        date: targetDate,
+        name: normalizedStaple.name,
+        servings: chosenServings,
         cal: Math.round(totals.cal),
         p: round1(totals.p),
         c: round1(totals.c),
         f: round1(totals.f),
-        isLabelData: deriveMealIsLabel(scaledItems, s.isLabelData),
-        savedStapleId: s.id,
+        isLabelData: deriveMealIsLabel(copiedItems, normalizedStaple.isLabelData),
+        savedStapleId: normalizedStaple.id,
         aiPhotosReceived: null,
-        note: `Quick logged (${labelSuffix})`,
-        items: scaledItems
+        note: `Logged from Saved (${chosenServings} serving${chosenServings === 1 ? '' : 's'})`,
+        items: JSON.parse(JSON.stringify(copiedItems))
       };
 
       state.meals.push(meal);
       await dbPut('meals', meal);
-      showToast(`Logged ${meal.name} to ${state.currentDate}`);
+      closeQuickLogModal();
+      state.currentDate = targetDate;
+      syncLogScreenDateLabels();
+      showToast(`Logged "${meal.name}" to ${targetDate}`);
       switchTab('today');
     }
 
-    async function quickLogStapleGrams(stapleId) {
-      const s = state.staples.find(x => x.id === stapleId);
-      if (!s) return;
-      const gInput = document.getElementById(`gramInput_${stapleId}`);
-      const grams = Number(gInput?.value);
-      if (!grams || grams <= 0) {
-        showToast('Enter grams to log');
-        return;
-      }
-      const baseG = Number(s.baseGrams) || 100;
-      const ratio = grams / baseG;
-      await quickLogStaple(stapleId, ratio, `${grams}g`);
+    function closeQuickLogModal() {
+      document.getElementById('quickLogModal').classList.remove('open');
     }
 
     async function deleteStaple(stapleId) {
@@ -2637,12 +3791,8 @@ STRICT OPERATING RULES:
         mode: 'meal',
         targetId: m.id,
         name: normalized.name,
-        baseGrams: 100,
-        multiplier: 1,
-        items: normalized.items.map(it => normalizeIngredientItem({
-          ...it,
-          initialServings: it.servings
-        }, it.isLabelData))
+        servings: Number(normalized.servings) || 1,
+        items: normalized.items.map(it => normalizeIngredientItem({ ...it }, it.isLabelData))
       };
 
       document.getElementById('editModalTitle').textContent = `Edit Logged Meal (${m.date})`;
@@ -2659,12 +3809,8 @@ STRICT OPERATING RULES:
         mode: 'staple',
         targetId: s.id,
         name: normalized.name,
-        baseGrams: Number(s.baseGrams) || 100,
-        multiplier: 1,
-        items: normalized.items.map(it => normalizeIngredientItem({
-          ...it,
-          initialServings: it.servings
-        }, it.isLabelData))
+        servings: Number(normalized.servings) || 1,
+        items: normalized.items.map(it => normalizeIngredientItem({ ...it }, it.isLabelData))
       };
 
       document.getElementById('editModalTitle').textContent = 'Edit Saved Meal / Staple';
@@ -2677,18 +3823,18 @@ STRICT OPERATING RULES:
         mode: 'new-staple',
         targetId: null,
         name: '',
-        baseGrams: 100,
-        multiplier: 1,
+        servings: 1,
         items: [
           normalizeIngredientItem({
             name: '',
-            servingDesc: '1 serving',
+            baseAmount: 1,
+            baseUnit: 'serving',
+            amount: 1,
+            unit: 'serving',
             baseCal: 0,
             baseP: 0,
             baseC: 0,
             baseF: 0,
-            servings: 1,
-            initialServings: 1,
             isLabelData: true
           })
         ]
@@ -2701,14 +3847,6 @@ STRICT OPERATING RULES:
 
     function renderUnifiedModalBody() {
       const isMealMode = state.modalEditor.mode === 'meal';
-      const isStapleMode = state.modalEditor.mode === 'staple' || state.modalEditor.mode === 'new-staple';
-
-      const baseGramsRowHtml = isStapleMode ? `
-        <div style="margin-bottom: 10px;">
-          <label for="modalBaseGramsInput">Base Serving Weight in Grams (for quick-logging by grams)</label>
-          <input type="number" id="modalBaseGramsInput" value="${state.modalEditor.baseGrams}" oninput="state.modalEditor.baseGrams = Number(this.value) || 100" />
-        </div>
-      ` : '';
 
       const alsoUpdateSavedHtml = isMealMode ? `
         <label class="checkbox-row">
@@ -2718,45 +3856,41 @@ STRICT OPERATING RULES:
       ` : '';
 
       const deleteBtnHtml = isMealMode
-        ? `<button type="button" class="btn-danger" onclick="deleteLoggedMeal('${state.modalEditor.targetId}')">Delete Meal</button>`
+        ? `<button type="button" class="btn-danger" onclick="deleteLoggedMeal('${state.modalEditor.targetId}')">Delete</button>`
         : (state.modalEditor.mode === 'staple'
             ? `<button type="button" class="btn-danger" onclick="deleteStapleFromModal('${state.modalEditor.targetId}')">Delete</button>`
             : '');
 
       document.getElementById('editModalBody').innerHTML = `
-        <div style="margin-bottom: 10px;">
-          <label for="modalItemTitleInput">Meal / Saved Item Name</label>
+        <div class="field">
+          <label for="modalItemTitleInput">Name</label>
           <input type="text" id="modalItemTitleInput" value="${escapeHtml(state.modalEditor.name)}" placeholder="e.g., Protein Shake or Chicken & Rice" oninput="state.modalEditor.name = this.value" />
         </div>
 
-        ${baseGramsRowHtml}
-
-        <div style="margin-bottom: 10px;">
-          <label>Whole-Meal Multiplier (Scales All Ingredient Servings)</label>
-          <div class="mult-bar" id="modalMultButtonsBar">
-            <button type="button" class="mult-btn" onclick="applyModalMealMultiplier(1/6, '1/6')">1/6</button>
-            <button type="button" class="mult-btn" onclick="applyModalMealMultiplier(0.25, '1/4')">1/4</button>
-            <button type="button" class="mult-btn" onclick="applyModalMealMultiplier(1/3, '1/3')">1/3</button>
-            <button type="button" class="mult-btn" onclick="applyModalMealMultiplier(0.5, '1/2')">1/2</button>
-            <button type="button" class="mult-btn" onclick="applyModalMealMultiplier(0.75, '3/4')">3/4</button>
-            <button type="button" class="mult-btn active" onclick="applyModalMealMultiplier(1, '1x')">1x</button>
-            <button type="button" class="mult-btn" onclick="applyModalMealMultiplier(1.25, '1.25x')">1.25x</button>
-            <button type="button" class="mult-btn" onclick="applyModalMealMultiplier(1.5, '1.5x')">1.5x</button>
-            <button type="button" class="mult-btn" onclick="applyModalMealMultiplier(2, '2x')">2x</button>
+        <div class="meal-servings-box">
+          <div>
+            <div class="srv-title">Servings</div>
+            <div class="srv-sub">Multiplies on top of all ingredients</div>
+          </div>
+          <div class="big-step-controls">
+            <button type="button" class="big-step-btn" onclick="stepModalMealServings(-0.5)" aria-label="Decrease servings">&minus;</button>
+            <input type="number" step="0.5" min="0.1" class="big-srv-input" id="modalMealServingsInput" value="${state.modalEditor.servings}" oninput="onModalMealServingsInput(this.value)" />
+            <button type="button" class="big-step-btn" onclick="stepModalMealServings(0.5)" aria-label="Increase servings">+</button>
           </div>
         </div>
 
         <div id="modalIngredientsList" class="ing-list"></div>
 
-        <div class="row-wrap" style="justify-content: space-between; margin-top: 10px; margin-bottom: 12px;">
-          <button type="button" class="btn-secondary btn-sm" onclick="addModalIngredientRow()">+ Add Ingredient</button>
-          <div id="modalLiveTotalsText" style="font-weight:700; font-size:0.88rem; color:var(--text);">Total: 0 kcal | 0P | 0C | 0F</div>
+        <div class="row-wrap totals-row">
+          <button type="button" class="btn-secondary btn-sm" onclick="addModalIngredientRow()">+ Add ingredient</button>
+          <div id="modalLiveTotalsText" style="font-weight:800; font-size:0.9rem; color:var(--highlight);">Total: 0 kcal | 0P | 0C | 0F</div>
         </div>
 
         ${alsoUpdateSavedHtml}
 
         <div class="row" style="gap: 8px;">
           <button type="button" class="btn-primary" onclick="saveModalChanges()">Save</button>
+          <button type="button" class="btn-secondary" onclick="closeEditModal()">Cancel</button>
           ${deleteBtnHtml}
         </div>
       `;
@@ -2774,40 +3908,43 @@ STRICT OPERATING RULES:
     function addModalIngredientRow() {
       state.modalEditor.items.push(normalizeIngredientItem({
         name: '',
-        servingDesc: '1 serving',
+        baseAmount: 1,
+        baseUnit: 'serving',
+        amount: 1,
+        unit: 'serving',
         baseCal: 0,
         baseP: 0,
         baseC: 0,
         baseF: 0,
-        servings: 1,
-        initialServings: 1,
         isLabelData: false
       }));
       renderModalIngredientsList();
     }
 
-    function applyModalMealMultiplier(factor, labelStr) {
-      state.modalEditor.multiplier = factor;
-      updateMultiplierHighlight('#modalMultButtonsBar', labelStr);
+    function stepModalMealServings(delta) {
+      const cur = Number(state.modalEditor.servings) || 1;
+      const next = Math.max(0.5, round2(cur + delta));
+      state.modalEditor.servings = next;
+      const inp = document.getElementById('modalMealServingsInput');
+      if (inp) inp.value = next;
+      refreshContextTotalsOnly('modal');
+    }
 
-      state.modalEditor.items.forEach(item => {
-        const baseSrv = (item.initialServings !== undefined && item.initialServings > 0) ? item.initialServings : 1;
-        item.servings = round2(baseSrv * factor);
-      });
-      renderModalIngredientsList();
+    function onModalMealServingsInput(val) {
+      const parsed = Math.max(0.1, round2(Number(val) || 1));
+      state.modalEditor.servings = parsed;
+      refreshContextTotalsOnly('modal');
     }
 
     async function saveModalChanges() {
       const titleInput = document.getElementById('modalItemTitleInput');
       const rawName = (titleInput ? titleInput.value : state.modalEditor.name).trim();
-      const cleanItems = state.modalEditor.items.map(it => normalizeIngredientItem({
-        ...it,
-        initialServings: it.servings
-      }, it.isLabelData));
+      const cleanItems = state.modalEditor.items.map(it => normalizeIngredientItem(it, it.isLabelData));
+      const mealServings = Math.max(0.1, round2(Number(state.modalEditor.servings) || 1));
 
       const firstItemName = cleanItems[0]?.name?.trim();
       const finalName = rawName || firstItemName || 'Saved Meal';
-      const totals = computeItemsListTotals(cleanItems);
+      const totals = computeItemsListTotals(cleanItems, mealServings);
       const isLabelData = deriveMealIsLabel(cleanItems, false);
 
       if (state.modalEditor.mode === 'meal') {
@@ -2815,6 +3952,7 @@ STRICT OPERATING RULES:
         if (!meal) return;
 
         meal.name = finalName;
+        meal.servings = mealServings;
         meal.cal = Math.round(totals.cal);
         meal.p = round1(totals.p);
         meal.c = round1(totals.c);
@@ -2833,12 +3971,14 @@ STRICT OPERATING RULES:
             matchingStaple = state.staples.find(s => s.name.trim().toLowerCase() === finalName.toLowerCase());
           }
 
+          const stapleTotals = computeItemsListTotals(cleanItems, mealServings);
           if (matchingStaple) {
             matchingStaple.name = finalName;
-            matchingStaple.cal = Math.round(totals.cal);
-            matchingStaple.p = round1(totals.p);
-            matchingStaple.c = round1(totals.c);
-            matchingStaple.f = round1(totals.f);
+            matchingStaple.servings = mealServings;
+            matchingStaple.cal = Math.round(stapleTotals.cal);
+            matchingStaple.p = round1(stapleTotals.p);
+            matchingStaple.c = round1(stapleTotals.c);
+            matchingStaple.f = round1(stapleTotals.f);
             matchingStaple.isLabelData = isLabelData;
             matchingStaple.items = JSON.parse(JSON.stringify(cleanItems));
             meal.savedStapleId = matchingStaple.id;
@@ -2848,11 +3988,11 @@ STRICT OPERATING RULES:
             const newStaple = {
               id: newStapleId,
               name: finalName,
-              baseGrams: 100,
-              cal: Math.round(totals.cal),
-              p: round1(totals.p),
-              c: round1(totals.c),
-              f: round1(totals.f),
+              servings: mealServings,
+              cal: Math.round(stapleTotals.cal),
+              p: round1(stapleTotals.p),
+              c: round1(stapleTotals.c),
+              f: round1(stapleTotals.f),
               isLabelData,
               items: JSON.parse(JSON.stringify(cleanItems))
             };
@@ -2870,12 +4010,11 @@ STRICT OPERATING RULES:
       }
 
       // Staple Edit or New Staple
-      const baseGrams = Number(document.getElementById('modalBaseGramsInput')?.value) || 100;
       if (state.modalEditor.mode === 'staple') {
         const s = state.staples.find(x => x.id === state.modalEditor.targetId);
         if (!s) return;
         s.name = finalName;
-        s.baseGrams = baseGrams;
+        s.servings = mealServings;
         s.cal = Math.round(totals.cal);
         s.p = round1(totals.p);
         s.c = round1(totals.c);
@@ -2890,7 +4029,7 @@ STRICT OPERATING RULES:
         const newS = {
           id: 'staple_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
           name: finalName,
-          baseGrams,
+          servings: mealServings,
           cal: Math.round(totals.cal),
           p: round1(totals.p),
           c: round1(totals.c),
@@ -3025,8 +4164,8 @@ STRICT OPERATING RULES:
       renderBackupStatusElements();
 
       const backupPayload = {
-        app: 'MacroTrack',
-        version: '3.4',
+        app: 'Fuel-Trak',
+        version: '3.5',
         exportedAt: nowIso,
         settings: {
           targetCal: state.settings.targetCal,
@@ -3065,7 +4204,7 @@ STRICT OPERATING RULES:
         await dbClear('meals');
         await dbClear('staples');
 
-        // Migrate any older backup entries seamlessly to servings = 1
+        // Migrate any older backup entries seamlessly to base = 1 serving
         state.meals = data.meals.map(normalizeRecord);
         state.staples = data.staples.map(normalizeRecord);
 
@@ -3156,7 +4295,7 @@ STRICT OPERATING RULES:
       clearTimeout(toastTimer);
       toastTimer = setTimeout(() => {
         t.style.display = 'none';
-      }, 2600);
+      }, 2800);
     }
 
     async function bootstrapApp() {
