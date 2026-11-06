@@ -265,6 +265,7 @@
     input[type="password"],
     input[type="number"],
     input[type="date"],
+    input[type="time"],
     select,
     textarea {
       width: 100%;
@@ -301,9 +302,110 @@
       appearance: textfield;
     }
 
-    input[type="date"]::-webkit-calendar-picker-indicator {
-      opacity: 0.7;
+    input[type="date"]::-webkit-calendar-picker-indicator,
+    input[type="time"]::-webkit-calendar-picker-indicator {
+      opacity: 0.75;
       cursor: pointer;
+    }
+
+    /* Native Time Picker with guaranteed 12-hour display overlay */
+    .time-picker-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+      width: 100%;
+      min-height: 46px;
+      background: var(--input-bg);
+      border: 1px solid var(--border-light);
+      border-radius: 12px;
+      padding: 0 12px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .time-picker-wrap:focus-within {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.18);
+    }
+
+    .time-picker-12h-text {
+      font-size: 0.96rem;
+      font-weight: 800;
+      color: var(--text);
+      pointer-events: none;
+      font-variant-numeric: tabular-nums;
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .time-picker-12h-text.is-empty {
+      color: var(--placeholder);
+      font-weight: 600;
+    }
+
+    .time-picker-icon {
+      width: 18px;
+      height: 18px;
+      color: var(--accent);
+      pointer-events: none;
+      flex-shrink: 0;
+      margin-left: 6px;
+    }
+
+    .time-picker-wrap input[type="time"] {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+      border: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .time-quick-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .time-chip-btn {
+      min-height: 32px;
+      padding: 5px 10px;
+      font-size: 0.76rem;
+      font-weight: 800;
+      border-radius: 8px;
+      background: var(--input-bg);
+      color: var(--text-soft);
+      border: 1px solid var(--border-light);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .time-chip-btn:active:not(:disabled) {
+      background: var(--accent-tint);
+      border-color: var(--accent);
+      color: #fdba74;
+    }
+
+    .time-chip-btn.active-null {
+      background: var(--accent-tint);
+      border-color: rgba(249, 115, 22, 0.55);
+      color: #fdba74;
+    }
+
+    .date-time-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    @media (max-width: 380px) {
+      .date-time-grid {
+        grid-template-columns: 1fr;
+      }
     }
 
     select {
@@ -847,6 +949,27 @@
       border: 1px solid var(--border-light);
     }
 
+    .meal-time-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      font-weight: 800;
+      letter-spacing: 0.03em;
+      background: rgba(249, 115, 22, 0.14);
+      color: #fdba74;
+      border: 1px solid rgba(249, 115, 22, 0.32);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .meal-time-badge.no-time {
+      background: rgba(148, 163, 184, 0.09);
+      color: var(--text-muted);
+      border-color: var(--border-light);
+    }
+
     /* Protein "Target hit" = the only green in the app */
     #proStatusBadge.badge-label {
       background: var(--success-bg);
@@ -955,14 +1078,20 @@
     /* Past day "+ Add to today" bar inside meal item */
     .meal-relog-bar {
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
+      flex-direction: column;
       gap: 8px;
       margin-top: 10px;
       padding-top: 10px;
       border-top: 1px solid var(--border);
       cursor: default;
+    }
+
+    .meal-relog-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
     }
 
     /* Multiplier Bar */
@@ -1633,6 +1762,39 @@
           <input type="text" id="mealTitleInput" placeholder="e.g., Post-Workout Shake or Chicken & Rice" />
         </div>
 
+        <!-- Date & Time Eaten Row -->
+        <div class="field">
+          <div class="date-time-grid">
+            <div>
+              <label for="logDateInput">Date</label>
+              <input type="date" id="logDateInput" onchange="onLogDateInputChange(this.value)" />
+            </div>
+            <div>
+              <label for="logTimeInput">Time eaten</label>
+              <div class="time-picker-wrap">
+                <span id="logTime12HrDisplay" class="time-picker-12h-text">12:00 PM</span>
+                <svg class="time-picker-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+                <input type="time" id="logTimeInput" oninput="onLogTimeInputChange(this.value)" onchange="onLogTimeInputChange(this.value)" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Time Buttons -->
+          <div class="time-quick-bar">
+            <button type="button" class="time-chip-btn" onclick="applyQuickTime('log', 0)">Now</button>
+            <button type="button" class="time-chip-btn" onclick="applyQuickTime('log', -30)">&minus;30 min</button>
+            <button type="button" class="time-chip-btn" onclick="applyQuickTime('log', -60)">&minus;1 hr</button>
+            <button type="button" class="time-chip-btn" id="logTimeNotSureBtn" onclick="setTimeNotSure('log')">Not sure</button>
+          </div>
+
+          <div id="logPastTimePrompt" class="alert-box alert-warning" style="display:none; margin-top: 10px;">
+            <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;">
+              <span>What time did you eat this?</span>
+              <button type="button" class="btn-secondary btn-sm" onclick="setTimeNotSure('log', true)">Not sure</button>
+            </div>
+          </div>
+        </div>
+
         <!-- Meal-Level Servings Control -->
         <div class="meal-servings-box">
           <div>
@@ -1814,7 +1976,7 @@
 
   <script>
     /********************************************************************
-     * 1. LOCAL DATE UTILITIES, UNIT CONVERSION ENGINE & DATA MODEL
+     * 1. LOCAL DATE & TIME UTILITIES, UNIT CONVERSION & DATA MODEL
      ********************************************************************/
     function getLocalYYYYMMDD(dateObj = new Date()) {
       const y = dateObj.getFullYear();
@@ -1828,6 +1990,79 @@
       const dt = new Date(y, m - 1, d);
       dt.setDate(dt.getDate() + deltaDays);
       return getLocalYYYYMMDD(dt);
+    }
+
+    // Local 24-hour "HH:MM" utilities (never uses toISOString or UTC)
+    function getLocalHHMM(dateObj = new Date()) {
+      const h = String(dateObj.getHours()).padStart(2, '0');
+      const m = String(dateObj.getMinutes()).padStart(2, '0');
+      return `${h}:${m}`;
+    }
+
+    function normalizeTimeHHMM(rawVal) {
+      if (rawVal === null || rawVal === undefined || rawVal === '') return null;
+      const str = String(rawVal).trim();
+      const match = str.match(/^(\d{1,2}):(\d{2})$/);
+      if (!match) return null;
+      const h = Number(match[1]);
+      const m = Number(match[2]);
+      if (!Number.isInteger(h) || !Number.isInteger(m) || h < 0 || h > 23 || m < 0 || m > 59) return null;
+      return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+    }
+
+    function shiftLocalHHMM(baseHHMM, deltaMinutes) {
+      const now = new Date();
+      let h = now.getHours();
+      let m = now.getMinutes();
+      const norm = normalizeTimeHHMM(baseHHMM);
+      if (norm) {
+        const parts = norm.split(':').map(Number);
+        h = parts[0];
+        m = parts[1];
+      }
+      const dt = new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, m, 0);
+      dt.setMinutes(dt.getMinutes() + deltaMinutes);
+      return getLocalHHMM(dt);
+    }
+
+    function formatTime12Hr(hhmm, nullLabel = 'No time') {
+      const norm = normalizeTimeHHMM(hhmm);
+      if (!norm) return nullLabel;
+      const [h24, m] = norm.split(':').map(Number);
+      const period = h24 >= 12 ? 'PM' : 'AM';
+      const h12 = h24 % 12 === 0 ? 12 : h24 % 12;
+      return `${h12}:${String(m).padStart(2, '0')} ${period}`;
+    }
+
+    function sortMealsByTime(mealsArray) {
+      return [...mealsArray].sort((a, b) => {
+        const tA = normalizeTimeHHMM(a.time);
+        const tB = normalizeTimeHHMM(b.time);
+        if (tA && tB) return tA.localeCompare(tB);
+        if (tA && !tB) return -1;
+        if (!tA && tB) return 1;
+        return 0;
+      });
+    }
+
+    // Older app versions saved cal/pro/carb/fat (or calories/protein_g/carbs_g/fat_g). Read whichever exists.
+    const LEGACY_KEYS = {
+      cal: ['cal', 'calories', 'kcal'],
+      p: ['p', 'pro', 'protein', 'protein_g'],
+      c: ['c', 'carb', 'carbs', 'carbs_g'],
+      f: ['f', 'fat', 'fat_g']
+    };
+    function legacyField(obj, field) {
+      if (!obj) return 0;
+      for (const k of LEGACY_KEYS[field]) {
+        const n = Number(obj[k]);
+        if (obj[k] !== undefined && obj[k] !== null && Number.isFinite(n)) return n;
+      }
+      return 0;
+    }
+    function legacyNum(val, fallback = 0) {
+      const n = Number(val);
+      return Number.isFinite(n) ? n : fallback;
     }
 
     function round1(num) {
@@ -1844,9 +2079,6 @@
     const MAX_PHOTOS = 6;
 
     // Exact Canadian & standard unit definitions
-    // Volume: tsp = 5 mL, tbsp = 15 mL, cup = 250 mL, fl oz = 29.57 mL, mL = 1 mL
-    // Weight: g = 1 g, oz = 28.35 g, lb = 453.6 g
-    // Count: serving, scoop, piece, slice, each = 1
     const UNIT_META = {
       'mL':      { type: 'volume', toStd: 1,     label: 'mL',      pluralName: 'mL' },
       'tsp':     { type: 'volume', toStd: 5,     label: 'tsp',     pluralName: 'tsp' },
@@ -1899,7 +2131,6 @@
       return metaA.type === metaB.type;
     }
 
-    // Converts `amount` from `fromUnit` into `toBaseUnit` within the same unit type
     function convertAmountToBaseUnit(amount, fromUnit, toBaseUnit) {
       const uFrom = canonicalizeUnit(fromUnit);
       const uBase = canonicalizeUnit(toBaseUnit);
@@ -1919,22 +2150,6 @@
       return `Can't convert ${uFrom.pluralName} to ${uTo.pluralName}. Enter it in the original unit or edit the numbers.`;
     }
 
-    // Read a number from the first field name that exists (older app versions used cal/pro/carb/fat, calories/protein_g/carbs_g/fat_g)
-    const LEGACY_KEYS = {
-      cal: ['cal', 'calories', 'kcal'],
-      p: ['p', 'pro', 'protein', 'protein_g'],
-      c: ['c', 'carb', 'carbs', 'carbs_g'],
-      f: ['f', 'fat', 'fat_g']
-    };
-    function legacyNum(obj, field) {
-      if (!obj) return 0;
-      for (const k of LEGACY_KEYS[field]) {
-        if (obj[k] !== undefined && obj[k] !== null && !isNaN(Number(obj[k]))) return Number(obj[k]);
-      }
-      return 0;
-    }
-
-    // Normalize an ingredient item (migrates old items to baseAmount = 1, baseUnit = 'serving')
     function normalizeIngredientItem(raw, fallbackIsLabel = false) {
       if (!raw || typeof raw !== 'object') {
         return {
@@ -1964,16 +2179,16 @@
       const hasPerServing = raw.baseCal !== undefined || raw.perServingCal !== undefined;
       const baseCal = hasPerServing
         ? (Number(raw.baseCal ?? raw.perServingCal) || 0)
-        : (legacyServings > 0 ? legacyNum(raw, 'cal') / legacyServings : legacyNum(raw, 'cal'));
+        : (legacyServings > 0 ? legacyField(raw, 'cal') / legacyServings : legacyField(raw, 'cal'));
       const baseP = hasPerServing
         ? (Number(raw.baseP ?? raw.perServingP) || 0)
-        : (legacyServings > 0 ? legacyNum(raw, 'p') / legacyServings : legacyNum(raw, 'p'));
+        : (legacyServings > 0 ? legacyField(raw, 'p') / legacyServings : legacyField(raw, 'p'));
       const baseC = hasPerServing
         ? (Number(raw.baseC ?? raw.perServingC) || 0)
-        : (legacyServings > 0 ? legacyNum(raw, 'c') / legacyServings : legacyNum(raw, 'c'));
+        : (legacyServings > 0 ? legacyField(raw, 'c') / legacyServings : legacyField(raw, 'c'));
       const baseF = hasPerServing
         ? (Number(raw.baseF ?? raw.perServingF) || 0)
-        : (legacyServings > 0 ? legacyNum(raw, 'f') / legacyServings : legacyNum(raw, 'f'));
+        : (legacyServings > 0 ? legacyField(raw, 'f') / legacyServings : legacyField(raw, 'f'));
 
       let unit = raw.unit ? canonicalizeUnit(raw.unit) : baseUnit;
       if (!areUnitsCompatible(unit, baseUnit)) {
@@ -2003,8 +2218,6 @@
       };
     }
 
-    // Exact ingredient macro math:
-    // Convert current (amount, unit) to baseUnit, then macros = baseMacros * (convertedAmount / baseAmount) * mealServings
     function computeItemTotals(item, mealServings = 1) {
       const mSrv = (mealServings !== undefined && mealServings !== null && !isNaN(Number(mealServings)))
         ? Math.max(0, Number(mealServings))
@@ -2038,7 +2251,6 @@
       return items.some(it => Boolean(it.isLabelData));
     }
 
-    // Migrate/normalize any logged meal or saved staple record
     function normalizeRecord(rec) {
       if (!rec || typeof rec !== 'object') return rec;
       const fallbackLabel = Boolean(rec.isLabelData) || /label/i.test(String(rec.source || ''));
@@ -2056,17 +2268,20 @@
               amount: 1,
               unit: 'serving',
               servingDesc: '1 serving',
-              baseCal: legacyNum(rec, 'cal'),
-              baseP: legacyNum(rec, 'p'),
-              baseC: legacyNum(rec, 'c'),
-              baseF: legacyNum(rec, 'f'),
+              baseCal: legacyField(rec, 'cal'),
+              baseP: legacyField(rec, 'p'),
+              baseC: legacyField(rec, 'c'),
+              baseF: legacyField(rec, 'f'),
               isLabelData: fallbackLabel
             }, fallbackLabel)
           ];
 
       const totals = computeItemsListTotals(items, mealServings);
+      const normalizedTime = normalizeTimeHHMM(rec.time);
+
       return {
         ...rec,
+        time: normalizedTime,
         servings: mealServings,
         cal: Math.round(totals.cal),
         p: round1(totals.p),
@@ -2090,12 +2305,15 @@
       meals: [],
       staples: [],
       logDraft: {
-        compressedPhotos: [], // [{ id, mimeType, base64, dataUrl }]
+        compressedPhotos: [],
         isCompressing: false,
         aiPhotosReceived: null,
         modelUsed: null,
         vagueWarning: '',
         servings: 1,
+        time: getLocalHHMM(),
+        timeConfirmedNull: false,
+        lastSyncedDate: null,
         items: [
           normalizeIngredientItem({ name: '', baseAmount: 1, baseUnit: 'serving', amount: 1, unit: 'serving', baseCal: 0, baseP: 0, baseC: 0, baseF: 0, isLabelData: false })
         ]
@@ -2105,13 +2323,18 @@
         targetId: null,
         name: '',
         servings: 1,
+        time: null,
+        timeConfirmedNull: false,
         items: []
       },
       quickLogDraft: {
         stapleId: null,
         servings: 1,
-        date: getLocalYYYYMMDD()
+        date: getLocalYYYYMMDD(),
+        time: getLocalHHMM(),
+        timeConfirmedNull: false
       },
+      relogTimeMap: {}, // { [mealId]: { time: "HH:MM"|null, confirmedNull: boolean } }
       swWaitingWorker: null
     };
 
@@ -2191,6 +2414,46 @@
       });
     }
 
+    async function importFromLegacyDatabase() {
+      try {
+        if (!indexedDB.databases) return;
+        const dbs = await indexedDB.databases();
+        const legacyNames = ['FuelTrakDB', 'fueltrak', 'fuel-trak-db'];
+        for (const info of dbs) {
+          if (info && info.name && legacyNames.includes(info.name)) {
+            await new Promise((resolve) => {
+              const req = indexedDB.open(info.name);
+              req.onsuccess = async (e) => {
+                const ldb = e.target.result;
+                try {
+                  if (ldb.objectStoreNames.contains('meals') && state.meals.length === 0) {
+                    const tx = ldb.transaction('meals', 'readonly');
+                    const mReq = tx.objectStore('meals').getAll();
+                    mReq.onsuccess = async () => {
+                      const rows = (mReq.result || []).map(normalizeRecord);
+                      for (const r of rows) {
+                        state.meals.push(r);
+                        await dbPut('meals', r);
+                      }
+                      resolve();
+                    };
+                    mReq.onerror = () => resolve();
+                  } else {
+                    resolve();
+                  }
+                } catch (_) {
+                  resolve();
+                } finally {
+                  ldb.close();
+                }
+              };
+              req.onerror = () => resolve();
+            });
+          }
+        }
+      } catch (_) {}
+    }
+
     async function initStoragePersistence() {
       const badge = document.getElementById('storagePersistBadge');
       if (navigator.storage && navigator.storage.persist) {
@@ -2229,66 +2492,14 @@
         await saveSettingsToDB();
       }
 
-      let rawMeals = await dbGetAll('meals');
-      let rawStaples = await dbGetAll('staples');
-
-      // One-time move from the older database name ('nutrition_db') if this one is empty
-      if (rawMeals.length === 0 && rawStaples.length === 0) {
-        const moved = await importFromLegacyDatabase();
-        if (moved) {
-          rawMeals = await dbGetAll('meals');
-          rawStaples = await dbGetAll('staples');
-        }
-      }
+      const rawMeals = await dbGetAll('meals');
+      const rawStaples = await dbGetAll('staples');
 
       state.meals = rawMeals.map(normalizeRecord);
       state.staples = rawStaples.map(normalizeRecord);
-    }
 
-    async function importFromLegacyDatabase() {
-      const LEGACY_DB = 'nutrition_db';
-      try {
-        if (indexedDB.databases) {
-          const list = await indexedDB.databases();
-          if (!list.some(d => d.name === LEGACY_DB)) return false;
-        }
-        const oldDb = await new Promise((resolve, reject) => {
-          const req = indexedDB.open(LEGACY_DB);
-          req.onupgradeneeded = (e) => { e.target.transaction.abort(); };
-          req.onsuccess = (e) => resolve(e.target.result);
-          req.onerror = () => resolve(null);
-        });
-        if (!oldDb) return false;
-        const readAll = (store) => new Promise((resolve) => {
-          if (!oldDb.objectStoreNames.contains(store)) return resolve([]);
-          const req = oldDb.transaction(store, 'readonly').objectStore(store).getAll();
-          req.onsuccess = () => resolve(req.result || []);
-          req.onerror = () => resolve([]);
-        });
-        const oldMeals = await readAll('meals');
-        const oldStaples = await readAll('staples');
-        const oldSettings = await readAll('settings');
-        oldDb.close();
-        if (oldMeals.length === 0 && oldStaples.length === 0) return false;
-
-        for (const m of oldMeals) await dbPut('meals', normalizeRecord(m));
-        for (const st of oldStaples) await dbPut('staples', normalizeRecord(st));
-
-        const getOld = (k) => { const row = oldSettings.find(r => r.key === k); return row ? row.value : null; };
-        const oldKey = getOld('apiKey');
-        if (oldKey && !state.settings.apiKey) state.settings.apiKey = oldKey;
-        const t = getOld('targets');
-        if (t && typeof t === 'object') {
-          if (Number(t.calories)) state.settings.targetCal = Number(t.calories);
-          if (Number(t.proteinMin)) state.settings.targetProMin = Number(t.proteinMin);
-          if (Number(t.proteinMax)) state.settings.targetProMax = Number(t.proteinMax);
-        }
-        await saveSettingsToDB();
-        showToast(`Moved ${oldMeals.length} meals & ${oldStaples.length} saved foods to the new version`);
-        return true;
-      } catch (err) {
-        console.error('Legacy import failed', err);
-        return false;
+      if (state.meals.length === 0 && state.staples.length === 0) {
+        await importFromLegacyDatabase();
       }
     }
 
@@ -2581,7 +2792,228 @@
     }
 
     /********************************************************************
-     * 4. NAVIGATION & TODAY DASHBOARD (WITH PAST-DAY RE-LOG & 7-DAY AVG)
+     * 4. TIME PICKER CONTROLS FOR LOG, QUICK-LOG, MODAL & RE-LOG
+     ********************************************************************/
+    function syncLogScreenDateLabels(forceResetTimeForDate = false) {
+      const todayYMD = getLocalYYYYMMDD();
+      const isToday = state.currentDate === todayYMD;
+      const labelStr = isToday ? `Today (${state.currentDate})` : state.currentDate;
+
+      document.getElementById('logTargetDateBadge').textContent = labelStr;
+      document.getElementById('logToDateBtn').textContent = `Log to ${labelStr}`;
+
+      const logDateInp = document.getElementById('logDateInput');
+      if (logDateInp) logDateInp.value = state.currentDate;
+
+      if (forceResetTimeForDate || state.logDraft.lastSyncedDate !== state.currentDate) {
+        state.logDraft.lastSyncedDate = state.currentDate;
+        if (isToday) {
+          state.logDraft.time = getLocalHHMM();
+          state.logDraft.timeConfirmedNull = false;
+        } else {
+          state.logDraft.time = null;
+          state.logDraft.timeConfirmedNull = false;
+        }
+      }
+
+      renderTimeControlUI('log');
+    }
+
+    function onLogDateInputChange(newDateVal) {
+      if (!newDateVal) return;
+      state.currentDate = newDateVal;
+      document.getElementById('todayDatePicker').value = state.currentDate;
+      syncLogScreenDateLabels(true);
+    }
+
+    function onLogTimeInputChange(val) {
+      const norm = normalizeTimeHHMM(val);
+      state.logDraft.time = norm;
+      state.logDraft.timeConfirmedNull = false;
+      renderTimeControlUI('log');
+    }
+
+    function onQuickLogDateChange(newDateVal) {
+      if (!newDateVal) return;
+      state.quickLogDraft.date = newDateVal;
+      const isToday = newDateVal === getLocalYYYYMMDD();
+      if (isToday) {
+        state.quickLogDraft.time = getLocalHHMM();
+        state.quickLogDraft.timeConfirmedNull = false;
+      } else {
+        state.quickLogDraft.time = null;
+        state.quickLogDraft.timeConfirmedNull = false;
+      }
+      renderTimeControlUI('quickLog');
+    }
+
+    function onQuickLogTimeInputChange(val) {
+      state.quickLogDraft.time = normalizeTimeHHMM(val);
+      state.quickLogDraft.timeConfirmedNull = false;
+      renderTimeControlUI('quickLog');
+    }
+
+    function onModalTimeInputChange(val) {
+      state.modalEditor.time = normalizeTimeHHMM(val);
+      state.modalEditor.timeConfirmedNull = false;
+      renderTimeControlUI('modal');
+    }
+
+    function applyQuickTime(context, deltaMinutes, mealId = null) {
+      const nextHHMM = deltaMinutes === 0
+        ? getLocalHHMM()
+        : shiftLocalHHMM(getLocalHHMM(), deltaMinutes);
+
+      if (context === 'log') {
+        state.logDraft.time = nextHHMM;
+        state.logDraft.timeConfirmedNull = false;
+        renderTimeControlUI('log');
+      } else if (context === 'quickLog') {
+        state.quickLogDraft.time = nextHHMM;
+        state.quickLogDraft.timeConfirmedNull = false;
+        renderTimeControlUI('quickLog');
+      } else if (context === 'modal') {
+        state.modalEditor.time = nextHHMM;
+        state.modalEditor.timeConfirmedNull = false;
+        renderTimeControlUI('modal');
+      } else if (context === 'relog' && mealId) {
+        state.relogTimeMap[mealId] = { time: nextHHMM, confirmedNull: false };
+        renderRelogTimeUI(mealId);
+      }
+    }
+
+    function setTimeNotSure(context, proceedWithAction = false, mealId = null) {
+      if (context === 'log') {
+        state.logDraft.time = null;
+        state.logDraft.timeConfirmedNull = true;
+        renderTimeControlUI('log');
+        if (proceedWithAction && state.logDraft.pendingAlsoSave !== undefined) {
+          const alsoSave = state.logDraft.pendingAlsoSave;
+          state.logDraft.pendingAlsoSave = undefined;
+          commitCurrentMeal(alsoSave);
+        }
+      } else if (context === 'quickLog') {
+        state.quickLogDraft.time = null;
+        state.quickLogDraft.timeConfirmedNull = true;
+        renderTimeControlUI('quickLog');
+        if (proceedWithAction) {
+          confirmQuickLogStaple();
+        }
+      } else if (context === 'modal') {
+        state.modalEditor.time = null;
+        state.modalEditor.timeConfirmedNull = true;
+        renderTimeControlUI('modal');
+      } else if (context === 'relog' && mealId) {
+        state.relogTimeMap[mealId] = { time: null, confirmedNull: true };
+        renderRelogTimeUI(mealId);
+      }
+    }
+
+    function renderTimeControlUI(context) {
+      if (context === 'log') {
+        const inp = document.getElementById('logTimeInput');
+        const disp = document.getElementById('logTime12HrDisplay');
+        const notSureBtn = document.getElementById('logTimeNotSureBtn');
+        const promptEl = document.getElementById('logPastTimePrompt');
+        const isPastDay = state.currentDate !== getLocalYYYYMMDD();
+
+        if (inp) inp.value = state.logDraft.time || '';
+        if (disp) {
+          if (state.logDraft.time) {
+            disp.textContent = formatTime12Hr(state.logDraft.time);
+            disp.classList.remove('is-empty');
+          } else if (state.logDraft.timeConfirmedNull) {
+            disp.textContent = 'Not sure (No time)';
+            disp.classList.add('is-empty');
+          } else {
+            disp.textContent = 'Select time...';
+            disp.classList.add('is-empty');
+          }
+        }
+        if (notSureBtn) {
+          notSureBtn.classList.toggle('active-null', Boolean(!state.logDraft.time && state.logDraft.timeConfirmedNull));
+        }
+        if (promptEl) {
+          promptEl.style.display = (isPastDay && !state.logDraft.time && !state.logDraft.timeConfirmedNull) ? 'block' : 'none';
+        }
+      } else if (context === 'quickLog') {
+        const inp = document.getElementById('quickLogTimeInput');
+        const disp = document.getElementById('quickLogTime12HrDisplay');
+        const notSureBtn = document.getElementById('quickLogTimeNotSureBtn');
+        const promptEl = document.getElementById('quickLogPastTimePrompt');
+        const isPastDay = state.quickLogDraft.date !== getLocalYYYYMMDD();
+
+        if (inp) inp.value = state.quickLogDraft.time || '';
+        if (disp) {
+          if (state.quickLogDraft.time) {
+            disp.textContent = formatTime12Hr(state.quickLogDraft.time);
+            disp.classList.remove('is-empty');
+          } else if (state.quickLogDraft.timeConfirmedNull) {
+            disp.textContent = 'Not sure (No time)';
+            disp.classList.add('is-empty');
+          } else {
+            disp.textContent = 'Select time...';
+            disp.classList.add('is-empty');
+          }
+        }
+        if (notSureBtn) {
+          notSureBtn.classList.toggle('active-null', Boolean(!state.quickLogDraft.time && state.quickLogDraft.timeConfirmedNull));
+        }
+        if (promptEl) {
+          promptEl.style.display = (isPastDay && !state.quickLogDraft.time && !state.quickLogDraft.timeConfirmedNull) ? 'block' : 'none';
+        }
+      } else if (context === 'modal') {
+        const inp = document.getElementById('modalTimeInput');
+        const disp = document.getElementById('modalTime12HrDisplay');
+        const notSureBtn = document.getElementById('modalTimeNotSureBtn');
+
+        if (inp) inp.value = state.modalEditor.time || '';
+        if (disp) {
+          if (state.modalEditor.time) {
+            disp.textContent = formatTime12Hr(state.modalEditor.time);
+            disp.classList.remove('is-empty');
+          } else {
+            disp.textContent = 'Not sure (No time)';
+            disp.classList.add('is-empty');
+          }
+        }
+        if (notSureBtn) {
+          notSureBtn.classList.toggle('active-null', Boolean(!state.modalEditor.time));
+        }
+      }
+    }
+
+    function onRelogTimeInputChange(mealId, val) {
+      state.relogTimeMap[mealId] = {
+        time: normalizeTimeHHMM(val),
+        confirmedNull: false
+      };
+      renderRelogTimeUI(mealId);
+    }
+
+    function renderRelogTimeUI(mealId) {
+      const entry = state.relogTimeMap[mealId] || { time: getLocalHHMM(), confirmedNull: false };
+      const inp = document.getElementById(`relogTime_${mealId}`);
+      const disp = document.getElementById(`relogTimeDisp_${mealId}`);
+      const notSureBtn = document.getElementById(`relogNotSure_${mealId}`);
+
+      if (inp) inp.value = entry.time || '';
+      if (disp) {
+        if (entry.time) {
+          disp.textContent = formatTime12Hr(entry.time);
+          disp.classList.remove('is-empty');
+        } else {
+          disp.textContent = 'Not sure (No time)';
+          disp.classList.add('is-empty');
+        }
+      }
+      if (notSureBtn) {
+        notSureBtn.classList.toggle('active-null', Boolean(!entry.time && entry.confirmedNull));
+      }
+    }
+
+    /********************************************************************
+     * 5. NAVIGATION & TODAY DASHBOARD (SORTED BY TIME + 12HR BADGE)
      ********************************************************************/
     function switchTab(tabName) {
       if (tabName !== 'log' && userWantsMic) {
@@ -2606,27 +3038,20 @@
     function shiftDate(delta) {
       state.currentDate = addDaysToYYYYMMDD(state.currentDate, delta);
       renderTodayScreen();
-      syncLogScreenDateLabels();
+      syncLogScreenDateLabels(true);
     }
 
     function onDatePickerChange(val) {
       if (!val) return;
       state.currentDate = val;
       renderTodayScreen();
-      syncLogScreenDateLabels();
+      syncLogScreenDateLabels(true);
     }
 
     function jumpToToday() {
       state.currentDate = getLocalYYYYMMDD();
       renderTodayScreen();
-      syncLogScreenDateLabels();
-    }
-
-    function syncLogScreenDateLabels() {
-      const isToday = state.currentDate === getLocalYYYYMMDD();
-      const labelStr = isToday ? `Today (${state.currentDate})` : state.currentDate;
-      document.getElementById('logTargetDateBadge').textContent = labelStr;
-      document.getElementById('logToDateBtn').textContent = `Log to ${labelStr}`;
+      syncLogScreenDateLabels(true);
     }
 
     function calculateSevenDayAverage(anchorDateStr) {
@@ -2662,7 +3087,9 @@
       const todayYMD = getLocalYYYYMMDD();
       const isViewingOtherDay = state.currentDate !== todayYMD;
 
-      const dayMeals = state.meals.filter(m => m.date === state.currentDate);
+      const rawDayMeals = state.meals.filter(m => m.date === state.currentDate);
+      const dayMeals = sortMealsByTime(rawDayMeals);
+
       const totals = dayMeals.reduce((acc, m) => {
         acc.cal += Number(m.cal) || 0;
         acc.p += Number(m.p) || 0;
@@ -2740,17 +3167,41 @@
             : `<span class="badge badge-estimate">ESTIMATE</span>`;
           const itemCount = Array.isArray(m.items) ? m.items.length : 1;
           const mealSrv = Number(m.servings) || 1;
+          const hasTime = Boolean(normalizeTimeHHMM(m.time));
+          const timeDisplay = hasTime ? formatTime12Hr(m.time) : 'No time';
+          const timeBadgeHtml = `<span class="meal-time-badge ${hasTime ? '' : 'no-time'}">${escapeHtml(timeDisplay)}</span>`;
 
-          // Feature 2: When viewing any past/other day, show "+ Add to today" with a servings box
+          if (isViewingOtherDay && !state.relogTimeMap[m.id]) {
+            state.relogTimeMap[m.id] = { time: getLocalHHMM(), confirmedNull: false };
+          }
+          const relogState = state.relogTimeMap[m.id] || { time: getLocalHHMM(), confirmedNull: false };
+          const relogDispStr = relogState.time ? formatTime12Hr(relogState.time) : 'Not sure (No time)';
+
           const relogHtml = isViewingOtherDay ? `
             <div class="meal-relog-bar" onclick="event.stopPropagation()">
-              <div class="servings-Control">
-                <span class="srv-label">Servings:</span>
-                <button type="button" class="step-btn" onclick="stepRelogServings('${m.id}', -0.5)">&minus;</button>
-                <input type="number" step="0.5" min="0.1" class="srv-input" id="relogSrv_${m.id}" value="${mealSrv}" />
-                <button type="button" class="step-btn" onclick="stepRelogServings('${m.id}', 0.5)">+</button>
+              <div class="meal-relog-row">
+                <div class="servings-Control">
+                  <span class="srv-label">Servings:</span>
+                  <button type="button" class="step-btn" onclick="stepRelogServings('${m.id}', -0.5)">&minus;</button>
+                  <input type="number" step="0.5" min="0.1" class="srv-input" id="relogSrv_${m.id}" value="${mealSrv}" />
+                  <button type="button" class="step-btn" onclick="stepRelogServings('${m.id}', 0.5)">+</button>
+                </div>
+                <div style="flex:1; min-width: 155px;">
+                  <div class="time-picker-wrap" style="min-height:36px; padding:0 10px;">
+                    <span id="relogTimeDisp_${m.id}" class="time-picker-12h-text ${relogState.time ? '' : 'is-empty'}" style="font-size:0.84rem;">${escapeHtml(relogDispStr)}</span>
+                    <svg class="time-picker-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+                    <input type="time" id="relogTime_${m.id}" value="${relogState.time || ''}" oninput="onRelogTimeInputChange('${m.id}', this.value)" onchange="onRelogTimeInputChange('${m.id}', this.value)" />
+                  </div>
+                </div>
+                <button type="button" class="btn-primary btn-inline-primary" onclick="relogMealToToday('${m.id}')">+ Add to today</button>
               </div>
-              <button type="button" class="btn-primary btn-inline-primary" onclick="relogMealToToday('${m.id}')">+ Add to today</button>
+              <div class="time-quick-bar" style="margin-top:2px;">
+                <span class="muted-text" style="font-size:0.72rem; font-weight:700; margin-right:2px;">Time eaten:</span>
+                <button type="button" class="time-chip-btn" onclick="applyQuickTime('relog', 0, '${m.id}')">Now</button>
+                <button type="button" class="time-chip-btn" onclick="applyQuickTime('relog', -30, '${m.id}')">&minus;30 min</button>
+                <button type="button" class="time-chip-btn" onclick="applyQuickTime('relog', -60, '${m.id}')">&minus;1 hr</button>
+                <button type="button" class="time-chip-btn ${(!relogState.time && relogState.confirmedNull) ? 'active-null' : ''}" id="relogNotSure_${m.id}" onclick="setTimeNotSure('relog', false, '${m.id}')">Not sure</button>
+              </div>
             </div>
           ` : '';
 
@@ -2758,7 +3209,10 @@
             <div class="meal-item" onclick="openEditMealModal('${m.id}')">
               <div class="meal-item-top">
                 <div>
-                  <span class="meal-item-name">${escapeHtml(m.name || 'Logged Meal')}</span>
+                  <div class="row-wrap" style="gap:6px; margin-bottom:4px;">
+                    ${timeBadgeHtml}
+                    <span class="meal-item-name">${escapeHtml(m.name || 'Logged Meal')}</span>
+                  </div>
                   <div class="muted-text" style="font-size:0.75rem;">${mealSrv} serving(s) &middot; ${itemCount} ingredient(s) &middot; Tap to edit</div>
                 </div>
                 ${badge}
@@ -2792,6 +3246,11 @@
       const srvInput = document.getElementById(`relogSrv_${mealId}`);
       const chosenServings = srvInput ? Math.max(0.1, round2(Number(srvInput.value) || normalized.servings || 1)) : (normalized.servings || 1);
 
+      const relogTimeState = state.relogTimeMap[mealId];
+      const chosenTime = relogTimeState
+        ? normalizeTimeHHMM(relogTimeState.time)
+        : getLocalHHMM();
+
       const copiedItems = normalized.items.map(it => normalizeIngredientItem({ ...it }, it.isLabelData));
       const totals = computeItemsListTotals(copiedItems, chosenServings);
       const todayYMD = getLocalYYYYMMDD();
@@ -2799,6 +3258,7 @@
       const newMeal = {
         id: 'meal_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
         date: todayYMD,
+        time: chosenTime,
         name: normalized.name,
         servings: chosenServings,
         cal: Math.round(totals.cal),
@@ -2815,11 +3275,14 @@
       state.meals.push(newMeal);
       await dbPut('meals', newMeal);
       renderTodayScreen();
-      showToast(`Added "${newMeal.name}" (${chosenServings} srv) to Today`);
+      const timeLabel = chosenTime ? formatTime12Hr(chosenTime) : 'No time';
+      showToast(`Added "${newMeal.name}" (${timeLabel}) to Today`);
     }
 
     function copyDaySummary() {
-      const dayMeals = state.meals.filter(m => m.date === state.currentDate);
+      const rawDayMeals = state.meals.filter(m => m.date === state.currentDate);
+      const dayMeals = sortMealsByTime(rawDayMeals);
+
       const totals = dayMeals.reduce((acc, m) => {
         acc.cal += Number(m.cal) || 0;
         acc.p += Number(m.p) || 0;
@@ -2830,12 +3293,12 @@
 
       const avg = calculateSevenDayAverage(state.currentDate);
       const avgLine = avg.loggedDays > 0
-        ? `7-Day Avg (${avg.loggedDays}/7d): ${avg.avgCal} kcal | ${avg.avgPro}g P`
+        ? `7-Day Avg (${avg.loggedDays}/7d): ${avg.avgCal} kcal | ${avg.avgPro} g P`
         : `7-Day Avg: No days logged`;
 
       const lines = [
         `Fuel-Trak Summary — ${state.currentDate}`,
-        `Totals: ${Math.round(totals.cal)} / ${state.settings.targetCal} kcal | ${round1(totals.p)}g P (Target ${state.settings.targetProMin}-${state.settings.targetProMax}g) | ${round1(totals.c)}g C | ${round1(totals.f)}g F`,
+        `Totals: ${Math.round(totals.cal)} / ${state.settings.targetCal} kcal | ${round1(totals.p)} g P (Target ${state.settings.targetProMin}-${state.settings.targetProMax}g) | ${round1(totals.c)} g C | ${round1(totals.f)} g F`,
         avgLine,
         `---`
       ];
@@ -2843,9 +3306,9 @@
       if (dayMeals.length === 0) {
         lines.push('No meals logged.');
       } else {
-        dayMeals.forEach((m, idx) => {
-          const tag = m.isLabelData ? '[LABEL]' : '[ESTIMATE]';
-          lines.push(`${idx + 1}. ${m.name} ${tag}: ${Math.round(m.cal)} kcal (${round1(m.p)}P / ${round1(m.c)}C / ${round1(m.f)}F)`);
+        dayMeals.forEach((m) => {
+          const timePrefix = normalizeTimeHHMM(m.time) ? formatTime12Hr(m.time) : 'Time unknown';
+          lines.push(`${timePrefix}, ${m.name}: ${Math.round(m.cal)} kcal, ${round1(m.p)} g P (${round1(m.c)} g C, ${round1(m.f)} g F)`);
         });
       }
 
@@ -2857,7 +3320,7 @@
     }
 
     /********************************************************************
-     * 5. MULTI-PHOTO APPEND (UP TO 6), THUMBNAILS & COMPRESSION
+     * 6. MULTI-PHOTO APPEND (UP TO 6), THUMBNAILS & COMPRESSION
      ********************************************************************/
     function onModeChange() {
       const mode = document.getElementById('analysisMode').value;
@@ -2872,7 +3335,7 @@
     async function handlePhotoInput(fileList) {
       const incomingFiles = Array.from(fileList || []);
       const inputEl = document.getElementById('photoInput');
-      if (inputEl) inputEl.value = ''; // Reset input so user can keep adding one by one
+      if (inputEl) inputEl.value = '';
 
       if (incomingFiles.length === 0) return;
 
@@ -2986,7 +3449,7 @@
     }
 
     /********************************************************************
-     * 6. GEMINI API CALL (MULTI-LABEL SUPPORT + BASE AMOUNT/UNIT MODEL)
+     * 7. GEMINI API CALL (MULTI-LABEL SUPPORT + BASE AMOUNT/UNIT MODEL)
      ********************************************************************/
     function sleep(ms) {
       return new Promise(res => setTimeout(res, ms));
@@ -3052,7 +3515,6 @@
       const recipeText = document.getElementById('recipeInput').value.trim();
       const noteText = document.getElementById('noteInput').value.trim();
 
-      // RULE 5: Label mode with no photo -> STOP immediately, ask for the label, return no numbers.
       if (mode === 'label' && photoCount === 0) {
         showStatusAlert('STOP: Label mode requires a photo of the Nutrition / Supplemented Food Facts table. Attach a label photo and try again. No numbers returned.', 'danger');
         return;
@@ -3224,7 +3686,6 @@ STRICT OPERATING RULES:
         const fallbackMsg = usedFallback ? ` (Fell back to ${FALLBACK_MODEL} due to high demand)` : '';
         showStatusAlert(`Analysis complete. AI received ${photoCount} photo(s).${fallbackMsg}`, 'success');
 
-        // RULE 2: Only wipe photos AFTER a successful analysis
         clearAttachedPhotos();
       } catch (err) {
         showStatusAlert(`Analysis failed (photos kept intact): ${err.message}`, 'danger');
@@ -3269,7 +3730,7 @@ STRICT OPERATING RULES:
     }
 
     /********************************************************************
-     * 7. SHARED INGREDIENT ROW RENDERER, UNIT CONVERSION & SERVINGS MATH
+     * 8. SHARED INGREDIENT ROW RENDERER, UNIT CONVERSION & SERVINGS MATH
      ********************************************************************/
     function updateMultiplierHighlight(containerSelector, labelStr) {
       document.querySelectorAll(`${containerSelector} .mult-btn`).forEach(btn => {
@@ -3400,7 +3861,6 @@ STRICT OPERATING RULES:
         row.name = val;
       } else {
         row[field] = Number(val) || 0;
-        // Clear any cross-type conversion warning if the user manually edits the numbers
         row.conversionError = '';
         const errEl = document.getElementById(`${contextPrefix}_convErr_${idx}`);
         if (errEl) errEl.style.display = 'none';
@@ -3416,7 +3876,6 @@ STRICT OPERATING RULES:
       const parsed = Math.max(0, Number(val) || 0);
       row.amount = round2(parsed);
 
-      // If this is a brand-new blank row with 0 macros across the board, keep baseAmount synced until macros are entered
       const isBlankNewRow = (row.baseCal === 0 && row.baseP === 0 && row.baseC === 0 && row.baseF === 0);
       if (isBlankNewRow && parsed > 0) {
         row.baseAmount = round2(parsed);
@@ -3437,7 +3896,6 @@ STRICT OPERATING RULES:
       const nextUnit = canonicalizeUnit(newUnitVal);
       const isBlankNewRow = (row.baseCal === 0 && row.baseP === 0 && row.baseC === 0 && row.baseF === 0);
 
-      // If brand-new blank row with 0 macros, let user pick any initial unit for the new ingredient
       if (isBlankNewRow) {
         row.unit = nextUnit;
         row.baseUnit = nextUnit;
@@ -3448,13 +3906,12 @@ STRICT OPERATING RULES:
         return;
       }
 
-      // Check unit compatibility with the locked baseUnit
       if (!areUnitsCompatible(nextUnit, row.baseUnit)) {
         const msg = getCannotConvertMessage(row.unit, nextUnit);
         row.conversionError = msg;
         const selectEl = document.getElementById(`${contextPrefix}_unit_${idx}`);
         if (selectEl) {
-          selectEl.value = row.unit; // Keep the old unit
+          selectEl.value = row.unit;
         }
         const errEl = document.getElementById(`${contextPrefix}_convErr_${idx}`);
         if (errEl) {
@@ -3465,7 +3922,6 @@ STRICT OPERATING RULES:
         return;
       }
 
-      // Compatible unit within same family (Volume, Weight, or Count): update unit and recalculate from base
       row.unit = nextUnit;
       row.conversionError = '';
       const errEl = document.getElementById(`${contextPrefix}_convErr_${idx}`);
@@ -3498,7 +3954,6 @@ STRICT OPERATING RULES:
       }
     }
 
-    // Log Screen Specific List & Servings Functions
     function renderLogIngredientsList() {
       const container = document.getElementById('logIngredientsList');
       container.innerHTML = buildIngredientRowsHtml(state.logDraft.items, 'log');
@@ -3551,6 +4006,23 @@ STRICT OPERATING RULES:
         stopSpeechRecognition();
       }
 
+      const isPastDay = state.currentDate !== getLocalYYYYMMDD();
+      const chosenTime = normalizeTimeHHMM(state.logDraft.time);
+
+      // Requirement 2: If past day and time is empty (and user hasn't tapped "Not sure"), ask "What time did you eat this?" before saving
+      if (isPastDay && !chosenTime && !state.logDraft.timeConfirmedNull) {
+        state.logDraft.pendingAlsoSave = alsoSaveStaple;
+        const promptEl = document.getElementById('logPastTimePrompt');
+        if (promptEl) {
+          promptEl.style.display = 'block';
+          promptEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        showToast('What time did you eat this? Pick a time or tap "Not sure".');
+        return;
+      }
+
+      state.logDraft.pendingAlsoSave = undefined;
+
       const cleanItems = state.logDraft.items.map(it => normalizeIngredientItem(it, it.isLabelData));
       const mealServings = Math.max(0.1, round2(Number(state.logDraft.servings) || 1));
       const totals = computeItemsListTotals(cleanItems, mealServings);
@@ -3583,6 +4055,7 @@ STRICT OPERATING RULES:
       const newMeal = {
         id: 'meal_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
         date: state.currentDate,
+        time: chosenTime,
         name: mealName,
         servings: mealServings,
         cal: Math.round(totals.cal),
@@ -3612,6 +4085,7 @@ STRICT OPERATING RULES:
       state.logDraft.items = [
         normalizeIngredientItem({ name: '', baseAmount: 1, baseUnit: 'serving', amount: 1, unit: 'serving', baseCal: 0, baseP: 0, baseC: 0, baseF: 0, isLabelData: false })
       ];
+      syncLogScreenDateLabels(true);
       updateMultiplierHighlight('#multButtonsBar', '1x');
       renderLogIngredientsList();
       renderAnalysisMetaUI();
@@ -3621,7 +4095,7 @@ STRICT OPERATING RULES:
     }
 
     /********************************************************************
-     * 8. SAVED STAPLES & MEALS SCREEN + QUICK "+ LOG" SHEET
+     * 9. SAVED STAPLES & MEALS SCREEN + QUICK "+ LOG" SHEET
      ********************************************************************/
     function renderSavedScreen() {
       const q = (document.getElementById('savedSearchInput').value || '').toLowerCase().trim();
@@ -3664,10 +4138,15 @@ STRICT OPERATING RULES:
       if (!s) return;
 
       const normalized = normalizeRecord(s);
+      const defaultDate = state.currentDate || getLocalYYYYMMDD();
+      const isToday = defaultDate === getLocalYYYYMMDD();
+
       state.quickLogDraft = {
         stapleId: normalized.id,
         servings: Number(normalized.servings) || 1,
-        date: state.currentDate || getLocalYYYYMMDD()
+        date: defaultDate,
+        time: isToday ? getLocalHHMM() : null,
+        timeConfirmedNull: false
       };
 
       document.getElementById('quickLogModalTitle').textContent = `Log "${normalized.name}"`;
@@ -3685,8 +4164,34 @@ STRICT OPERATING RULES:
         </div>
 
         <div class="field">
-          <label for="quickLogDateInput">Date to log</label>
-          <input type="date" id="quickLogDateInput" value="${state.quickLogDraft.date}" onchange="state.quickLogDraft.date = this.value" />
+          <div class="date-time-grid">
+            <div>
+              <label for="quickLogDateInput">Date to log</label>
+              <input type="date" id="quickLogDateInput" value="${state.quickLogDraft.date}" onchange="onQuickLogDateChange(this.value)" />
+            </div>
+            <div>
+              <label for="quickLogTimeInput">Time eaten</label>
+              <div class="time-picker-wrap">
+                <span id="quickLogTime12HrDisplay" class="time-picker-12h-text">12:00 PM</span>
+                <svg class="time-picker-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+                <input type="time" id="quickLogTimeInput" oninput="onQuickLogTimeInputChange(this.value)" onchange="onQuickLogTimeInputChange(this.value)" />
+              </div>
+            </div>
+          </div>
+
+          <div class="time-quick-bar">
+            <button type="button" class="time-chip-btn" onclick="applyQuickTime('quickLog', 0)">Now</button>
+            <button type="button" class="time-chip-btn" onclick="applyQuickTime('quickLog', -30)">&minus;30 min</button>
+            <button type="button" class="time-chip-btn" onclick="applyQuickTime('quickLog', -60)">&minus;1 hr</button>
+            <button type="button" class="time-chip-btn" id="quickLogTimeNotSureBtn" onclick="setTimeNotSure('quickLog')">Not sure</button>
+          </div>
+
+          <div id="quickLogPastTimePrompt" class="alert-box alert-warning" style="display:none; margin-top: 10px;">
+            <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;">
+              <span>What time did you eat this?</span>
+              <button type="button" class="btn-secondary btn-sm" onclick="setTimeNotSure('quickLog', true)">Not sure</button>
+            </div>
+          </div>
         </div>
 
         <div class="avg-strip" style="margin-bottom: 16px;">
@@ -3700,6 +4205,7 @@ STRICT OPERATING RULES:
         </div>
       `;
 
+      renderTimeControlUI('quickLog');
       updateQuickLogLivePreview();
       document.getElementById('quickLogModal').classList.add('open');
     }
@@ -3734,18 +4240,28 @@ STRICT OPERATING RULES:
       const s = state.staples.find(x => x.id === state.quickLogDraft.stapleId);
       if (!s) return;
 
+      const dateInputVal = document.getElementById('quickLogDateInput')?.value;
+      const targetDate = dateInputVal || state.quickLogDraft.date || state.currentDate || getLocalYYYYMMDD();
+      const isPastDay = targetDate !== getLocalYYYYMMDD();
+      const chosenTime = normalizeTimeHHMM(state.quickLogDraft.time);
+
+      if (isPastDay && !chosenTime && !state.quickLogDraft.timeConfirmedNull) {
+        const promptEl = document.getElementById('quickLogPastTimePrompt');
+        if (promptEl) promptEl.style.display = 'block';
+        showToast('What time did you eat this? Pick a time or tap "Not sure".');
+        return;
+      }
+
       const normalizedStaple = normalizeRecord(s);
       const chosenServings = Math.max(0.1, round2(Number(state.quickLogDraft.servings) || 1));
-      const dateInputVal = document.getElementById('quickLogDateInput')?.value;
-      const targetDate = dateInputVal || state.currentDate || getLocalYYYYMMDD();
 
-      // Deep-copy items so editing in the day's log never alters the saved staple
       const copiedItems = normalizedStaple.items.map(it => normalizeIngredientItem({ ...it }, it.isLabelData));
       const totals = computeItemsListTotals(copiedItems, chosenServings);
 
       const meal = {
         id: 'meal_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
         date: targetDate,
+        time: chosenTime,
         name: normalizedStaple.name,
         servings: chosenServings,
         cal: Math.round(totals.cal),
@@ -3763,7 +4279,7 @@ STRICT OPERATING RULES:
       await dbPut('meals', meal);
       closeQuickLogModal();
       state.currentDate = targetDate;
-      syncLogScreenDateLabels();
+      syncLogScreenDateLabels(true);
       showToast(`Logged "${meal.name}" to ${targetDate}`);
       switchTab('today');
     }
@@ -3780,7 +4296,7 @@ STRICT OPERATING RULES:
     }
 
     /********************************************************************
-     * 9. UNIFIED INGREDIENT & SERVINGS EDITOR MODAL (LOGGED & SAVED MEALS)
+     * 10. UNIFIED INGREDIENT, SERVINGS & TIME EDITOR MODAL
      ********************************************************************/
     function openEditMealModal(mealId) {
       const m = state.meals.find(x => x.id === mealId);
@@ -3792,6 +4308,8 @@ STRICT OPERATING RULES:
         targetId: m.id,
         name: normalized.name,
         servings: Number(normalized.servings) || 1,
+        time: normalizeTimeHHMM(normalized.time),
+        timeConfirmedNull: !normalizeTimeHHMM(normalized.time),
         items: normalized.items.map(it => normalizeIngredientItem({ ...it }, it.isLabelData))
       };
 
@@ -3810,6 +4328,8 @@ STRICT OPERATING RULES:
         targetId: s.id,
         name: normalized.name,
         servings: Number(normalized.servings) || 1,
+        time: null,
+        timeConfirmedNull: true,
         items: normalized.items.map(it => normalizeIngredientItem({ ...it }, it.isLabelData))
       };
 
@@ -3824,6 +4344,8 @@ STRICT OPERATING RULES:
         targetId: null,
         name: '',
         servings: 1,
+        time: null,
+        timeConfirmedNull: true,
         items: [
           normalizeIngredientItem({
             name: '',
@@ -3848,6 +4370,23 @@ STRICT OPERATING RULES:
     function renderUnifiedModalBody() {
       const isMealMode = state.modalEditor.mode === 'meal';
 
+      const timeEditHtml = isMealMode ? `
+        <div class="field">
+          <label for="modalTimeInput">Time eaten</label>
+          <div class="time-picker-wrap">
+            <span id="modalTime12HrDisplay" class="time-picker-12h-text">12:00 PM</span>
+            <svg class="time-picker-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+            <input type="time" id="modalTimeInput" oninput="onModalTimeInputChange(this.value)" onchange="onModalTimeInputChange(this.value)" />
+          </div>
+          <div class="time-quick-bar">
+            <button type="button" class="time-chip-btn" onclick="applyQuickTime('modal', 0)">Now</button>
+            <button type="button" class="time-chip-btn" onclick="applyQuickTime('modal', -30)">&minus;30 min</button>
+            <button type="button" class="time-chip-btn" onclick="applyQuickTime('modal', -60)">&minus;1 hr</button>
+            <button type="button" class="time-chip-btn" id="modalTimeNotSureBtn" onclick="setTimeNotSure('modal')">Not sure</button>
+          </div>
+        </div>
+      ` : '';
+
       const alsoUpdateSavedHtml = isMealMode ? `
         <label class="checkbox-row">
           <input type="checkbox" id="alsoUpdateSavedCheckbox" />
@@ -3866,6 +4405,8 @@ STRICT OPERATING RULES:
           <label for="modalItemTitleInput">Name</label>
           <input type="text" id="modalItemTitleInput" value="${escapeHtml(state.modalEditor.name)}" placeholder="e.g., Protein Shake or Chicken & Rice" oninput="state.modalEditor.name = this.value" />
         </div>
+
+        ${timeEditHtml}
 
         <div class="meal-servings-box">
           <div>
@@ -3895,6 +4436,9 @@ STRICT OPERATING RULES:
         </div>
       `;
 
+      if (isMealMode) {
+        renderTimeControlUI('modal');
+      }
       renderModalIngredientsList();
     }
 
@@ -3952,6 +4496,7 @@ STRICT OPERATING RULES:
         if (!meal) return;
 
         meal.name = finalName;
+        meal.time = normalizeTimeHHMM(state.modalEditor.time);
         meal.servings = mealServings;
         meal.cal = Math.round(totals.cal);
         meal.p = round1(totals.p);
@@ -4009,7 +4554,6 @@ STRICT OPERATING RULES:
         return;
       }
 
-      // Staple Edit or New Staple
       if (state.modalEditor.mode === 'staple') {
         const s = state.staples.find(x => x.id === state.modalEditor.targetId);
         if (!s) return;
@@ -4063,7 +4607,7 @@ STRICT OPERATING RULES:
     }
 
     /********************************************************************
-     * 10. SETTINGS & BACKUP REMINDER LOGIC ("No backup yet" vs ">7 days")
+     * 11. SETTINGS & BACKUP REMINDER LOGIC ("No backup yet" vs ">7 days")
      ********************************************************************/
     function renderSettingsScreen() {
       document.getElementById('settingsApiKey').value = state.settings.apiKey || '';
@@ -4165,7 +4709,7 @@ STRICT OPERATING RULES:
 
       const backupPayload = {
         app: 'Fuel-Trak',
-        version: '3.5',
+        version: '3.6',
         exportedAt: nowIso,
         settings: {
           targetCal: state.settings.targetCal,
@@ -4174,7 +4718,7 @@ STRICT OPERATING RULES:
           model: state.settings.model,
           lastBackupDate: state.settings.lastBackupDate
         },
-        meals: state.meals,
+        meals: state.meals.map(m => ({ ...m, time: normalizeTimeHHMM(m.time) })),
         staples: state.staples
       };
 
@@ -4204,7 +4748,7 @@ STRICT OPERATING RULES:
         await dbClear('meals');
         await dbClear('staples');
 
-        // Migrate any older backup entries seamlessly to base = 1 serving
+        // Migrate any older backup entries seamlessly (missing time becomes time = null)
         state.meals = data.meals.map(normalizeRecord);
         state.staples = data.staples.map(normalizeRecord);
 
@@ -4235,7 +4779,7 @@ STRICT OPERATING RULES:
     }
 
     /********************************************************************
-     * 11. SERVICE WORKER REGISTRATION & UPDATE BANNER
+     * 12. SERVICE WORKER REGISTRATION & UPDATE BANNER
      ********************************************************************/
     function registerServiceWorker() {
       if (!('serviceWorker' in navigator)) return;
@@ -4277,7 +4821,7 @@ STRICT OPERATING RULES:
     }
 
     /********************************************************************
-     * 12. HELPERS & BOOTSTRAP
+     * 13. HELPERS & BOOTSTRAP
      ********************************************************************/
     function escapeHtml(str) {
       return String(str ?? '')
@@ -4302,7 +4846,7 @@ STRICT OPERATING RULES:
       setupSpeechButtons();
       await loadAllStateFromDB();
       initStoragePersistence();
-      syncLogScreenDateLabels();
+      syncLogScreenDateLabels(true);
       renderLogIngredientsList();
       renderAnalysisMetaUI();
       renderTodayScreen();
